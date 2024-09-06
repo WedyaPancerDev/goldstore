@@ -1,0 +1,18 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "all": "concurrently \"vite\" \"php artisan serve --port=8120\"",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "axios": "^1.6.4",
+        "laravel-vite-plugin": "^1.0",
+        "vite": "^5.0",
+        "concurrently": "^8.2.2"
+    },
+    "dependencies": {
+        "chartjs-plugin-annotation": "^3.0.1"
+    }
+}
