@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title')
-CV. Tropikal Bali - Login
+Toko Emas - Login
 @endsection
 
 @section('content')
@@ -23,14 +23,24 @@ CV. Tropikal Bali - Login
                                 <p class="text-muted">Masuk untuk mengakses ke aplikasi.</p>
                             </div>
                             <!-- Sign in Form -->
-                            <form class="crancy-wc__form-main" action="index.html" method="post">
+                            <form class="crancy-wc__form-main"  action="{{ route('login') }}" method="post">
+                                @csrf
                                 <!-- Form Group -->
                                 <div class="form-group">
                                     <div class="form-group__input">
                                         <input class="crancy-wc__form-input fw-medium" type="username" name="username"
                                             placeholder="Username" />
                                     </div>
+
+                                    @if($errors->has('username'))
+                                    <div class="pt-2">
+                                        <span class="form-text fw-semibold text-danger">
+                                            {{ $errors->first('username') }}
+                                        </span>
+                                    </div>
+                                    @endif
                                 </div>
+
                                 <!-- Form Group -->
                                 <div class="form-group">
                                     <div class="form-group__input">
@@ -39,19 +49,17 @@ CV. Tropikal Bali - Login
                                         <span class="crancy-wc__toggle"><i class="fas fa-eye"
                                                 id="toggle-icon"></i></span>
                                     </div>
+
+                                    @if($errors->has('password'))
+                                    <div class="pt-2">
+                                        <span class="form-text fw-semibold text-danger">
+                                            {{ $errors->first('password') }}
+                                        </span>
+                                    </div>
+                                    @endif
                                 </div>
 
-                                <!-- Form Group -->
-                                <div class="form-group">
-                                    <div class="crancy-wc__check-inline">
-                                        <div class="crancy-wc__checkbox">
-                                            <input class="crancy-wc__form-check" id="checkbox" name="checkbox"
-                                                type="checkbox" />
-                                            <label for="checkbox">Ingat saya</label>
-                                        </div>
-                                        <div class="crancy-wc__forgot"></div>
-                                    </div>
-                                </div>
+                               
                                 <!-- Form Group -->
                                 <div class="form-group mg-top-30">
                                     <div class="crancy-wc__button">

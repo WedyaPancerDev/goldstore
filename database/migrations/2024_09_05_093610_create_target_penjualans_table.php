@@ -18,6 +18,7 @@ return new class extends Migration
                 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
             ]);
             $table->integer("total")->default(0);
+            $table->string("status")->default("TIDAK TERPENUHI");
             $table->timestamps();
         });
     }

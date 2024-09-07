@@ -16,6 +16,18 @@ class AuthenticatedController extends Controller
 
     public function store(Request $request)
     {
+        
+        $request->validate(
+            [
+                'username' => 'required|string|min:5', 
+                'password' => 'required',
+            ],
+            [
+                'username.required' => 'Username harus diisi.',
+                'username.username' => 'Username tidak valid.',
+                'password.required' => 'Password harus diisi.',
+            ]
+        );
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -48,5 +60,18 @@ class AuthenticatedController extends Controller
                     break;
             }
         }
+        return back()->with('error', 'Email atau password salah.');
+    }
+
+    public function destroy(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }
