@@ -12,7 +12,7 @@ class TransaksiPengeluaranController extends Controller
      */
     public function index()
     {
-        //
+        return view("pages.admin.transaksi-pengeluaran.index");
     }
 
     /**

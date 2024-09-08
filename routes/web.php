@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Controllers\AssignBonusController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\MasterBonusController;
+use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\TargetPenjualanController;
+use App\Http\Controllers\TransaksiPengeluaranController;
+use App\Models\AssignBonus;
+use App\Models\MasterBonus;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedController::class, 'index'])->name('ui.login');
@@ -18,7 +27,6 @@ Route::middleware(['auth'])->group(function () {
             'manajer' => route('manajer.root'),
             'akuntan' => route('akuntan.root'),
             'staff' => route('staff.root'),
-            default => null,
         };
 
         if (is_null($redirectRoute)) {
@@ -34,95 +42,80 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin', [DashboardController::class, 'indexAdmin'])->name('admin.root');
 
-        // pengguna
-        Route::get("/admin/pengguna", [DashboardController::class,""])->name("admin.manajement-pengguna.index");
-        // produk
-        Route::get('/admin/produk', [DashboardController::class,''])->name('admin.manajement-produk.index');
+        Route::resource('produk', ProdukController::class)->names([
+            'index' => 'manajemen-produk.index',
+            'create' => 'manajemen-produk.create',
+            'store' => 'manajemen-produk.store',
+            'edit' => 'manajemen-produk.edit',
+            'update' => 'manajemen-produk.update',
+            'destroy' => 'manajemen-produk.destroy',
+        ]);
 
-        // kategori
-        Route::get('/admin/kategori', [DashboardController::class,''])->name("admin.manajement-kategori.index");
+        Route::resource('pengguna', PenggunaController::class)->names([
+            'index' => 'manajemen-pengguna.index',
+            'store' => 'manajemen-pengguna.store',
+            'edit' => 'manajemen-pengguna.edit',
+            'update' => 'manajemen-pengguna.update',
+            'destroy' => 'manajemen-pengguna.destroy',
+        ]);
 
-        // master bonus
-        Route::get("/admin/master-bonus", [DashboardController::class,""])->name("admin.manajemen-master-bonus.index");
+        Route::resource('kategori', KategoriController::class)->names([
+            'index' => 'manajemen-kategori.index',
+            'create' => 'manajemen-kategori.create',
+            'store' => 'manajemen-kategori.store',
+            'edit' => 'manajemen-kategori.edit',
+            'update' => 'manajemen-kategori.update',
+            'destroy' => 'manajemen-kategori.destroy',
+        ]);
 
-        // asign bonnus
-        Route::get("/admin/asign-bonus", [DashboardController::class,""])->name("admin.manajement-asign-bonus.index");
+        Route::resource('master-bonus', MasterBonusController::class)->names([
+            'index' => 'manajemen-master-bonus.index',
+            'create' => 'manajemen-master-bonus.create',
+            'store' => 'manajemen-master-bonus.store',
+            'edit' => 'manajemen-master-bonus.edit',
+            'update' => 'manajemen-master-bonus.update',
+            'destroy' => 'manajemen-master-bonus.destroy',
+        ]);
 
-        // penjualan
-        Route::get("/admin/penjualan", [DashboardController::class,""])->name("admin.manajement-penjualan.index");
+        Route::resource('assign-bonus', AssignBonusController::class)->names([
+            'index' => 'manajemen-assign-bonus.index',
+            'create' => 'manajemen-assign-bonus.create',
+            'store' => 'manajemen-assign-bonus.store',
+            'edit' => 'manajemen-assign-bonus.edit',
+            'update' => 'manajemen-assign-bonus.update',
+            'destroy' => 'manajemen-assign-bonus.destroy',
+        ]);
 
-        // transaksi pengeluaran
-        Route::get("/admin/transaksi-pengeluaran", [DashboardController::class,""])->name("admin.manajement-asign-bonus.index");
+        Route::resource('target-penjualan', TargetPenjualanController::class)->names([
+            'index' => 'manajemen-target-penjualan.index',
+            'create' => 'manajemen-target-penjualan.create',
+            'store' => 'manajemen-target-penjualan.store',
+            'edit' => 'manajemen-target-penjualan.edit',
+            'update' => 'manajemen-target-penjualan.update',
+            'destroy' => 'manajemen-target-penjualan.destroy',
+        ]);
 
-        
+        Route::resource('transaksi-pengeluaran', TransaksiPengeluaranController::class)->names([
+            'index' => 'manajemen-transaksi-pengeluaran.index',
+            'create' => 'manajemen-transaksi-pengeluaran.create',
+            'store' => 'manajemen-transaksi-pengeluaran.store',
+            'edit' => 'manajemen-transaksi-pengeluaran.edit',
+            'update' => 'manajemen-transaksi-pengeluaran.update',
+            'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
+        ]);
     });
 
     Route::middleware(['role:manajer'])->group(function () {
-        Route::get('/manajer', [DashboardController::class, 'indexmanajer'])->name('manajer.root');
-
-          // pengguna
-          Route::get("/manajement/pengguna", [DashboardController::class,""])->name("manajement.manajement-pengguna.index");
-          // produk
-          Route::get('/manajement/produk', [DashboardController::class,''])->name('manajement.manajement-produk.index');
-  
-          // kategori
-          Route::get('/manajement/kategori', [DashboardController::class,''])->name("manajement.manajement-kategori.index");
-  
-          // master bonus
-          Route::get("/manajement/master-bonus", [DashboardController::class,""])->name("manajement.manajemen-master-bonus.index");
-  
-          // asign bonnus
-          Route::get("/manajement/asign-bonus", [DashboardController::class,""])->name("manajement.manajement-asign-bonus.index");
-  
-          // penjualan
-          Route::get("/manajement/penjualan", [DashboardController::class,""])->name("manajement.manajement-penjualan.index");
-  
-          // transaksi pengeluaran
-          Route::get("/manajement/transaksi-pengeluaran", [DashboardController::class,""])->name("manajement.manajement-asign-bonus.index");
+        Route::get('/manajer', [DashboardController::class, 'indexManajer'])->name('manajer.root');
     });
 
     Route::middleware(['role:akuntan'])->group(function () {
         Route::get('/akuntan', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
-
-          // pengguna
-          Route::get("/akuntan/pengguna", [DashboardController::class,""])->name("akuntan.manajement-pengguna.index");
-          // produk
-          Route::get('/akuntan/produk', [DashboardController::class,''])->name('akuntan.manajement-produk.index');
-  
-          // kategori
-          Route::get('/akuntan/kategori', [DashboardController::class,''])->name("akuntan.manajement-kategori.index");
-  
-          // master bonus
-          Route::get("/akuntan/master-bonus", [DashboardController::class,""])->name("akuntan.manajemen-master-bonus.index");
-  
-          // asign bonnus
-          Route::get("/akuntan/asign-bonus", [DashboardController::class,""])->name("akuntan.manajement-asign-bonus.index");
-  
-          // penjualan
-          Route::get("/akuntan/penjualan", [DashboardController::class,""])->name("akuntan.manajement-penjualan.index");
-  
-          // transaksi pengeluaran
-          Route::get("/akuntan/transaksi-pengeluaran", [DashboardController::class,""])->name("akuntan.manajement-asign-bonus.index");
     });
 
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff', [DashboardController::class, 'indexStaff'])->name('staff.root');
 
-          // pengguna
-          Route::get("/staff/pengguna", [DashboardController::class,""])->name("staff.manajement-pengguna.index");
-         
-          // master bonus
-          Route::get("/staff/master-bonus", [DashboardController::class,""])->name("staff.manajemen-master-bonus.index");
-  
-          // asign bonnus
-          Route::get("/staff/asign-bonus", [DashboardController::class,""])->name("staff.manajement-asign-bonus.index");
-  
-          // penjualan
-          Route::get("/staff/penjualan", [DashboardController::class,""])->name("staff.manajement-penjualan.index");
-  
-          // transaksi pengeluaran
-          Route::get("/staff/transaksi-pengeluaran", [DashboardController::class,""])->name("staff.manajement-asign-bonus.index");
     });
 
-   
 });

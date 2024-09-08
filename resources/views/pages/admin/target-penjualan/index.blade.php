@@ -1,12 +1,12 @@
 @extends('layouts.master')
 @section('title')
-Toko Emas - Produk
+Toko Emas - Target Penjualan
 @endsection
 
 @section('content')
 
 <div class="container container__bscreen mt-5 mx-4">
-    Produk
+    Target Penjualan
 </div>
 
 @endsection

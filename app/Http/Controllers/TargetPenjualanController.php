@@ -12,7 +12,7 @@ class TargetPenjualanController extends Controller
      */
     public function index()
     {
-        //
+        return view("pages.admin.target-penjualan.index");
     }
 
     /**

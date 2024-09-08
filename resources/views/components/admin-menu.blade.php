@@ -40,7 +40,7 @@
 
                 @hasanyrole('admin|akuntan|manajer')
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-pengguna.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-note fs-4 me-2"></i>
                             <span class="menu-bar__name fs-6 fw-medium">Pengguna</span>
@@ -49,7 +49,7 @@
                 </li>
             
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-kategori.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-package fs-4 me-2"></i>
                             <span class="menu-bar__name fs-6 fw-medium"> Kategori<span>
@@ -58,7 +58,7 @@
                 </li>
 
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-produk.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-package fs-4 me-2"></i>
                             <span class="menu-bar__name fs-6 fw-medium"> Produk</span>
@@ -67,7 +67,7 @@
                 </li>   
             
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-transaksi-pengeluaran.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-notebook fs-4 me-2"></i>
                             <span class="menu-bar__name fs-6 fw-medium"> T Pengeluran</span>
@@ -76,7 +76,7 @@
                 </li>
             
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-master-bonus.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-note fs-4 me-2"></i>
                             <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
@@ -85,19 +85,19 @@
                 </li>
             
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-assign-bonus.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-note fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Asign Bonus</span>
+                            <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
                         </span>
                     </a>
                 </li>
             
                 <li class="pb-2">
-                    <a class="collapsed links px-2" href="#">
+                    <a class="collapsed links px-2" href="{{route("manajemen-target-penjualan.index")}}">
                         <span class="menu-bar__text d-flex">
                             <i class="ph ph-note fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Penjualan</span>
+                            <span class="menu-bar__name fs-6 fw-medium">Target Penjualan</span>
                         </span>
                     </a>
                 </li>

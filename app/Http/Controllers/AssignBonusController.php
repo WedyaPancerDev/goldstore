@@ -12,7 +12,7 @@ class AssignBonusController extends Controller
      */
     public function index()
     {
-        //
+        return view("pages.admin.assign-bonus.index");
     }
 
     /**

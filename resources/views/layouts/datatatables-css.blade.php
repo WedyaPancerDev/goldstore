@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatables.min.css') }}">
