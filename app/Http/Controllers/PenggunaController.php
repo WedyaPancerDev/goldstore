@@ -17,31 +17,64 @@ class PenggunaController extends Controller
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
             ->select([
-                'users.id', 'users.username', 'users.fullname', 'users.account_status',
-                'users.last_login', 'users.created_at', 'roles.name as role'
+                'users.id',
+                'users.username',
+                'users.fullname',
+                'users.account_status',
+                'users.last_login',
+                'users.created_at',
+                'users.is_deleted',
+                'roles.name as role'
             ])
             ->orderBy('users.created_at', 'asc')
             ->get();
 
         return view('pages.admin.pengguna.index', compact('users'));
-
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-    }
+
+
+     public function store(Request $request)
+     {
+         $request->validate([
+             'fullname' => 'required|string|max:255',
+             'username' => 'required|string|max:255|unique:users',
+             'password' => 'required|string|min:8',
+             'role' => 'required|string|in:manajer,akuntan,staff', 
+             'account_status' => 'nullable|string|in:active,inactive', 
+         ]);
+     
+        
+         DB::transaction(function () use ($request) {
+            
+             $user = User::create([
+                 'fullname' => $request->fullname,
+                 'username' => $request->username,
+                 'password' => bcrypt($request->password),
+                 'account_status' => $request->account_status ?? 'active', 
+                 'is_login' => null,
+                 'created_at' => now(),
+                 'is_delete' => 0,
+             ]);
+     
+             DB::table('model_has_roles')->insert([
+                 'role_id' => DB::table('roles')->where('name', $request->role)->value('id'),
+                 'model_type' => User::class,
+                 'model_id' => $user->id,
+             ]);
+         });
+     
+         return redirect()->route('manajemen-pengguna.index')->with('success','penggua berhasil ditambah');
+     }
+     
 
     /**
      * Display the specified resource.
