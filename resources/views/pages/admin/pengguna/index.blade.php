@@ -4,11 +4,10 @@ Toko Emas - Pengguna
 @endsection
 
 @section('title-section')
-    Pengguna
+Pengguna
 @endsection
 
 @section('css')
-    @include('layouts.datatatables-css')
 @endsection
 
 @section('content')
@@ -33,13 +32,12 @@ Toko Emas - Pengguna
                 <div class="crancy-table-meta mg-top-30">
                     <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
                         <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                            data-bs-target="#management-produk-create">
+                            data-bs-target="#management-pengguna-create">
                             <i class="ph ph-plus fs-5"></i>
-                            Tambah produk
+                            Tambah Pengguna
                         </button>
                     </div>
                 </div>
-
 
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="crancy-table-tab-1" role="tabpanel"
@@ -68,9 +66,6 @@ Toko Emas - Pengguna
                                         <th class="crancy-table__column-2 crancy-table__h2">
                                             Nama Lengkap
                                         </th>
-                                        <th class="crancy-table__column-3 crancy-table__h3">
-                                            Username
-                                        </th>
                                         <th class="crancy-table__column-4 crancy-table__h4">
                                             Role
                                         </th>
@@ -98,17 +93,12 @@ Toko Emas - Pengguna
                                         </td>
                                         <td class="crancy-table__column-2 fw-semibold">
                                             {{ $user->fullname ?? '-' }}
-
-                                        </td>
-                                        <td class="crancy-table__column-3 fw-semibold">
-                                            {{ $user->username ?? '-' }}
-
                                         </td>
                                         <td class="crancy-table__column-4 fw-semibold">
                                             <div
-                                            class="crancy-table__status crancy-table__status--unpaid fw-semibold text-capitalize">
-                                            {{ $user->role }}
-                                        </div>
+                                                class="crancy-table__status crancy-table__status--unpaid fw-semibold text-capitalize">
+                                                {{ $user->role }}
+                                            </div>
 
                                         </td>
                                         <td class="crancy-table__column-5 fw-semibold">
@@ -129,7 +119,7 @@ Toko Emas - Pengguna
                                             {{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}
                                         </td>
                                         <td class="crancy-table__column-7 fw-semibold">
-                                           
+
                                             {{ \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') ?? '-' }}
 
                                         </td>
@@ -140,8 +130,7 @@ Toko Emas - Pengguna
                                                     Edit
                                                 </button>
 
-                                                <form action=""
-                                                    method="POST">
+                                                <form action="" method="POST">
                                                     @csrf
                                                     @method('DELETE')
 
@@ -181,5 +170,5 @@ Toko Emas - Pengguna
 @endsection
 
 @section('scripts')
-    @include('layouts.datatables-scripts')
+@include('layouts.datatables-scripts')
 @endsection

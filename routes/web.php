@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::middleware(['role:admin'])->group(function () {
-        Route::get('/admin', [DashboardController::class, 'indexAdmin'])->name('admin.root');
+        Route::get('/admin/dashboard', [DashboardController::class, 'indexAdmin'])->name('admin.root');
 
         Route::resource('produk', ProdukController::class)->names([
             'index' => 'manajemen-produk.index',
@@ -106,15 +106,15 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:manajer'])->group(function () {
-        Route::get('/manajer', [DashboardController::class, 'indexManajer'])->name('manajer.root');
+        Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
     });
 
     Route::middleware(['role:akuntan'])->group(function () {
-        Route::get('/akuntan', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
+        Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
     });
 
     Route::middleware(['role:staff'])->group(function () {
-        Route::get('/staff', [DashboardController::class, 'indexStaff'])->name('staff.root');
+        Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
 
     });
 

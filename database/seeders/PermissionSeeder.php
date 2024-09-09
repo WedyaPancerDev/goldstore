@@ -32,8 +32,6 @@ class PermissionSeeder extends Seeder
         $currentAkuntan = User::find(3);
         $currentStaff = User::find(4);
 
-
-
         $currentAdmin->assignRole('admin');
         $currentManajer->assignRole('manajer');
         $currentAkuntan->assignRole('akuntan');

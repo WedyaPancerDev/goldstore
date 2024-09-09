@@ -17,3 +17,82 @@
         scrollbar-color: #6baf8d #fff;
     }
 }
+
+.scroll-x {
+    overflow-x: scroll;
+}
+
+.btn-cst {
+    height: 35px !important;
+    font-size: 14px !important;
+}
+
+.links {
+    border-radius: 10px;
+    transition: background-color 0.3s;
+}
+
+.crancy-adashboard {
+    padding-right: 40px !important;
+}
+
+.links:hover {
+    background-color: #f3f4f6;
+}
+
+.active-bg {
+    background-color: #f3f4f6;
+}
+
+.border-r {
+    border-right: none;
+}
+
+.fw-semibold {
+    font-weight: 600 !important;
+}
+
+@media screen and (min-width: 768px) {
+    .border-r {
+        border-right: 1.5px solid #e2e8f0;
+    }
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px !important;
+}
+
+input.form-file {
+    padding: 10px 10px !important;
+}
+
+.produk-qty-title {
+    letter-spacing: -0.06em;
+    font-weight: 800;
+}
+
+.card-rounded {
+    cursor: pointer;
+    border-radius: 14px !important;
+    transition: box-shadow 0.3s;
+}
+
+.shadow-cst:hover {
+    box-shadow: 3px 3px 3px rgba(169, 171, 178, 0.03),
+        13px 10px 11px rgba(169, 171, 178, 0.05),
+        30px 23px 24px rgba(169, 171, 178, 0.08);
+}
+
+.border-label-cst {
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.form-group-item-produk {
+    padding: 10px 0;
+    margin-bottom: 10px;
+    border-top: 1px dashed #111;
+    border-bottom: 1px dashed #111;
+}

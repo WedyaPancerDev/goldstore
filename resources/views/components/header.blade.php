@@ -10,7 +10,7 @@
                         </div>
                         <div class="crancy-header__heading">
                             <h3 class="crancy-header__title m-0">
-                                Dashboard - Sales
+                                @yield('title-section')
                             </h3>
                             <p class="crancy-header__text">
                                 Let's check your store today
@@ -21,17 +21,9 @@
                             <div class="crancy-header__nav-bottom">
                                 <!-- Logo -->
                                 <div class="logo crancy-sidebar-padding">
-                                    <a class="crancy-logo" href="index.html">
+                                    <a class="crancy-logo">
                                         <!-- Logo for Default -->
-                                        <img class="crancy-logo__main" src="{{ URL::asset('assets/img/logo.png') }}"
-                                            alt="#" />
-                                        <img class="crancy-logo__main--dark"
-                                            src="{{ URL::asset('assets/img/logo/dark.png') }}" alt="#" />
-                                        <!-- Logo for Dark Version -->
-                                        <img class="crancy-logo__main--small"
-                                            src="{{ URL::asset('assets/img/logo-icon.png') }}" alt="#" />
-                                        <img class="crancy-logo__main--small--dark"
-                                            src="{{ URL::asset('assets/img/img/logo-icon-dark.png') }}" alt="#" />
+                                        <img src="{{ URL::asset('assets/img/favicon.svg') }}" alt="#" />
                                     </a>
                                 </div>
                             </div>
@@ -74,19 +66,9 @@
                                                                 Profile
                                                             </a>
                                                         </li>
+
                                                         <li>
-                                                            <a href="#">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none">
-                                                                    <path
-                                                                        d="M2 12V7C2 4.79086 3.79086 3 6 3H18C20.2091 3 22 4.79086 22 7V17C22 19.2091 20.2091 21 18 21H8M6 8L9.7812 10.5208C11.1248 11.4165 12.8752 11.4165 14.2188 10.5208L18 8M2 15H8M2 18H8"
-                                                                        stroke-width="1.5" stroke-linecap="round" />
-                                                                </svg>
-                                                                Inbox
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a  id="logout" href="#">
+                                                            <a id="logout" href="">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                     height="24" viewBox="0 0 24 24" fill="none">
                                                                     <path
@@ -97,15 +79,7 @@
                                                             </a>
                                                         </li>
                                                     </ul>
-                                                    <ul class="crancy-dmpage">
-                                                        <li>
-                                                            <a href="#">Privacy
-                                                                Policy</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#">About</a>
-                                                        </li>
-                                                    </ul>
+
                                                 </div>
                                             </div>
                                             <!-- End Dropdown List -->
