@@ -31,7 +31,7 @@ Pengguna
             <div class="crancy-dsinner">
                 <div class="crancy-table-meta mg-top-30">
                     <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                        <button type="button" class="crancy-btn crancy-btn__filter"  data-bs-toggle="modal"
+                        <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                             data-bs-target="#management-user-create">
                             <i class="ph ph-plus fs-5"></i>
                             Tambah Pengguna
@@ -119,9 +119,11 @@ Pengguna
                                             {{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}
                                         </td>
                                         <td class="crancy-table__column-7 fw-semibold">
-
+                                            @if($user->last_login == null)
+                                            -
+                                            @else
                                             {{ \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') ?? '-' }}
-
+                                            @endif
                                         </td>
                                         <td class="crancy-table__column-8">
                                             <div class="d-flex align-items-center gap-2">
@@ -131,8 +133,7 @@ Pengguna
                                                 </button>
 
                                                 @if($user->account_status != 'active')
-                                                <form action=""
-                                                    method="POST">
+                                                <form action="" method="POST">
                                                     @csrf
                                                     @method('PATCH')
 
@@ -142,8 +143,7 @@ Pengguna
                                                     </button>
                                                 </form>
                                                 @else
-                                                <form action=""
-                                                    method="POST">
+                                                <form action="" method="POST">
                                                     @csrf
                                                     @method('DELETE')
 
@@ -174,55 +174,56 @@ Pengguna
 <div id="management-user-create" class="modal fade" tabindex="-1" aria-labelledby="management-user" aria-hidden="true"
     style="display: none;">
     <div class="modal-dialog modal-dialog-scrollable">
-        <form method="POST" action="{{ route('manajemen-pengguna.store') }}" class="modal-content" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('manajemen-pengguna.store') }}" class="modal-content"
+            enctype="multipart/form-data">
             @csrf
             <div class="modal-header">
                 <h5 class="modal-title fs-6" id="management-user">Tambah Pengguna Baru</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        
+
             <div class="modal-body p-4">
                 <div class="mb-3 form-group">
                     <label class="form-label" for="fullname">Nama Lengkap <span class="text-danger">*</span></label>
-                    <input id="fullname" class="crancy-wc__form-input fw-semibold" type="text"
-                        name="fullname" placeholder="Masukan nama lengkap" required />
+                    <input id="fullname" class="crancy-wc__form-input fw-semibold" type="text" name="fullname"
+                        placeholder="Masukan nama lengkap" required />
                     @if($errors->has('fullname'))
-                        <div class="pt-2">
-                            <span class="form-text fw-semibold text-danger">
-                                {{ $errors->first('fullname') }}
-                            </span>
-                        </div>
+                    <div class="pt-2">
+                        <span class="form-text fw-semibold text-danger">
+                            {{ $errors->first('fullname') }}
+                        </span>
+                    </div>
                     @endif
                 </div>
-        
+
                 <div class="mb-3 form-group">
                     <label class="form-label" for="username">Username <span class="text-danger">*</span></label>
-                    <input id="username" class="crancy-wc__form-input fw-semibold" type="text"
-                        name="username" placeholder="Masukan Username" required />
+                    <input id="username" class="crancy-wc__form-input fw-semibold" type="text" name="username"
+                        placeholder="Masukan Username" required />
                     @if($errors->has('username'))
-                        <div class="pt-2">
-                            <span class="form-text fw-semibold text-danger">
-                                {{ $errors->first('username') }}
-                            </span>
-                        </div>
+                    <div class="pt-2">
+                        <span class="form-text fw-semibold text-danger">
+                            {{ $errors->first('username') }}
+                        </span>
+                    </div>
                     @endif
                 </div>
-        
+
                 <!-- Tambahkan input untuk password -->
                 <div class="mb-3 form-group">
                     <label class="form-label" for="password">Password <span class="text-danger">*</span></label>
-                    <input id="password" class="crancy-wc__form-input fw-semibold" type="password"
-                        name="password" placeholder="Masukan password" required />
-                        
+                    <input id="password" class="crancy-wc__form-input fw-semibold" type="password" name="password"
+                        placeholder="Masukan password" required />
+
                     @if($errors->has('password'))
-                        <div class="pt-2">
-                            <span class="form-text fw-semibold text-danger">
-                                {{ $errors->first('password') }}
-                            </span>
-                        </div>
+                    <div class="pt-2">
+                        <span class="form-text fw-semibold text-danger">
+                            {{ $errors->first('password') }}
+                        </span>
+                    </div>
                     @endif
                 </div>
-        
+
                 <div class="mb-3 form-group">
                     <label class="form-label" for="role">Pilih Role <span class="text-danger">*</span></label>
                     <select id="role" class="form-select crancy__item-input fw-semibold" name="role">
@@ -232,15 +233,15 @@ Pengguna
                         <option value="staff">Staff</option>
                     </select>
                     @if($errors->has('role'))
-                        <div class="pt-2">
-                            <span class="form-text fw-semibold text-danger">
-                                {{ $errors->first('role') }}
-                            </span>
-                        </div>
+                    <div class="pt-2">
+                        <span class="form-text fw-semibold text-danger">
+                            {{ $errors->first('role') }}
+                        </span>
+                    </div>
                     @endif
                 </div>
             </div>
-        
+
             <div class="modal-footer">
                 <button id="btn-submit" type="submit" class="btn btn-primary">Tambah Pengguna</button>
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
