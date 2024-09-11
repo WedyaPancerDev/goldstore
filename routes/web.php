@@ -51,13 +51,16 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-produk.destroy',
         ]);
 
+
         Route::resource('pengguna', PenggunaController::class)->names([
             'index' => 'manajemen-pengguna.index',
             'store' => 'manajemen-pengguna.store',
             'edit' => 'manajemen-pengguna.edit',
             'update' => 'manajemen-pengguna.update',
-            'destroy' => 'manajemen-pengguna.destroy',
         ]);
+
+        Route::delete("/admin/manajemen-pengguna/{id}/delete", [PenggunaController::class, 'destroy'])->name("admin.manajemen-pengguna.destroy");
+        Route::patch("/admin/manajemen-pengguna/{id}/restore", [PenggunaController::class, 'restore'])->name("admin.manajemen-pengguna.restore");
 
         Route::resource('kategori', KategoriController::class)->names([
             'index' => 'manajemen-kategori.index',

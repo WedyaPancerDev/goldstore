@@ -105,6 +105,24 @@ class PenggunaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        User::where('id', $id)->update([
+            'is_deleted' => true,
+            'account_status' => 'inactive'
+        ]);
+
+        return redirect()->route('manajemen-pengguna.index')->with('success','Data pengguna berhasil dinonaktifkan.');
+
+        
+    }
+
+    public function restore(string $id)
+    {
+        User::where('id', $id)->update([
+            'is_deleted' => false,
+            'account_status' => 'active'
+        ]);
+
+        return redirect()->route('manajemen-pengguna.index')->with('success','Data pengguna berhasil diaktifkan.');
+
     }
 }
