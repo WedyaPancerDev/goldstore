@@ -105,6 +105,7 @@ Toko Emas - Kategori
     </div>
 </section>
 
+
 <!-- Modal Tambah Kategori -->
 <div id="addKategoriModal" class="modal fade" tabindex="-1" aria-labelledby="addKategoriModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
