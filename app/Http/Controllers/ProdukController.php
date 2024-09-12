@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProdukController extends Controller
 {
@@ -12,7 +14,9 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        return view("pages.admin.produk.index");
+        $produks = Produk::with('kategori')->get();
+        $kategoris = Kategori::all();
+        return view("pages.admin.produk.index", compact('produks', 'kategoris'));
     }
 
     /**
@@ -28,7 +32,31 @@ class ProdukController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request);
+        $validated = $request->validate([
+            'nama' => 'required',
+            'kode_produk' => 'required|unique:produk',
+            'satuan' => 'required',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'deskripsi' => 'nullable',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stok' => 'required|numeric',
+            'kategori_id' => 'required',
+        ]);
+    
+        $validated['created_by'] = Auth::user()->id;
+    
+        if ($request->hasFile('foto')) {
+            $image = $request->file('foto');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $validated['foto'] = $imageName;
+        }
+    
+        Produk::create($validated);
+    
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
 
     /**
@@ -52,7 +80,34 @@ class ProdukController extends Controller
      */
     public function update(Request $request, Produk $produk)
     {
-        //
+
+        $produk = Produk::findOrFail($id);
+
+    $validated = $request->validate([
+        'nama' => 'required',
+        'kode_produk' => "required|unique:produks,kode_produk,{$id}",
+        'satuan' => 'required',
+        'harga_beli' => 'required|numeric',
+        'harga_jual' => 'required|numeric',
+        'deskripsi' => 'nullable',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'stok' => 'required|numeric',
+        'created_by' => 'required',
+        'kategori_id' => 'required',
+    ]);
+
+    // Handle image upload
+    if ($request->hasFile('foto')) {
+        $image = $request->file('foto');
+        $imageName = time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imageName);
+        $validated['foto'] = $imageName;
+    }
+
+    $produk->update($validated);
+
+    return redirect()->back()->with('success', 'Produk berhasil diupdate');
+
     }
 
     /**
@@ -60,6 +115,8 @@ class ProdukController extends Controller
      */
     public function destroy(Produk $produk)
     {
-        //
+        $produk->delete();
+
+        return redirect()->route('manajemen-produk.index')->with('success', 'Produk berhasil dihapus');
     }
 }

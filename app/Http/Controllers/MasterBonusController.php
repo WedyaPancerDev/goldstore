@@ -12,7 +12,8 @@ class MasterBonusController extends Controller
      */
     public function index()
     {
-        return view("pages.admin.master-bonus.index");
+        $bonuses = MasterBonus::all();
+        return view("pages.admin.master-bonus.index", compact('bonuses'));
     }
 
     /**
@@ -28,7 +29,18 @@ class MasterBonusController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'nama' => 'required|string|max:255',  
+            'total' => 'required|numeric|min:0',
+        ]);
+
+        MasterBonus::create([
+            'nama' => $request->input('nama'),   
+            'total' => $request->input('total'),
+        ]);
+
+        return redirect()->route('manajemen-master-bonus.index')->with('success', 'Bonus berhasil ditambahkan.');
     }
 
     /**
@@ -52,7 +64,18 @@ class MasterBonusController extends Controller
      */
     public function update(Request $request, MasterBonus $masterBonus)
     {
-        //
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'total' => 'required|numeric|min:0',
+        ]);
+
+        $masterBonus->update([
+            'nama' => $request->input('nama'),  
+            'total' => $request->input('total'),
+        ]);
+
+        return redirect()->route('manajemen-master-bonus.index')->with('success', 'Bonus berhasil diperbarui.');
     }
 
     /**
@@ -60,6 +83,9 @@ class MasterBonusController extends Controller
      */
     public function destroy(MasterBonus $masterBonus)
     {
-        //
+
+        $masterBonus->delete();
+
+        return redirect()->route('manajemen-master-bonus.index')->with('success', 'Bonus berhasil dihapus.');
     }
 }
