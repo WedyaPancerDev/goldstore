@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Text;
 use App\Models\Produk;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
@@ -16,7 +18,11 @@ class ProdukController extends Controller
     {
         $produks = Produk::with('kategori')->get();
         $kategoris = Kategori::all();
-        return view("pages.admin.produk.index", compact('produks', 'kategoris'));
+
+        // Example generate code
+        // $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+
+        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk'));
     }
 
     /**
@@ -32,30 +38,34 @@ class ProdukController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
         $validated = $request->validate([
             'nama' => 'required',
-            'kode_produk' => 'required|unique:produk',
             'satuan' => 'required',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
             'deskripsi' => 'nullable',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'stok' => 'required|numeric',
             'kategori_id' => 'required',
         ]);
-    
+
+        // Example using storeAs and save the image to storage folder `photos/product`
+        // Before that, you must run `php artisan storage:link` to create a symbolic link
+
+        $validated['kode_produk'] = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
         $validated['created_by'] = Auth::user()->id;
-    
-        if ($request->hasFile('foto')) {
-            $image = $request->file('foto');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $validated['foto'] = $imageName;
-        }
-    
+        $image = $request->file('foto');
+
+        $fileName = time() . str($request->nama)->slug();
+        $resultFile = $image
+            ? $image->storeAs('photos/product', "{$fileName}.{$image->extension()}")
+            : null;
+
+        $baseUrl = Storage::url($resultFile);
+
+        $validated['foto'] = $baseUrl;
         Produk::create($validated);
-    
+
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
 
@@ -80,34 +90,31 @@ class ProdukController extends Controller
      */
     public function update(Request $request, Produk $produk)
     {
+        $produk = Produk::findOrFail($produk->id);
 
-        $produk = Produk::findOrFail($id);
+        $validated = $request->validate([
+            'nama' => 'required',
+            'satuan' => 'required',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'deskripsi' => 'nullable',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'stok' => 'required|numeric',
+            'created_by' => 'required',
+            'kategori_id' => 'required',
+        ]);
 
-    $validated = $request->validate([
-        'nama' => 'required',
-        'kode_produk' => "required|unique:produks,kode_produk,{$id}",
-        'satuan' => 'required',
-        'harga_beli' => 'required|numeric',
-        'harga_jual' => 'required|numeric',
-        'deskripsi' => 'nullable',
-        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'stok' => 'required|numeric',
-        'created_by' => 'required',
-        'kategori_id' => 'required',
-    ]);
-
-    // Handle image upload
-    if ($request->hasFile('foto')) {
         $image = $request->file('foto');
-        $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('images'), $imageName);
-        $validated['foto'] = $imageName;
-    }
+        $fileName = time() . str($request->nama)->slug();
 
-    $produk->update($validated);
+        $resultFile = $image
+            ? Storage::url($image->storeAs('photos/product', "{$fileName}.{$image->extension()}"))
+            : $produk->foto;
 
-    return redirect()->back()->with('success', 'Produk berhasil diupdate');
+        $validated['foto'] = $resultFile;
 
+        $produk->update($validated);
+        return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
     /**
