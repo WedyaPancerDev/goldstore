@@ -20,7 +20,7 @@ class ProdukController extends Controller
         $kategoris = Kategori::all();
 
         // Example generate code
-        // $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+        $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
 
         return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk'));
     }
@@ -44,13 +44,10 @@ class ProdukController extends Controller
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
             'deskripsi' => 'nullable',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'stok' => 'required|numeric',
             'kategori_id' => 'required',
         ]);
-
-        // Example using storeAs and save the image to storage folder `photos/product`
-        // Before that, you must run `php artisan storage:link` to create a symbolic link
 
         $validated['kode_produk'] = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
         $validated['created_by'] = Auth::user()->id;
@@ -60,9 +57,9 @@ class ProdukController extends Controller
         $resultFile = $image
             ? $image->storeAs('photos/product', "{$fileName}.{$image->extension()}")
             : null;
-
+            
         $baseUrl = Storage::url($resultFile);
-
+        
         $validated['foto'] = $baseUrl;
         Produk::create($validated);
 
@@ -90,19 +87,17 @@ class ProdukController extends Controller
      */
     public function update(Request $request, Produk $produk)
     {
-        $produk = Produk::findOrFail($produk->id);
-
         $validated = $request->validate([
             'nama' => 'required',
             'satuan' => 'required',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
             'deskripsi' => 'nullable',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'stok' => 'required|numeric',
-            'created_by' => 'required',
             'kategori_id' => 'required',
         ]);
+
 
         $image = $request->file('foto');
         $fileName = time() . str($request->nama)->slug();
@@ -113,7 +108,7 @@ class ProdukController extends Controller
 
         $validated['foto'] = $resultFile;
 
-        $produk->update($validated);
+        $produk->update($validated); 
         return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
