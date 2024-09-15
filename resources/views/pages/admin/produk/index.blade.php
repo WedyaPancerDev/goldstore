@@ -96,15 +96,28 @@ Toko Emas - Produk
                                             <td class="crancy-table__column-5 text-center">
                                                 <div class="d-flex align-items-center gap-2 justify-content-center">
                                                     <button type="button" class="btn-view btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2"
-                                                        data-id="{{ $item->id }}" data-nama="{{ $item->nama }}" data-kode_produk="{{ $item->kode_produk }}" 
-                                                        data-satuan="{{ $item->satuan }}" data-harga_beli="{{ $item->harga_beli }}" data-harga_jual="{{ $item->harga_jual }}"
-                                                        data-deskripsi="{{ $item->deskripsi }}" data-foto="{{ $item->foto }}" data-stok="{{ $item->stok }}" 
+                                                        data-id="{{ $item->id }}" 
+                                                        data-nama="{{ $item->nama }}" 
+                                                        data-kode_produk="{{ $item->kode_produk }}" 
+                                                        data-satuan="{{ $item->satuan }}" 
+                                                        data-harga_beli="{{ $item->harga_beli }}" data-harga_jual="{{ $item->harga_jual }}"
+                                                        data-deskripsi="{{ $item->deskripsi }}" 
+                                                        data-foto="{{ $item->foto }}" 
+                                                        data-stok="{{ $item->stok }}" 
                                                         data-kategori="{{ $item->kategori->nama }}" data-bs-toggle="modal" data-bs-target="#viewProdukModal">
                                                         Detail
                                                     </button>
                                                     <button type="button" class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                        data-id="{{ $item->id }}" data-nama="{{ $item->nama }}" data-harga_jual="{{ $item->harga_jual }}" 
-                                                        data-stok="{{ $item->stok }}" data-kategori_id="{{ $item->kategori_id }}" data-bs-toggle="modal" 
+                                                        data-id="{{ $item->id }}" data-nama="{{ $item->nama }}" data-nama="{{ $item->nama }}" 
+                                                        data-kode_produk="{{ $item->kode_produk }}"
+                                                        data-satuan="{{ $item->satuan }}" 
+                                                        data-harga_beli="{{ $item->harga_beli }}" 
+                                                        data-harga_jual="{{ $item->harga_jual }}"
+                                                        data-stok="{{ $item->stok }}" 
+                                                        data-deskripsi="{{ $item->deskripsi }}" 
+                                                        data-kategori_id="{{ $item->kategori_id }}" 
+                                                        data-foto="{{ $item->foto }}"
+                                                        data-bs-toggle="modal" 
                                                         data-bs-target="#editProdukModal">
                                                         Edit
                                                     </button>
@@ -153,7 +166,9 @@ Toko Emas - Produk
 
                 <div class="mb-3 d-flex justify-content-center">
                     {{-- <label class="form-label fw-bold">Foto Produk:</label> --}}
-                    <img id="viewFotoProduk" src="" alt="Foto Produk" width="200" class="border rounded-3" />
+                    
+                    <img id="viewFotoProduk" src="" alt="Foto Produk" width="200" class="border rounded-3"/>
+                    
                 </div>                
 
                 <div class="mb-3">
@@ -218,12 +233,7 @@ Toko Emas - Produk
                     <input id="nama" class="crancy-wc__form-input fw-semibold" type="text" name="nama" placeholder="Masukan nama produk" required />
                 </div>
                 
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="kode_produk">Kode Produk <span class="text-danger">*</span></label>
-                    <input id="kode_produk" class="crancy-wc__form-input fw-semibold" type="text" name="kode_produk" placeholder="Masukan kode produk" required />
-                </div>
-
-                <div class="mb-3 form-group">
+                <div class="mb-5 pb-3 form-group">
                     <label class="form-label" for="satuan">Satuan <span class="text-danger">*</span></label>
                     <select id="satuan" class="form-select crancy__item-input fw-semibold" name="satuan" required>
                         <option value="" disabled selected>Pilih Satuan</option>
@@ -259,9 +269,12 @@ Toko Emas - Produk
 
                 <div class="mb-3 form-group">
                     <label class="form-label" for="foto">Foto Produk</label>
-                    <input id="foto" class="crancy-wc__form-input fw-semibold" type="file" name="foto" />
+                    <label for="foto" class="btn btn-light rounded-3 py-3 w-100 fw-semibold">
+                        Pilih File
+                    </label>
+                    <input id="foto" class="form-control" type="file" name="foto" style="display: none;" />
                 </div>
-
+                
                 <div class="mb-3 form-group">
                     <label class="form-label" for="stok">Stok <span class="text-danger">*</span></label>
                     <input id="stok" class="crancy-wc__form-input fw-semibold" type="number" name="stok" placeholder="Masukan stok" required />
@@ -304,14 +317,11 @@ Toko Emas - Produk
                     <input id="editNamaProduk" class="crancy-wc__form-input fw-semibold" type="text" name="nama" placeholder="Masukan nama produk" required />
                 </div>
                 
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="editKodeProduk">Kode Produk <span class="text-danger">*</span></label>
-                    <input id="editKodeProduk" class="crancy-wc__form-input fw-semibold" type="text" name="kode_produk" placeholder="Masukan kode produk" required />
-                </div>
 
-                <div class="mb-3 form-group">
+                <div class="mb-5 form-group">
                     <label class="form-label" for="editSatuan">Satuan <span class="text-danger">*</span></label>
                     <select id="editSatuan" class="form-select crancy__item-input fw-semibold" name="satuan" required>
+                        <option value="" disabled selected>Pilih Satuan</option>
                         <option value="pcs">Pieces</option>
                         <option value="kg">Kilogram</option>
                         <option value="gr">Gram</option>
@@ -329,7 +339,7 @@ Toko Emas - Produk
 
                 <div class="mb-3 form-group">
                     <label class="form-label" for="editHargaBeli">Harga Beli <span class="text-danger">*</span></label>
-                    <input id="editHargaBeli" class="crancy-wc__form-input fw-semibold" type="number" name="harga_beli" required />
+                    <input id="editHargaBeli" class="crancy-wc__form-input fw-semibold" type="number" name="harga_beli" value="editHargaBeli" required />
                 </div>
 
                 <div class="mb-3 form-group">
@@ -344,7 +354,10 @@ Toko Emas - Produk
 
                 <div class="mb-3 form-group">
                     <label class="form-label" for="editFoto">Foto Produk</label>
-                    <input id="editFoto" class="crancy-wc__form-input fw-semibold" type="file" name="foto" />
+                    <label for="editFoto" class="btn btn-light rounded-3 py-3 w-100 fw-semibold">
+                        Pilih File
+                    </label>
+                    <input id="editFoto" class="form-control" type="file" name="foto" style="display: none;" />
                     <img id="fotoPreview" src="" alt="Preview Foto" width="100" />
                 </div>
 
@@ -400,7 +413,7 @@ Toko Emas - Produk
         $('#editKategoriId').val(kategori_id);
 
         if (foto) {
-            $('#fotoPreview').attr('src', '/storage/images/' + foto);
+            $('#fotoPreview').attr('src', foto);
         } else {
             $('#fotoPreview').attr('src', '');
         }
@@ -416,7 +429,6 @@ Toko Emas - Produk
         reader.readAsDataURL(this.files[0]);
     });
 });
-
 
 
 $(document).ready(function(){
@@ -442,9 +454,11 @@ $(document).ready(function(){
         $('#viewKategoriProduk').text(kategori);
         
         if (foto) {
-            $('#viewFotoProduk').attr('src', '/images/' + foto);
+            
+            $('#viewFotoProduk').attr('src', foto);
+
         } else {
-            $('#viewFotoProduk').attr('src', '');
+            $('#viewFotoProduk').hide();
         }
     });
 });

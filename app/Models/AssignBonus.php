@@ -9,7 +9,7 @@ class AssignBonus extends Model
 {
     use HasFactory;
 
-    protected $table = 'assign-bonus';
+    protected $table = 'assign_bonus';
     protected $guarded = [
         'created_at',
         'updated_at'
