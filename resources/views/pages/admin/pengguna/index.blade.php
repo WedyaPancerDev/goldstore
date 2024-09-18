@@ -129,12 +129,13 @@
                                                         <div class="d-flex justify-content-center gap-2">
                                                             @if ($user->is_deleted == 0)
                                                                 {{-- EDIT --}}
-                                                                <button type="button" id="btn-edit-modal"
-                                                                    data-id="{{ $user->id }}"
-                                                                    data-role="{{ $user->role }}"
-                                                                    class="btn-edit btn-cst btn-warning px-2">
+                                                                <button type="button"
+                                                                    class="btn-edit btn-cst btn-warning px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editUserModal-{{ $user->id }}">
                                                                     Ubah
                                                                 </button>
+
 
                                                                 {{-- DELETE / DEACTIVATE --}}
                                                                 <button type="button"
@@ -206,7 +207,7 @@
                                                                     @method('PATCH')
 
                                                                     <button type="submit"
-                                                                    class="btn-cst btn-success d-flex align-items-center justify-content-center px-2">
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center px-2">
                                                                         Aktifkan
                                                                     </button>
                                                                 </form>
@@ -229,8 +230,8 @@
     </section>
 
     {{-- create --}}
-    <div id="management-user-create" class="modal fade" tabindex="-1" aria-labelledby="management-user"
-        aria-hidden="true" style="display: none;">
+    <div id="management-user-create" class="modal fade" tabindex="-1" aria-labelledby="management-user" aria-hidden="true"
+        style="display: none;">
         <div class="modal-dialog modal-dialog-scrollable">
             <form method="POST" action="{{ route('manajemen-pengguna.store') }}" class="modal-content"
                 enctype="multipart/form-data">
@@ -267,7 +268,6 @@
                         @endif
                     </div>
 
-                    <!-- Tambahkan input untuk password -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="password">Password <span class="text-danger">*</span></label>
                         <input id="password" class="crancy-wc__form-input fw-semibold" type="password" name="password"
@@ -308,13 +308,84 @@
         </div>
     </div>
 
+    {{-- edt --}}
+    @foreach ($users as $user)
+        <div id="editUserModal-{{ $user->id }}" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <form method="POST" action="{{ route('manajemen-pengguna.update', $user->id) }}" class="modal-content"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-6">Edit Pengguna</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <!-- Full Name -->
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="fullname-{{ $user->id }}">Nama Lengkap <span
+                                    class="text-danger">*</span></label>
+                            <input id="fullname-{{ $user->id }}" class="crancy-wc__form-input fw-semibold"
+                                type="text" name="fullname" value="{{ $user->fullname }}" required />
+                            @if ($errors->has('fullname'))
+                                <div class="pt-2">
+                                    <span
+                                        class="form-text fw-semibold text-danger">{{ $errors->first('fullname') }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Username -->
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="username-{{ $user->id }}">Username <span
+                                    class="text-danger">*</span></label>
+                            <input id="username-{{ $user->id }}" class="crancy-wc__form-input fw-semibold"
+                                type="text" name="username" value="{{ $user->username }}" required />
+                            @if ($errors->has('username'))
+                                <div class="pt-2">
+                                    <span
+                                        class="form-text fw-semibold text-danger">{{ $errors->first('username') }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Role -->
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="role-{{ $user->id }}">Role <span
+                                    class="text-danger">*</span></label>
+                            <select id="role-{{ $user->id }}" class="form-select crancy__item-input fw-semibold"
+                                name="role">
+                                <option value="manajer" {{ $user->role == 'manajer' ? 'selected' : '' }}>Manajer</option>
+                                <option value="akuntan" {{ $user->role == 'akuntan' ? 'selected' : '' }}>Akuntan</option>
+                                <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
+                            </select>
+                            @if ($errors->has('role'))
+                                <div class="pt-2">
+                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('role') }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endforeach
+
+
 @endsection
 
 @section('scripts')
     <script>
         $(document).ready(function() {
             $(document).on('click', '.btn-edit', function() {
-                let userId = $(this).data('user-id');
+                let userId = $(this).data('id');
                 window.location.href = 'pengguna/' + userId + '/edit';
             });
         });

@@ -118,7 +118,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
-
     });
-
 });
