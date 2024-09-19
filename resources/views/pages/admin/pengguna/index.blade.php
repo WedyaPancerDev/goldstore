@@ -381,16 +381,6 @@
 
 @endsection
 
-@section('scripts')
-    <script>
-        $(document).ready(function() {
-            $(document).on('click', '.btn-edit', function() {
-                let userId = $(this).data('id');
-                window.location.href = 'pengguna/' + userId + '/edit';
-            });
-        });
-    </script>
-@endsection
 
 @section('scripts')
     @include('layouts.datatables-scripts')
