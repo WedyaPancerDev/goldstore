@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KategoriController extends Controller
 {
@@ -33,7 +34,10 @@ class KategoriController extends Controller
             'nama' => 'required|unique:kategori,nama',
         ]);
 
-        Kategori::create($validated);
+        DB::transaction(function () use ($validated) {
+            Kategori::create($validated);
+        });
+
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
@@ -49,22 +53,25 @@ class KategoriController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Kategori $kategori)
-    {
-
-        return view("pages.admin.kategori.index", compact('kategori'));
-    }
+    public function edit(Kategori $kategori) {}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Kategori $kategori)
+    public function update(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'nama' => 'required|unique:kategori,nama,' . $kategori->id,  
+        $request->validate([
+            'nama' => 'required|unique:kategori,nama,' . $id,
         ]);
 
-        $kategori->update($validated);
+        DB::transaction(function () use ($request, $id) {
+            $kategori = Kategori::find($id);
+
+            $kategori->update([
+                'nama' => $request->nama
+            ]);
+        });
+
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diperbarui');
     }

@@ -343,6 +343,7 @@
                                     class="text-danger">*</span></label>
                             <input id="username-{{ $user->id }}" class="crancy-wc__form-input fw-semibold"
                                 type="text" name="username" value="{{ $user->username }}" required />
+
                             @if ($errors->has('username'))
                                 <div class="pt-2">
                                     <span
@@ -377,11 +378,9 @@
             </div>
         </div>
     @endforeach
-
-
 @endsection
 
 
-@section('scripts')
+{{-- @section('scripts')
     @include('layouts.datatables-scripts')
-@endsection
+@endsection --}}

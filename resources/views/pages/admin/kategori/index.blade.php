@@ -78,11 +78,11 @@
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
                                                             <button type="button"
                                                                 class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                                data-id="{{ $data->id }}"
-                                                                data-nama="{{ $data->nama }}" data-bs-toggle="modal"
-                                                                data-bs-target="#editKategoriModal">
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editKategoriModal-{{ $data->id }}">
                                                                 Edit
                                                             </button>
+
                                                             <form
                                                                 action="{{ route('manajemen-kategori.destroy', $data->id) }}"
                                                                 method="POST">
@@ -143,55 +143,48 @@
     </div>
 
     <!-- Modal Edit Kategori -->
-    <div id="editKategoriModal" class="modal fade" tabindex="-1" aria-labelledby="editKategoriModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <form method="POST" action="" class="modal-content" id="editKategoriForm">
-                @csrf
-                @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+    @foreach ($kategori as $data)
+        <div id="editKategoriModal-{{ $data->id }}" class="modal fade" tabindex="-1"
+            aria-labelledby="editKategoriModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}" class="modal-content"
+                    id="editKategoriForm">
+                    @csrf
+                    @method('PUT')
 
-                <div class="modal-body p-4">
-                    <div class="mb-3 form-group">
-                        <label class="form-label" for="editNama">Nama Kategori <span class="text-danger">*</span></label>
-                        <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold" type="text"
-                            name="nama" placeholder="Masukan nama kategori" required />
-                        @if ($errors->has('nama'))
-                            <div class="pt-2">
-                                <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
-                            </div>
-                        @endif
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
-                </div>
-            </form>
+                    {{-- name kategori --}}
+                    <div class="modal-body p-4">
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="editNama-{{ $data->nama }}">Nama Kategori <span
+                                    class="text-danger">*</span></label>
+                            <input id="editNamaKategori-{{ $data->id }}" class="crancy-wc__form-input fw-semibold"
+                                type="text" name="nama" placeholder="Masukan nama kategori"
+                                value="{{ $data->nama }}" required />
+
+                            @if ($errors->has('nama'))
+                                <div class="pt-2">
+                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-
+    @endforeach
 @endsection
 
-@section('script')
-    <script>
-        $(document).ready(function() {
 
-            $(document).on('click', '.btn-edit', function() {
-                let id = $(this).data('id');
-                let nama = $(this).data('nama');
-
-                $('#editNamaKategori').val(nama);
-
-                $('#editKategoriForm').attr('action', '/kategori/' + id);
-            });
-        });
-    </script>
-@endsection
 
 @section('scripts')
     @include('layouts.datatables-scripts')

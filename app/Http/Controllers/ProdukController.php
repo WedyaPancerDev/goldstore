@@ -55,11 +55,11 @@ class ProdukController extends Controller
 
         $fileName = time() . str($request->nama)->slug();
         $resultFile = $image
-            ? $image->storeAs('photos/product', "{$fileName}.{$image->extension()}")
+            ? $image->storeAs('public/photos/product', "{$fileName}.{$image->extension()}")
             : null;
-            
+
         $baseUrl = Storage::url($resultFile);
-        
+
         $validated['foto'] = $baseUrl;
         Produk::create($validated);
 
@@ -108,7 +108,7 @@ class ProdukController extends Controller
 
         $validated['foto'] = $resultFile;
 
-        $produk->update($validated); 
+        $produk->update($validated);
         return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
