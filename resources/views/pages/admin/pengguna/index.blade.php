@@ -151,46 +151,42 @@
                                                                     aria-hidden="true">
                                                                     <div class="modal-dialog modal-dialog-centered">
                                                                         <div class="modal-content">
-                                                                            <div class="modal-header">
+                                                                            <!-- Modal Header -->
+                                                                            <div class="modal-header border-0">
                                                                                 <button type="button" class="btn-close"
                                                                                     data-bs-dismiss="modal"
                                                                                     aria-label="Close"></button>
                                                                             </div>
-                                                                            <div class="modal-body p-md-3">
-                                                                                <div class="text-center">
-                                                                                    <div class="text-danger">
-                                                                                        <i
-                                                                                            class="bi bi-trash display-4"></i>
-                                                                                    </div>
-                                                                                    <div class="mt-4 fs-base">
-                                                                                        <h4 class="mb-1">Apakah kamu
-                                                                                            yakin?
-                                                                                        </h4>
-                                                                                        <p
-                                                                                            class="text-muted fw-medium mx-4 mb-0">
-                                                                                            Apakah kamu yakin ingin
-                                                                                            menonaktifkan pengguna ini?
-                                                                                            <strong>Pengguna yang
-                                                                                                dinonaktifkan
-                                                                                                bisa diaktifkan
-                                                                                                lagi.</strong>
-                                                                                        </p>
-                                                                                    </div>
+
+                                                                            <!-- Modal Body -->
+                                                                            <div class="modal-body text-center p-4">
+                                                                                <div class="text-danger mb-4">
+                                                                                    <i class="bi bi-trash display-4"></i>
                                                                                 </div>
+                                                                                <h4 class="mb-2">Apakah kamu yakin?</h4>
+                                                                                <p class="text-muted mb-4">
+                                                                                    Apakah kamu yakin ingin menonaktifkan
+                                                                                    pengguna ini?
+                                                                                    <strong>Pengguna yang dinonaktifkan bisa
+                                                                                        diaktifkan lagi.</strong>
+                                                                                </p>
+
+                                                                                <!-- Action Buttons -->
                                                                                 <div
-                                                                                    class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                                                                                    class="d-grid gap-2 d-md-flex justify-content-md-center">
                                                                                     <button type="button"
-                                                                                        class="btn w-sm btn-light"
-                                                                                        data-bs-dismiss="modal">Close</button>
+                                                                                        class="btn btn-light btn-sm"
+                                                                                        data-bs-dismiss="modal">
+                                                                                        Batal
+                                                                                    </button>
                                                                                     <form
                                                                                         action="{{ route('admin.manajemen-pengguna.destroy', $user->id) }}"
                                                                                         method="POST">
                                                                                         @csrf
                                                                                         @method('DELETE')
-
                                                                                         <button type="submit"
-                                                                                            class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2">
-                                                                                            Iya, Non Aktifkan!
+                                                                                            class="btn btn-danger btn-sm">
+                                                                                            Iya, Nonaktifkan!
                                                                                         </button>
                                                                                     </form>
                                                                                 </div>
@@ -352,21 +348,26 @@
                         </div>
 
                         <!-- Role -->
-                        <div class="mb-3 form-group">
-                            <label class="form-label" for="role-{{ $user->id }}">Role <span
-                                    class="text-danger">*</span></label>
-                            <select id="role-{{ $user->id }}" class="form-select crancy__item-input fw-semibold"
-                                name="role">
-                                <option value="manajer" {{ $user->role == 'manajer' ? 'selected' : '' }}>Manajer</option>
-                                <option value="akuntan" {{ $user->role == 'akuntan' ? 'selected' : '' }}>Akuntan</option>
-                                <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
-                            </select>
-                            @if ($errors->has('role'))
-                                <div class="pt-2">
-                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('role') }}</span>
-                                </div>
-                            @endif
-                        </div>
+                        @if ($user->role != 'admin')
+                            <div class="mb-3 form-group">
+                                <label class="form-label" for="role-{{ $user->id }}">Role <span
+                                        class="text-danger">*</span></label>
+                                <select id="role-{{ $user->id }}" class="form-select crancy__item-input fw-semibold"
+                                    name="role">
+                                    <option value="manajer" {{ $user->role == 'manajer' ? 'selected' : '' }}>Manajer
+                                    </option>
+                                    <option value="akuntan" {{ $user->role == 'akuntan' ? 'selected' : '' }}>Akuntan
+                                    </option>
+                                    <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
+                                </select>
+                                @if ($errors->has('role'))
+                                    <div class="pt-2">
+                                        <span
+                                            class="form-text fw-semibold text-danger">{{ $errors->first('role') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
 
                     <div class="modal-footer">
@@ -377,6 +378,7 @@
             </div>
         </div>
     @endforeach
+
 
 
 @endsection

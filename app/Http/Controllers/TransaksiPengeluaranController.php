@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TransaksiPengeluaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransaksiPengeluaranController extends Controller
 {
@@ -12,7 +13,20 @@ class TransaksiPengeluaranController extends Controller
      */
     public function index()
     {
-        return view("pages.admin.transaksi-pengeluaran.index");
+        $transaksiPengeluaran = DB::table('transaksi_pengeluaran')
+            ->join('produk', 'transaksi_pengeluaran.produk_id', '=', 'produk.id') // adjust the column name here
+            ->select(
+                'transaksi_pengeluaran.nomor_order',
+                'transaksi_pengeluaran.order_date',
+                'transaksi_pengeluaran.quantity',
+                'transaksi_pengeluaran.total_price',
+                'transaksi_pengeluaran.deskripsi',
+                'produk.nama as nama_produk'
+            )
+            ->get();
+
+
+        return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran"));
     }
 
     /**
