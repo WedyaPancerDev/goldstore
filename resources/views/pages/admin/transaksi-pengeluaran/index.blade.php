@@ -148,10 +148,11 @@
                 </div>
 
                 <div class="modal-body p-4">
-                    <div class="mb-3 form-group">
+
+                    <div class="mb-5 form-group">
                         <label class="form-label" for="product_id">Pilih Produk <span class="text-danger">*</span></label>
                         <select id="product_id" class="form-select crancy__item-input" name="product_id" required>
-                            <option value="" disabled selected>Tentukan Produk</option>
+                            <option data-display="Tentukan Produk" selected disabled></option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" data-price="{{ $product->harga_jual }}">
                                     {{ $product->nama }}
@@ -230,11 +231,12 @@
 
                     <div class="modal-body p-4">
 
-                        <div class="mb-3 form-group">
+                        <div class="mb-5 form-group">
                             <label class="form-label" for="product_id">Pilih Produk <span
                                     class="text-danger">*</span></label>
-                            <select id="product_id" class="form-select crancy__item-input" name="product_id" required>
-                                <option value="" disabled>Tentukan Produk</option>
+                            <select id="product_id" class="form-select crancy__item-input fw-semibold" name="product_id"
+                                required>
+                                <option data-display="Tentukan Produk" selected disabled></option>
                                 @foreach ($products as $product)
                                     <option value="{{ $product->id }}" data-price="{{ $product->harga_jual }}"
                                         {{ $transaksi->produk_id == $product->id ? 'selected' : '' }}>
@@ -306,6 +308,8 @@
 @endsection
 
 @section('script')
+    @include('layouts.datatables-scripts')
+
     <script>
         $(document).ready(function() {
             $('#product_id').on('change', function() {
@@ -358,9 +362,4 @@
             });
         });
     </script>
-@endsection
-
-
-@section('scripts')
-    @include('layouts.datatables-scripts')
 @endsection
