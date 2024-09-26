@@ -13,10 +13,9 @@ class TransaksiPengeluaranController extends Controller
      */
     public function index()
     {
-        // Fetch transaction and product details
         $transaksiPengeluaran = DB::table('transaksi_pengeluaran')
             ->join('produk', 'transaksi_pengeluaran.produk_id', '=', 'produk.id')
-            ->join('kategori', 'produk.kategori_id', '=', 'kategori.id') // Fixed the typo here
+            ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
             ->select(
                 'transaksi_pengeluaran.id',
                 'transaksi_pengeluaran.nomor_order',

@@ -317,8 +317,11 @@
                 var price = selectedOption.data('price');
                 var quantity = $('#quantity').val();
 
-                if (quantity && price) {
+                // Check if quantity is a valid number
+                if (quantity && price && !isNaN(quantity)) {
                     $('#total_price').val(price * quantity);
+                } else {
+                    $('#total_price').val(0); // Set default to 0 if quantity is invalid
                 }
             });
 
@@ -326,14 +329,14 @@
                 var quantity = $(this).val();
                 var price = $('#product_id').find(':selected').data('price') || 0;
 
+                this.value = this.value.replace(/[^0-9]/g, '');
 
-                if (quantity === "") {
+                if (quantity === "" || isNaN(quantity)) {
                     $('#total_price').val(0);
                 } else {
                     var totalPrice = parseInt(quantity) * parseFloat(price);
                     $('#total_price').val(totalPrice);
                 }
-
 
                 var selectedProduct = $('#product_id').val();
                 var products = @json($products);
@@ -347,10 +350,6 @@
                         $('#stock-warning').text('').hide();
                     }
                 }
-            });
-
-            $('#quantity').on('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
             });
 
             $('#total_price').on('input', function() {
