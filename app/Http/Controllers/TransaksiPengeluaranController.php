@@ -37,6 +37,17 @@ class TransaksiPengeluaranController extends Controller
         return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products"));
     }
 
+    public function checkStock(Request $request)
+    {
+        $product = DB::table('produk')->where('id', $request->product_id)->first();
+
+        if ($product) {
+            return response()->json(['stok' => $product->stok]);
+        }
+
+        return response()->json(['error' => 'Produk tidak ditemukan'], 404);
+    }
+
 
     /**
      * Show the form for creating a new resource.

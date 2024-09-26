@@ -159,6 +159,8 @@
                                 </option>
                             @endforeach
                         </select>
+
+
                         @if ($errors->has('product_id'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('product_id') }}</span>
@@ -170,6 +172,8 @@
                         <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
                         <input id="quantity" class="form-control" type="text" name="quantity"
                             placeholder="Masukkan Quantity" value="0" required />
+                        <div id="stock-warning" class="text-danger mb-2"></div>
+
 
                         @if ($errors->has('quantity'))
                             <div class="pt-2">
@@ -208,7 +212,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button id="btn-submit" type="submit" class="btn btn-primary">Tambah Transaksi</button>
+                    <button type="submit" id="btn-submit" class="btn btn-primary" disabled>Tambah Transaksi</button>
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
                 </div>
             </form>
@@ -312,53 +316,80 @@
 
     <script>
         $(document).ready(function() {
-            $('#product_id').on('change', function() {
-                var selectedOption = $(this).find(':selected');
-                var price = selectedOption.data('price');
-                var quantity = $('#quantity').val();
 
-                // Check if quantity is a valid number
-                if (quantity && price && !isNaN(quantity)) {
-                    $('#total_price').val(price * quantity);
-                } else {
-                    $('#total_price').val(0); // Set default to 0 if quantity is invalid
-                }
+            $('#product_id').on('change', function() {
+                validateForm();
+                calculateTotalPrice();
             });
 
             $('#quantity').on('input', function() {
-                var quantity = $(this).val();
-                var price = $('#product_id').find(':selected').data('price') || 0;
-
                 this.value = this.value.replace(/[^0-9]/g, '');
 
-                if (quantity === "" || isNaN(quantity)) {
+                validateForm();
+
+                if ($(this).val() === '' || $(this).val() == 0) {
                     $('#total_price').val(0);
                 } else {
-                    var totalPrice = parseInt(quantity) * parseFloat(price);
-                    $('#total_price').val(totalPrice);
+                    calculateTotalPrice();
                 }
+            });
 
+            function calculateTotalPrice() {
+                var selectedProduct = $('#product_id').find(':selected');
+                var price = selectedProduct.data('price') || 0;
+                var quantity = $('#quantity').val();
+
+
+                if (quantity && price && quantity > 0) {
+                    checkStock(quantity, selectedProduct.val(), price);
+                } else {
+                    $('#total_price').val(0);
+                }
+            }
+
+            function checkStock(quantity, productId, price) {
+                if (productId) {
+                    $.ajax({
+                        url: '{{ route('check-stock') }}',
+                        type: 'GET',
+                        data: {
+                            product_id: productId
+                        },
+                        success: function(response) {
+                            var stok = response.stok;
+
+                            if (quantity > stok) {
+                                $('#stock-warning').text(
+                                    'Jumlah quantity melebihi stok produk yang tersedia. Stok: ' +
+                                    stok);
+                                $('#total_price').val(
+                                    0);
+                                $('#btn-submit').prop('disabled', true);
+                            } else {
+                                $('#stock-warning').text('');
+                                var totalPrice = parseFloat(price) * parseInt(quantity);
+                                $('#total_price').val(totalPrice.toLocaleString('id-ID', {
+                                    minimumFractionDigits: 0
+                                }));
+                                validateForm();
+                            }
+                        }
+                    });
+                }
+            }
+
+            function validateForm() {
                 var selectedProduct = $('#product_id').val();
-                var products = @json($products);
-                var product = products.find(p => p.id == selectedProduct);
+                var quantity = $('#quantity').val();
 
-                if (product) {
-                    var stock = product.stok;
-                    if (quantity > stock) {
-                        $('#stock-warning').text('Stok barang sudah habis.').show();
-                    } else {
-                        $('#stock-warning').text('').hide();
-                    }
+                if (selectedProduct && quantity && quantity > 0) {
+                    $('#btn-submit').prop('disabled', false);
+                } else {
+                    $('#btn-submit').prop('disabled', true);
                 }
-            });
+            }
 
-            $('#total_price').on('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-            $(".js-select-2").select2({
-                theme: "default",
-            });
+            validateForm();
         });
     </script>
 @endsection

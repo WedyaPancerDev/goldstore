@@ -106,6 +106,8 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'manajemen-transaksi-pengeluaran.update',
             'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
         ]);
+
+        Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
     });
 
     Route::middleware(['role:manajer'])->group(function () {
