@@ -105,7 +105,7 @@
                                                         {{ $transaksi->quantity ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 fw-semibold">
-                                                        {{ $transaksi->total_price ?? '-' }}
+                                                        {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
                                                     </td>
                                                     <td class="crancy-table__column-6 fw-semibold">
                                                         {{ $transaksi->deskripsi ?? '-' }}
@@ -151,7 +151,7 @@
 
                     <div class="mb-5 form-group">
                         <label class="form-label" for="product_id">Pilih Produk <span class="text-danger">*</span></label>
-                        <select id="product_id" class="form-select crancy__item-input" name="product_id" required>
+                        <select class="form-select crancy__item-input product-select" name="product_id" required>
                             <option data-display="Tentukan Produk" selected disabled></option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" data-price="{{ $product->harga_jual }}">
@@ -170,9 +170,10 @@
 
                     <div class="mb-3 form-group">
                         <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
-                        <input id="quantity" class="form-control" type="text" name="quantity"
+                        <input class="form-control quantity-input" type="text" name="quantity"
                             placeholder="Masukkan Quantity" value="0" required />
-                        <div id="stock-warning" class="text-danger mb-2"></div>
+
+                        <span id="stock-warning" class="text-danger py-2 text-sm"></span>
 
 
                         @if ($errors->has('quantity'))
@@ -238,8 +239,8 @@
                         <div class="mb-5 form-group">
                             <label class="form-label" for="product_id">Pilih Produk <span
                                     class="text-danger">*</span></label>
-                            <select id="product_id" class="form-select crancy__item-input fw-semibold" name="product_id"
-                                required>
+                            <select class="form-select crancy__item-input product-select" name="product_id" required
+                                data-original="{{ $transaksi->produk_id }}">
                                 <option data-display="Tentukan Produk" selected disabled></option>
                                 @foreach ($products as $product)
                                     <option value="{{ $product->id }}" data-price="{{ $product->harga_jual }}"
@@ -258,14 +259,12 @@
 
                         <div class="mb-3 form-group">
                             <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
-                            <input id="quantity" class="form-control" type="text" name="quantity"
-                                placeholder="Masukkan Quantity" value="{{ $transaksi->quantity }}" required />
+                            <input id="quantity" class="form-control quantity-input" type="text" name="quantity"
+                                placeholder="Masukkan Quantity" value="{{ $transaksi->quantity }}" required
+                                data-original="{{ $transaksi->quantity }}" />
 
-                            @if ($errors->has('quantity'))
-                                <div class="pt-2">
-                                    <span class="form-text text-danger">{{ $errors->first('quantity') }}</span>
-                                </div>
-                            @endif
+                            <span id="stock-warning" class="text-danger py-2 text-sm"></span>
+
                         </div>
 
 
@@ -273,18 +272,15 @@
                             <label class="form-label" for="total_price">Total Harga <span
                                     class="text-danger">*</span></label>
                             <input id="total_price" class="form-control" type="text" name="total_price"
-                                value="{{ $transaksi->total_price }}" value="0" readonly />
+                                value="  {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}" value="0"
+                                readonly />
                         </div>
 
                         <div class="mb-3 form-group">
                             <label class="form-label" for="deskripsi">Deskripsi <span
                                     class="text-danger">*</span></label>
-                            <textarea id="deskripsi" class="crancy-wc__form-input fw-semibold" name="deskripsi">{{ $transaksi->deskripsi }}</textarea>
-                            @if ($errors->has('deskripsi'))
-                                <div class="pt-2">
-                                    <span class="form-text text-danger">{{ $errors->first('deskripsi') }}</span>
-                                </div>
-                            @endif
+                            <textarea id="deskripsi" class="crancy-wc__form-input fw-semibold" name="deskripsi"
+                                data-original="{{ $transaksi->deskripsi }}">{{ $transaksi->deskripsi }}</textarea>
                         </div>
 
                         <div class="mb-3 form-group">
@@ -301,7 +297,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="btn-submit" type="submit" class="btn btn-primary">Update Transaksi</button>
+                        <button type="submit" id="btn-submit" class="btn btn-primary" disabled>Update</button>
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
                     </div>
                 </form>
@@ -316,38 +312,59 @@
 
     <script>
         $(document).ready(function() {
+            function updateEditButtonState(modal) {
+                let isChanged = false;
 
-            $('#product_id').on('change', function() {
-                validateForm();
-                calculateTotalPrice();
+                modal.find('.form-control, .crancy-wc__form-input').each(function() {
+                    const originalValue = $(this).data('original');
+                    const currentValue = $(this).val();
+
+                    if (currentValue !== originalValue) {
+                        isChanged = true;
+                        return false;
+                    }
+                });
+
+                const quantity = modal.find('.quantity-input').val();
+                const productSelected = modal.find('.product-select').val();
+
+                modal.find('#btn-submit').prop('disabled', !isChanged);
+            }
+
+            $('.modal').on('input change', function() {
+                updateEditButtonState($(this));
             });
 
-            $('#quantity').on('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
+            $('.product-select').on('change', function() {
+                validateForm($(this));
+                calculateTotalPrice($(this));
+            });
 
-                validateForm();
+            $('.quantity-input').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                validateForm($(this));
 
                 if ($(this).val() === '' || $(this).val() == 0) {
-                    $('#total_price').val(0);
+                    $(this).closest('.modal-body').find('#total_price').val(0);
                 } else {
-                    calculateTotalPrice();
+                    calculateTotalPrice($(this));
                 }
             });
 
-            function calculateTotalPrice() {
-                var selectedProduct = $('#product_id').find(':selected');
+            function calculateTotalPrice(quantityInput) {
+                var selectedProduct = quantityInput.closest('.modal-body').find('.product-select').find(
+                    ':selected');
                 var price = selectedProduct.data('price') || 0;
-                var quantity = $('#quantity').val();
-
+                var quantity = quantityInput.val();
 
                 if (quantity && price && quantity > 0) {
-                    checkStock(quantity, selectedProduct.val(), price);
+                    checkStock(quantity, selectedProduct.val(), price, quantityInput);
                 } else {
-                    $('#total_price').val(0);
+                    quantityInput.closest('.modal-body').find('#total_price').val(0);
                 }
             }
 
-            function checkStock(quantity, productId, price) {
+            function checkStock(quantity, productId, price, quantityInput) {
                 if (productId) {
                     $.ajax({
                         url: '{{ route('check-stock') }}',
@@ -357,30 +374,32 @@
                         },
                         success: function(response) {
                             var stok = response.stok;
+                            var stockWarning = quantityInput.closest('.modal-body').find(
+                                '#stock-warning');
 
                             if (quantity > stok) {
-                                $('#stock-warning').text(
+                                stockWarning.text(
                                     'Jumlah quantity melebihi stok produk yang tersedia. Stok: ' +
                                     stok);
-                                $('#total_price').val(
-                                    0);
+                                quantityInput.closest('.modal-body').find('#total_price').val(0);
                                 $('#btn-submit').prop('disabled', true);
                             } else {
-                                $('#stock-warning').text('');
+                                stockWarning.text('');
                                 var totalPrice = parseFloat(price) * parseInt(quantity);
-                                $('#total_price').val(totalPrice.toLocaleString('id-ID', {
-                                    minimumFractionDigits: 0
-                                }));
-                                validateForm();
+                                quantityInput.closest('.modal-body').find('#total_price').val(totalPrice
+                                    .toLocaleString('id-ID', {
+                                        minimumFractionDigits: 0
+                                    }));
+                                validateForm(quantityInput);
                             }
                         }
                     });
                 }
             }
 
-            function validateForm() {
-                var selectedProduct = $('#product_id').val();
-                var quantity = $('#quantity').val();
+            function validateForm(element) {
+                var selectedProduct = element.closest('.modal-body').find('.product-select').val();
+                var quantity = element.closest('.modal-body').find('.quantity-input').val();
 
                 if (selectedProduct && quantity && quantity > 0) {
                     $('#btn-submit').prop('disabled', false);
@@ -389,7 +408,33 @@
                 }
             }
 
-            validateForm();
+            function updateEditButtonState(modal) {
+                let isChanged = false;
+
+                modal.find('.form-control, .crancy-wc__form-input').each(function() {
+                    const originalValue = $(this).data('original');
+                    const currentValue = $(this).val();
+
+                    console.log(`Original: ${originalValue}, Current: ${currentValue}`);
+
+                    if (currentValue !== originalValue) {
+                        isChanged = true;
+                        console.log("Change detected!");
+                        return false;
+                    }
+                });
+
+                console.log(`isChanged: ${isChanged}`);
+                modal.find('#btn-submit').prop('disabled', !isChanged);
+            }
+
+            $('.modal').on('input change', function() {
+                updateEditButtonState($(this));
+            });
+
+            $('#modal').on('show.bs.modal', function() {
+                updateEditButtonState($(this));
+            });
         });
     </script>
 @endsection
