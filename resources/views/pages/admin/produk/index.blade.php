@@ -27,18 +27,6 @@ Toko Emas - Produk
         </div>
     </div>
 
-    @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="col-xxl-12 col-12">
         <div class="crancy-body">
             <div class="crancy-dsinner">
@@ -95,30 +83,20 @@ Toko Emas - Produk
                                             <td class="crancy-table__column-3 fw-semibold">{{ $item->stok }}</td>
                                             <td class="crancy-table__column-5 text-center">
                                                 <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                    <button type="button" class="btn-view btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2"
-                                                        data-id="{{ $item->id }}" 
-                                                        data-nama="{{ $item->nama }}" 
-                                                        data-kode_produk="{{ $item->kode_produk }}" 
-                                                        data-satuan="{{ $item->satuan }}" 
-                                                        data-harga_beli="{{ $item->harga_beli }}" data-harga_jual="{{ $item->harga_jual }}"
-                                                        data-deskripsi="{{ $item->deskripsi }}" 
-                                                        data-foto="{{ $item->foto }}" 
-                                                        data-stok="{{ $item->stok }}" 
-                                                        data-kategori="{{ $item->kategori->nama }}" data-bs-toggle="modal" data-bs-target="#viewProdukModal">
+                                                    <form method="GET" action="{{ route('manajemen-produk.index') }}">
+                                                        <input type="hidden" name="detail_id" value="{{ $item->id }}">
+                                                        <button type="" data-bs-toggle="modal" data-bs-target="#viewProdukModal"
+                                                        class="btn-view btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2">
+                                                            Detail
+                                                        </button>
+                                                    </form>
+
+                                                    {{-- <button type="button" class="btn-cst btn-light d-flex align-items-center justify-content-center w-auto px-2" data-bs-toggle="modal"
+                                                        data-bs-target="#viewProdukModal">
                                                         Detail
                                                     </button>
-                                                    <button type="button" class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                        data-id="{{ $item->id }}" data-nama="{{ $item->nama }}" data-nama="{{ $item->nama }}" 
-                                                        data-kode_produk="{{ $item->kode_produk }}"
-                                                        data-satuan="{{ $item->satuan }}" 
-                                                        data-harga_beli="{{ $item->harga_beli }}" 
-                                                        data-harga_jual="{{ $item->harga_jual }}"
-                                                        data-stok="{{ $item->stok }}" 
-                                                        data-deskripsi="{{ $item->deskripsi }}" 
-                                                        data-kategori_id="{{ $item->kategori_id }}" 
-                                                        data-foto="{{ $item->foto }}"
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#editProdukModal">
+                                                     --}}
+                                                    <button type="button" class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2">
                                                         Edit
                                                     </button>
                                                     <form action="{{ route('manajemen-produk.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
@@ -150,71 +128,66 @@ Toko Emas - Produk
 </section>
 
 <!-- Modal Lihat Produk -->
-<div id="viewProdukModal" class="modal fade" tabindex="-1" aria-labelledby="viewProdukModalLabel" aria-hidden="true">
+@if($detailProduk && $detailProduk->produk_id == '')
+<div id="viewProdukModal" class="modal fade" tabindex="-1"  aria-hidden="true" aria-labelledby="viewProdukModalLabel" >
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title fs-6" id="viewProdukModalLabel">Detail Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <a href="{{ route('manajemen-produk.index') }}" class="btn-close" aria-label="Close"></a>
             </div>
-            
             <div class="modal-body p-4">
                 <div class="mb-3">
                     <label class="form-label fw-bold">Nama Produk:</label>
-                    <p id="viewNamaProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->nama }}</p>
                 </div>
 
                 <div class="mb-3 d-flex justify-content-center">
-                    {{-- <label class="form-label fw-bold">Foto Produk:</label> --}}
-                    
-                    <img id="viewFotoProduk" src="" alt="Foto Produk" width="200" class="border rounded-3"/>
-                    
+                    <img src="{{ asset($detailProduk->foto) }}" alt="Foto Produk" width="200" class="border rounded-3"/>
                 </div>                
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Kode Produk:</label>
-                    <p id="viewKodeProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->kode_produk }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Satuan:</label>
-                    <p id="viewSatuanProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->satuan }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Harga Beli:</label>
-                    <p id="viewHargaBeliProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ number_format($detailProduk->harga_beli, 0, ',', '.') }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Harga Jual:</label>
-                    <p id="viewHargaJualProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ number_format($detailProduk->harga_jual, 0, ',', '.') }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Deskripsi:</label>
-                    <p id="viewDeskripsiProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->deskripsi }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Stok:</label>
-                    <p id="viewStokProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->stok }}</p>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Kategori:</label>
-                    <p id="viewKategoriProduk" class="fw-semibold"></p>
+                    <p class="fw-semibold">{{ $detailProduk->kategori_nama }}</p>
                 </div>
-
             </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+                <a href="{{ route('manajemen-produk.index') }}" class="btn btn-light" data-bs-dismiss="modal">Tutup</a>
             </div>
         </div>
     </div>
 </div>
-
+@endif
 
 
 <!-- Modal Tambah Produk -->
@@ -389,80 +362,11 @@ Toko Emas - Produk
 
 @section('script')
 <script>
-   $(document).ready(function(){
+// function openDetailModal(id){
 
-    $(document).on('click', '.btn-edit', function() {
-        let id = $(this).data('id');
-        let nama = $(this).data('nama');
-        let kode_produk = $(this).data('kode_produk');
-        let satuan = $(this).data('satuan');
-        let harga_beli = $(this).data('harga_beli');
-        let harga_jual = $(this).data('harga_jual');
-        let stok = $(this).data('stok');
-        let deskripsi = $(this).data('deskripsi');
-        let kategori_id = $(this).data('kategori_id');
-        let foto = $(this).data('foto');
-
-        $('#editNamaProduk').val(nama);
-        $('#editKodeProduk').val(kode_produk);
-        $('#editSatuan').val(satuan);
-        $('#editHargaBeli').val(harga_beli);
-        $('#editHargaJual').val(harga_jual);
-        $('#editStok').val(stok);
-        $('#editDeskripsi').val(deskripsi);
-        $('#editKategoriId').val(kategori_id);
-
-        if (foto) {
-            $('#fotoPreview').attr('src', foto);
-        } else {
-            $('#fotoPreview').attr('src', '');
-        }
-
-        $('#editProdukForm').attr('action', '/produk/' + id);
-    });
-
-    $('#editFoto').change(function() {
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            $('#fotoPreview').attr('src', e.target.result);
-        }
-        reader.readAsDataURL(this.files[0]);
-    });
-});
-
-
-$(document).ready(function(){
-
-    $(document).on('click', '.btn-view', function() {
-        let nama = $(this).data('nama');
-        let kode_produk = $(this).data('kode_produk');
-        let satuan = $(this).data('satuan');
-        let harga_beli = $(this).data('harga_beli');
-        let harga_jual = $(this).data('harga_jual');
-        let deskripsi = $(this).data('deskripsi');
-        let stok = $(this).data('stok');
-        let kategori = $(this).data('kategori');
-        let foto = $(this).data('foto');
-
-        $('#viewNamaProduk').text(nama);
-        $('#viewKodeProduk').text(kode_produk);
-        $('#viewSatuanProduk').text(satuan);
-        $('#viewHargaBeliProduk').text(harga_beli);
-        $('#viewHargaJualProduk').text(harga_jual);
-        $('#viewDeskripsiProduk').text(deskripsi || '-');
-        $('#viewStokProduk').text(stok);
-        $('#viewKategoriProduk').text(kategori);
-        
-        if (foto) {
-            
-            $('#viewFotoProduk').attr('src', foto);
-
-        } else {
-            $('#viewFotoProduk').hide();
-        }
-    });
-});
-
+//     var viewProdukModal = new bootstrap.Modal(document.getElementById('viewProdukModal'));
+//     viewProdukModal.show(id);
+// }
 
 </script>
 @endsection

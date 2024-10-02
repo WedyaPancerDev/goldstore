@@ -7,6 +7,7 @@ use App\Models\Produk;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
@@ -14,15 +15,35 @@ class ProdukController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $produks = Produk::with('kategori')->get();
         $kategoris = Kategori::all();
+        $detailProduk = null; // Inisialisasi detailProduk sebagai null
 
-        // Example generate code
+        if ($request->has('detail_id')) {
+            // Ambil detail produk berdasarkan ID yang dikirimkan
+            $detailProduk = DB::table('produk')
+                ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
+                ->where('produk.id', $request->input('detail_id'))
+                ->select(
+                    'produk.id as produk_id',
+                    'produk.nama',
+                    'produk.kode_produk',
+                    'produk.foto',
+                    'produk.deskripsi',
+                    'produk.stok',
+                    'produk.satuan',
+                    'produk.harga_beli',
+                    'produk.harga_jual',
+                    'kategori.nama as kategori_nama',
+                )
+                ->first();
+        }
+
         $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
 
-        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk'));
+        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk'));
     }
 
     /**
@@ -69,9 +90,10 @@ class ProdukController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Produk $produk)
+    public function show(Produk $produk, $id)
     {
-        //
+        $produk = Produk::with('kategori')->findOrFail($id);
+        return route("manajemen-produk.index", compact('produk'));
     }
 
     /**
