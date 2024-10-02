@@ -14,4 +14,17 @@ class AssignBonus extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function transaksi_pengeluaran()
+    {
+        return $this->belongsTo(TransaksiPengeluaran::class);
+    }
+    public function bonus()
+    {
+        return $this->belongsTo(MasterBonus::class);
+    }
 }

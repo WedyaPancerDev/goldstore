@@ -81,7 +81,7 @@ Toko Emas - Assign Bonus
                                                         data-bs-target="#editAssignBonusModal">
                                                         Edit
                                                     </button>
-                                                    <form action="{{ route('manajemen-assign-bonus.destory', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus assign bonus ini?');">
+                                                    <form action="{{ route('manajemen-assign-bonus.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus assign bonus ini?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2">

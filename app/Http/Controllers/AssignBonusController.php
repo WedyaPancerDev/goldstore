@@ -15,7 +15,7 @@ class AssignBonusController extends Controller
      */
     public function index()
     {
-        $assignBonuses = AssignBonus::with(['user', 'transaksiPengeluaran', 'bonus'])->get();
+        $assignBonuses = AssignBonus::with(['users', 'transaksi_pengeluaran', 'bonus'])->get();
         $users = User::all();
         $transaksis = TransaksiPengeluaran::all();
         $bonuses = MasterBonus::all();
@@ -39,7 +39,7 @@ class AssignBonusController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'transaksi_pengeluaran_id' => 'required|exists:transaksi_pengeluaran,id',
-            'bonus_id' => 'required|exists:master_bonus,id',
+            'bonus_id' => 'required|exists:master-bonus,id',
         ]);
 
         AssignBonus::create($request->all());
