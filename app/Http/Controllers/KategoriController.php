@@ -33,7 +33,7 @@ class KategoriController extends Controller
             'nama' => 'required|unique:kategori,nama',
         ]);
 
-        Kategori::create($validated);
+        Kategori::create(attributes: $validated);
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
@@ -61,7 +61,7 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $kategori)
     {
         $validated = $request->validate([
-            'nama' => 'required|unique:kategori,nama,' . $kategori->id,  
+            'nama' => 'required|unique:kategori,nama,' . $kategori->id,
         ]);
 
         $kategori->update($validated);

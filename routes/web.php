@@ -51,13 +51,16 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-produk.destroy',
         ]);
 
+
         Route::resource('pengguna', PenggunaController::class)->names([
             'index' => 'manajemen-pengguna.index',
             'store' => 'manajemen-pengguna.store',
             'edit' => 'manajemen-pengguna.edit',
             'update' => 'manajemen-pengguna.update',
-            'destroy' => 'manajemen-pengguna.destroy',
         ]);
+
+        Route::delete("/admin/manajemen-pengguna/{id}/delete", [PenggunaController::class, 'destroy'])->name("admin.manajemen-pengguna.destroy");
+        Route::patch("/admin/manajemen-pengguna/{id}/restore", [PenggunaController::class, 'restore'])->name("admin.manajemen-pengguna.restore");
 
         Route::resource('kategori', KategoriController::class)->names([
             'index' => 'manajemen-kategori.index',
@@ -103,6 +106,8 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'manajemen-transaksi-pengeluaran.update',
             'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
         ]);
+
+        Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
     });
 
     Route::middleware(['role:manajer'])->group(function () {
@@ -115,7 +120,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
-
     });
-
 });

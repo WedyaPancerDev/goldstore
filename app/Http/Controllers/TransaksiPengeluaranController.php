@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TransaksiPengeluaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransaksiPengeluaranController extends Controller
 {
@@ -12,8 +13,41 @@ class TransaksiPengeluaranController extends Controller
      */
     public function index()
     {
-        return view("pages.admin.transaksi-pengeluaran.index");
+        $transaksiPengeluaran = DB::table('transaksi_pengeluaran')
+            ->join('produk', 'transaksi_pengeluaran.produk_id', '=', 'produk.id')
+            ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
+            ->select(
+                'transaksi_pengeluaran.id',
+                'transaksi_pengeluaran.nomor_order',
+                'transaksi_pengeluaran.order_date',
+                'transaksi_pengeluaran.quantity',
+                'transaksi_pengeluaran.total_price',
+                'transaksi_pengeluaran.deskripsi',
+                'transaksi_pengeluaran.produk_id',
+                'produk.nama as nama_produk',
+                'kategori.nama as kategori_nama'
+            )
+            ->get();
+
+        $products = DB::table('produk')
+            ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
+            ->select('produk.id', 'produk.nama', 'kategori.nama as kategori_nama', 'harga_jual')
+            ->get();
+
+        return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products"));
     }
+
+    public function checkStock(Request $request)
+    {
+        $product = DB::table('produk')->where('id', $request->product_id)->first();
+
+        if ($product) {
+            return response()->json(['stok' => $product->stok]);
+        }
+
+        return response()->json(['error' => 'Produk tidak ditemukan'], 404);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -28,8 +62,49 @@ class TransaksiPengeluaranController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'product_id' => 'required|exists:produk,id',
+            'quantity' => 'required|integer|min:1',
+            'deskripsi' => 'required|string',
+            'order_date' => 'required|date',
+        ]);
+
+        DB::transaction(function () use ($request) {
+
+            $product = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
+
+
+            if ($request->quantity > $product->stok) {
+                return back()->withErrors(['quantity' => 'Stok tidak mencukupi'])->withInput();
+            }
+
+
+            DB::table('produk')
+                ->where('id', $request->product_id)
+                ->update(['stok' => $product->stok - $request->quantity]);
+
+
+            $lastOrder = DB::table('transaksi_pengeluaran')->latest('id')->first();
+            $newOrderNumber = $lastOrder ? 'INV-' . str_pad($lastOrder->id + 1, 3, '0', STR_PAD_LEFT) : 'INV-001';
+
+
+            $totalPrice = $product->harga_jual * $request->quantity;
+
+
+            DB::table('transaksi_pengeluaran')->insert([
+                'nomor_order' => $newOrderNumber,
+                'produk_id' => $request->product_id,
+                'quantity' => $request->quantity,
+                'total_price' => $totalPrice,
+                'deskripsi' => $request->deskripsi,
+                'order_date' => $request->order_date,
+            ]);
+        });
+
+        return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'transaksi berhasil diperbarui');
     }
+
+
 
     /**
      * Display the specified resource.
@@ -50,11 +125,43 @@ class TransaksiPengeluaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, TransaksiPengeluaran $transaksiPengeluaran)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $request->validate([
+            'product_id' => 'required|exists:produk,id',
+            'quantity' => 'required|integer|min:1',
+            'deskripsi' => 'required|string',
+            'order_date' => 'required|date',
+        ]);
 
+        DB::transaction(function () use ($request, $id) {
+            $transaksi = DB::table('transaksi_pengeluaran')->where('id', $id)->first();
+
+            $oldProduct = DB::table('produk')->where('id', $transaksi->produk_id)->lockForUpdate()->first();
+
+            DB::table('produk')->where('id', $oldProduct->id)->update(['stok' => $oldProduct->stok + $transaksi->quantity]);
+
+            $newProduct = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
+
+            if ($request->quantity > $newProduct->stok) {
+                return back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk produk baru'])->withInput();
+            }
+
+            DB::table('produk')->where('id', $newProduct->id)->update(['stok' => $newProduct->stok - $request->quantity]);
+
+            $totalPrice = $newProduct->harga_jual * $request->quantity;
+
+            DB::table('transaksi_pengeluaran')->where('id', $id)->update([
+                'produk_id' => $request->product_id,
+                'quantity' => $request->quantity,
+                'total_price' => $totalPrice,
+                'deskripsi' => $request->deskripsi,
+                'order_date' => $request->order_date,
+            ]);
+        });
+
+        return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil diperbarui');
+    }
     /**
      * Remove the specified resource from storage.
      */
