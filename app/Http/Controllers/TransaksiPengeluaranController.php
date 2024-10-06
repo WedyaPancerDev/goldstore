@@ -29,6 +29,10 @@ class TransaksiPengeluaranController extends Controller
             )
             ->get();
 
+        $uniqueMonths = DB::table('target_penjualan')
+            ->distinct()
+            ->pluck('bulan');
+
         $products = DB::table('produk')
             ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
             ->select('produk.id', 'produk.nama', 'kategori.nama as kategori_nama', 'harga_jual')
