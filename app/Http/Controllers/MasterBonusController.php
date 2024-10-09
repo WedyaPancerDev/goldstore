@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterBonus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MasterBonusController extends Controller
 {
@@ -62,29 +63,38 @@ class MasterBonusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MasterBonus $masterBonus)
+    public function update(Request $request, $id)
     {
-
+        // Validasi input
         $request->validate([
             'nama' => 'required|string|max:255',
             'total' => 'required|numeric|min:0',
         ]);
 
-        $masterBonus->update([
-            'nama' => $request->input('nama'),  
-            'total' => $request->input('total'),
-        ]);
+        // Lakukan update menggunakan DB::table dan DB::raw
+        DB::table('master-bonus')
+            ->where('id', $id)
+            ->update([
+                'nama' => DB::raw("'" . $request->input('nama') . "'"),  // Escape value with single quotes
+                'total' => DB::raw($request->input('total')),  // Numeric value does not need quotes
+                'updated_at' => DB::raw('NOW()'),  // Menggunakan fungsi waktu database
+            ]);
 
+        // Redirect setelah update
         return redirect()->route('manajemen-master-bonus.index')->with('success', 'Bonus berhasil diperbarui.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MasterBonus $masterBonus)
+    public function destroy(string $id)
     {
-
-        $masterBonus->delete();
+        DB::table('master-bonus')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
 
         return redirect()->route('manajemen-master-bonus.index')->with('success', 'Bonus berhasil dihapus.');
     }

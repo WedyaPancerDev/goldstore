@@ -19,10 +19,9 @@ class ProdukController extends Controller
     {
         $produks = Produk::with('kategori')->get();
         $kategoris = Kategori::all();
-        $detailProduk = null; // Inisialisasi detailProduk sebagai null
+        $detailProduk = null; 
 
         if ($request->has('detail_id')) {
-            // Ambil detail produk berdasarkan ID yang dikirimkan
             $detailProduk = DB::table('produk')
                 ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
                 ->where('produk.id', $request->input('detail_id'))
@@ -72,6 +71,7 @@ class ProdukController extends Controller
 
         $validated['kode_produk'] = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
         $validated['created_by'] = Auth::user()->id;
+
         $image = $request->file('foto');
 
         $fileName = time() . str($request->nama)->slug();
@@ -83,6 +83,7 @@ class ProdukController extends Controller
         
         $validated['foto'] = $baseUrl;
         Produk::create($validated);
+
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
@@ -137,10 +138,15 @@ class ProdukController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produk $produk)
+    public function destroy(string $id)
     {
-        $produk->delete();
+        DB::table('produk')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
 
         return redirect()->route('manajemen-produk.index')->with('success', 'Produk berhasil dihapus');
     }
+
 }
