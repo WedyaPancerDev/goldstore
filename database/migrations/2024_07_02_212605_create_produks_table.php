@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->string('foto')->nullable();
             $table->double("stok")->default(0);
+            $table->boolean("is_deleted")->default(0);
             $table->foreignId("created_by")->references("id")->on("users");
             $table->timestamps();
             $table->softDeletes();

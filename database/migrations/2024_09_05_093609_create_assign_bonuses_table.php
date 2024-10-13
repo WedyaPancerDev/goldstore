@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('assign_bonus', function (Blueprint $table) {
             $table->id();
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }

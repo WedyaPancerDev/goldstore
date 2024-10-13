@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\TransaksiPengeluaran;
 use App\Models\MasterBonus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssignBonusController extends Controller
 {
@@ -15,11 +16,12 @@ class AssignBonusController extends Controller
      */
     public function index()
     {
-        $assignBonuses = AssignBonus::with(['user', 'transaksiPengeluaran', 'bonus'])->get();
+        $assignBonuses = AssignBonus::with(['users', 'transaksi_pengeluaran', 'bonus'])->get();
         $users = User::all();
         $transaksis = TransaksiPengeluaran::all();
         $bonuses = MasterBonus::all();
 
+        // dd($assignBonuses);
         return view("pages.admin.assign-bonus.index",compact('assignBonuses', 'users', 'transaksis', 'bonuses'));
     }
 
@@ -39,7 +41,7 @@ class AssignBonusController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'transaksi_pengeluaran_id' => 'required|exists:transaksi_pengeluaran,id',
-            'bonus_id' => 'required|exists:master_bonus,id',
+            'bonus_id' => 'required|exists:master-bonus,id',
         ]);
 
         AssignBonus::create($request->all());
@@ -66,15 +68,22 @@ class AssignBonusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, AssignBonus $assignBonus)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'transaksi_pengeluaran_id' => 'required|exists:transaksi_pengeluaran,id',
-            'bonus_id' => 'required|exists:master_bonus,id',
+            'bonus_id' => 'required|exists:master-bonus,id',
         ]);
 
-        $assignBonus->update($request->all());
+        DB::table('assign_bonus')
+            ->where('id', $id)
+            ->update([
+                'user_id' => DB::raw($request->input('user_id')),
+                'transaksi_pengeluaran_id' => DB::raw($request->input('transaksi_pengeluaran_id')),
+                'bonus_id' => DB::raw($request->input('bonus_id')),
+                'updated_at' => DB::raw('NOW()')
+            ]);
 
         return redirect()->route('manajemen-assign-bonus.index')->with('success', 'Bonus updated successfully.');
     }
@@ -82,9 +91,13 @@ class AssignBonusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AssignBonus $assignBonus)
+    public function destroy(string $id)
     {
-        $assignBonus->delete();
+        DB::table('assign_bonus')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
 
         return redirect()->route('manajemen-assign-bonus.index')->with('success', 'Bonus deleted successfully.');
     }

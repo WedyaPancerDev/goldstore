@@ -81,45 +81,45 @@ Toko Emas - Master Bonus
                                 
                                 {{-- crancy Table Body --}}
                                 <tbody class="crancy-table__body">
-                                    @if ($bonuses->count() > 0)
+                                @if ($bonuses->count() > 0)
+                                    @php
+                                        $iteration = 1;
+                                    @endphp
                                     @foreach ($bonuses as $bonus)
-                                    <tr>
-                                        <td class="crancy-table__column-1 fw-semibold">
-                                            {{ $loop->iteration }}
-                                        </td>
-                                        <td class="crancy-table__column-2 fw-semibold">
-                                            {{ $bonus->nama ?? '-' }}
-                                        </td>
-                                        <td class="crancy-table__column-3 fw-semibold">
-                                            Rp {{ number_format($bonus->total, 0, ',', '.') }}
-                                        </td>
-                                        <td class="crancy-table__column-4 fw-semibold">
-                                            {{ \Carbon\Carbon::parse($bonus->created_at)->format('d M Y') }}
-                                        </td>
-                                        <td class="crancy-table__column-5 fw-semibold">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <button type="button" data-bonus-id="{{ $bonus->id }}"
-                                                    class="btn-edit btn-cst btn-warning px-2">
-                                                    Edit
-                                                </button>
-                                
-                                                {{-- <form action="{{ route('manajemen-master-bonus.destroy', $bonus->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2">
-                                                        Hapus
-                                                    </button>
-                                                </form>--}}
-                                                
-                                            </div>
-                                        </td>
-                                    </tr>
+                                        @if ($bonus->is_deleted == 0)
+                                            <tr>
+                                                <td class="crancy-table__column-1 fw-semibold">
+                                                    {{ $iteration }}
+                                                </td>
+                                                <td class="crancy-table__column-2 fw-semibold">
+                                                    {{ $bonus->nama ?? '-' }}
+                                                </td>
+                                                <td class="crancy-table__column-3 fw-semibold">
+                                                    Rp {{ number_format($bonus->total, 0, ',', '.') }}
+                                                </td>
+                                                <td class="crancy-table__column-4 fw-semibold">
+                                                    {{ \Carbon\Carbon::parse($bonus->created_at)->format('d M Y') }}
+                                                </td>
+                                                <td class="crancy-table__column-5 fw-semibold">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <!-- Tombol Edit -->
+                                                        <button type="button" class="btn-edit btn-cst btn-warning px-2" data-bs-toggle="modal"
+                                                            data-bs-target="#editBonusModal-{{ $bonus->id }}">
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @php
+                                            $iteration++;
+                                        @endphp
+                                        @endif
                                     @endforeach
-                                    @else
+                                @else
                                     <tr>
                                         <td colspan="5" class="text-center">Tidak ada data bonus yang ditemukan.</td>
                                     </tr>
-                                    @endif
+                                @endif
                                 </tbody>
                                 
                                 {{-- End crancy Table Body --}}
@@ -157,20 +157,35 @@ Toko Emas - Master Bonus
     </div>
 </div>
 
+<!-- Modal Edit Bonus -->
+@foreach ($bonuses as $bonus)
+<div class="modal fade" id="editBonusModal-{{ $bonus->id }}" tabindex="-1" aria-labelledby="editBonusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBonusModalLabel">Edit Bonus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('manajemen-master-bonus.update', $bonus->id) }}" method="POST" class="p-2">
+                @csrf
+                @method('PUT')
+                <div class="mb-3">
+                    <label for="nama" class="form-label">Nama Bonus</label>
+                    <input type="text" class="form-control" id="editNama" name="nama" value="{{ $bonus->nama }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="total" class="form-label">Total (Amount)</label>
+                    <input type="number" class="form-control" id="editTotal" name="total" value="{{ $bonus->total }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
 
 @endsection
 
 @section('script')
-{{-- <script>
-    $(document).ready(function(){
-        $(document).on('click', '.btn-edit', function() {
-            let userId = $(this).data('user-id');
-            window.location.href = 'pengguna/' + userId + '/edit';
-        });
-    });
-</script> --}}
-@endsection
-
-@section('scripts')
     @include('layouts.datatables-scripts')
 @endsection

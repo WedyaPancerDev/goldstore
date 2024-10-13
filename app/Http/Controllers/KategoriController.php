@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KategoriController extends Controller
 {
@@ -73,9 +74,13 @@ class KategoriController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Kategori $kategori)
+    public function destroy(string $id)
     {
-        $kategori->delete();
+        DB::table('kategori')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dihapus');
     }
