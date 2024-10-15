@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthenticatedController::class, 'destroy'])->name('logout');
 
 
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:admin|akuntan|manajer'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'indexAdmin'])->name('admin.root');
 
         Route::resource('produk', ProdukController::class)->names([
@@ -105,9 +105,6 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('manajemen-target-penjualan/update/{id}', [TargetPenjualanController::class, 'update'])->name('manajemen-target-penjualan.update');
 
 
-
-
-
         Route::resource('transaksi-pengeluaran', TransaksiPengeluaranController::class)->names([
             'index' => 'manajemen-transaksi-pengeluaran.index',
             'create' => 'manajemen-transaksi-pengeluaran.create',
@@ -120,15 +117,74 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
     });
 
-    Route::middleware(['role:manajer'])->group(function () {
-        Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
-    });
 
     Route::middleware(['role:akuntan'])->group(function () {
         Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
     });
 
+    Route::middleware(['role:manajer'])->group(function () {
+        Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
+    });
+
     Route::middleware(['role:staff'])->group(function () {
-        Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
+        Route::resource('produk', ProdukController::class)->names([
+            'index' => 'manajemen-produk.index',
+            'create' => 'manajemen-produk.create',
+            'store' => 'manajemen-produk.store',
+            'edit' => 'manajemen-produk.edit',
+            'update' => 'manajemen-produk.update',
+            'destroy' => 'manajemen-produk.destroy',
+        ]);
+
+        Route::resource('kategori', KategoriController::class)->names([
+            'index' => 'manajemen-kategori.index',
+            'create' => 'manajemen-kategori.create',
+            'store' => 'manajemen-kategori.store',
+            'edit' => 'manajemen-kategori.edit',
+            'update' => 'manajemen-kategori.update',
+            'destroy' => 'manajemen-kategori.destroy',
+        ]);
+
+        Route::resource('master-bonus', MasterBonusController::class)->names([
+            'index' => 'manajemen-master-bonus.index',
+            'create' => 'manajemen-master-bonus.create',
+            'store' => 'manajemen-master-bonus.store',
+            'edit' => 'manajemen-master-bonus.edit',
+            'update' => 'manajemen-master-bonus.update',
+            'destroy' => 'manajemen-master-bonus.destroy',
+        ]);
+
+        Route::resource('assign-bonus', AssignBonusController::class)->names([
+            'index' => 'manajemen-assign-bonus.index',
+            'create' => 'manajemen-assign-bonus.create',
+            'store' => 'manajemen-assign-bonus.store',
+            'edit' => 'manajemen-assign-bonus.edit',
+            'update' => 'manajemen-assign-bonus.update',
+            'destroy' => 'manajemen-assign-bonus.destroy',
+        ]);
+
+        Route::resource('target-penjualan', TargetPenjualanController::class)->names([
+            'index' => 'manajemen-target-penjualan.index',
+            'create' => 'manajemen-target-penjualan.create',
+            'store' => 'manajemen-target-penjualan.store',
+        ]);
+
+        Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
+        Route::delete('/manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
+        Route::patch('/manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
+        Route::get('/manajemen-target-penjualan/{id}/detail', [TargetPenjualanController::class, 'detail'])->name('manajemen-target-penjualan.detail');
+        Route::get('manajemen-target-penjualan/edit/{id}', [TargetPenjualanController::class, 'edit'])->name('manajemen-target-penjualan.edit');
+        Route::patch('manajemen-target-penjualan/update/{id}', [TargetPenjualanController::class, 'update'])->name('manajemen-target-penjualan.update');
+
+        Route::resource('transaksi-pengeluaran', TransaksiPengeluaranController::class)->names([
+            'index' => 'manajemen-transaksi-pengeluaran.index',
+            'create' => 'manajemen-transaksi-pengeluaran.create',
+            'store' => 'manajemen-transaksi-pengeluaran.store',
+            'edit' => 'manajemen-transaksi-pengeluaran.edit',
+            'update' => 'manajemen-transaksi-pengeluaran.update',
+            'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
+        ]);
+
+        Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
     });
 });

@@ -1,14 +1,14 @@
 @php
-$role = auth()->user()->roles()->first()->name;
+    $role = auth()->user()->roles()->first()->name;
 
-$routeForRole = match ($role) {
-'admin' => route('admin.root'),
-'manajer' => route('manajer.root'),
-'staff' => route('staff.root'),
-'akuntan' => route('akuntan.root'),
-};
+    $routeForRole = match ($role) {
+        'admin' => route('admin.root'),
+        'manajer' => route('manajer.root'),
+        'staff' => route('staff.root'),
+        'akuntan' => route('akuntan.root'),
+    };
 
-$hasRole = request()->routeIs($role . '.root');
+    $hasRole = request()->routeIs($role . '.root');
 @endphp
 
 <div class="admin-menu">
@@ -40,76 +40,138 @@ $hasRole = request()->routeIs($role . '.root');
                     </a>
                 </li>
 
-                @role('admin|manajer|staff')
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-pengguna.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-pengguna.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-user fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Pengguna</span>
-                        </span>
-                    </a>
-                </li>
+                @role('admin|akuntan|manajer')
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-pengguna.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-pengguna.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-user fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Pengguna</span>
+                            </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-kategori.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-kategori.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-package fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Kategori<span>
-                                </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-kategori.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-kategori.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-package fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Kategori<span>
+                                    </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-produk.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-produk.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-package fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Produk</span>
-                        </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-produk.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-produk.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-package fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Produk</span>
+                            </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-transaksi-pengeluaran.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-notebook fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Transaksi Pengeluaran</span>
-                        </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-transaksi-pengeluaran.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-notebook fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Transaksi Pengeluaran</span>
+                            </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-master-bonus.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-master-bonus.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-note fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
-                        </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-master-bonus.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-master-bonus.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
+                            </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-assign-bonus.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-note fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
-                        </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-assign-bonus.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
+                            </span>
+                        </a>
+                    </li>
 
-                <li class="pb-2">
-                    <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
-                        href="{{ route('manajemen-target-penjualan.index') }}">
-                        <span class="menu-bar__text d-flex">
-                            <i class="ph ph-note fs-4 me-2"></i>
-                            <span class="menu-bar__name fs-6 fw-medium">Target Penjualan</span>
-                        </span>
-                    </a>
-                </li>
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-target-penjualan.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Target Penjualan</span>
+                            </span>
+                        </a>
+                    </li>
+                @endrole
+
+                @role('staff')
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-kategori.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-kategori.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-package fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Kategori<span>
+                                    </span>
+                        </a>
+                    </li>
+
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-produk.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-produk.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-package fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Produk</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-transaksi-pengeluaran.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-notebook fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Transaksi Pengeluaran</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-master-bonus.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-master-bonus.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-assign-bonus.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="pb-2">
+                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
+                            href="{{ route('manajemen-target-penjualan.index') }}">
+                            <span class="menu-bar__text d-flex">
+                                <i class="ph ph-note fs-4 me-2"></i>
+                                <span class="menu-bar__name fs-6 fw-medium">Target Penjualan</span>
+                            </span>
+                        </a>
+                    </li>
                 @endrole
             </ul>
         </div>
