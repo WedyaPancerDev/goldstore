@@ -71,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-kategori.destroy',
         ]);
 
+        Route::put('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+
+
         Route::resource('master-bonus', MasterBonusController::class)->names([
             'index' => 'manajemen-master-bonus.index',
             'create' => 'manajemen-master-bonus.create',

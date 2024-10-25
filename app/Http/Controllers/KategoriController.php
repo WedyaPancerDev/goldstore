@@ -84,4 +84,13 @@ class KategoriController extends Controller
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dihapus');
     }
+
+    public function restore($id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        $kategori->is_deleted = 0;
+        $kategori->save();
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diaktifkan kembali.');
+    }
 }
