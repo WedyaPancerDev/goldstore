@@ -3,6 +3,10 @@
     Toko Emas - Target Penjualan
 @endsection
 
+@section('title-section')
+    Target Penjualan
+@endsection
+
 @section('content')
     <section class="container container__bscreen mt-4">
         <div class="row mb-3">
