@@ -68,17 +68,14 @@
                                     </thead>
                                     <tbody class="crancy-table__body">
                                         @if ($kategori->count() > 0)
-                                        @php
-                                            $iteration = 1;
-                                        @endphp
                                             @foreach ($kategori as $data)
-                                            @if ($data->is_deleted == 0)
                                                 <tr>
-                                                    <td class="crancy-table__column-1 fw-semibold">{{ $iteration }}
+                                                    <td class="crancy-table__column-1 fw-semibold">{{ $loop->iteration }}
                                                     </td>
                                                     <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 text-center">
+                                                        @if ($data->is_deleted == 0)
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
                                                             <button type="button"
                                                                 class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
@@ -91,14 +88,24 @@
                                                             <button type="button" class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#removeKategoriModal-{{ $data->id }}">
-                                                                Hapus
+                                                                Nonaktifkan
                                                             </button>
                                                         </div>
+                                                        @else 
+                                                        <div class="d-flex align-items-center gap-2 justify-content-center">
+                                                            <form action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button type="submit"
+                                                                class="btn-edit btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                    Aktifkan
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                        @endif
                                                     </td>
                                                 </tr>
-                                            @php
-                                                $iteration++;
-                                            @endphp
                                                 
                                                 <!-- Modal Konfirmasi Hapus -->
                                                 <div id="removeKategoriModal-{{ $data->id }}"
@@ -115,8 +122,9 @@
                                                                 </div>
                                                                 <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                 <p class="text-muted mb-4">
-                                                                    Apakah kamu yakin ingin menghapus kategori ini?
-                                                                    <strong>Kategori yang dihapus tidak dapat dikembalikan.</strong>
+                                                                    Apakah kamu yakin ingin nonaktifkan kategori ini?
+                                                                    <strong>Kategori yang dinonaktifkan bisa
+                                                                        diaktifkan lagi.</strong>
                                                                 </p>
                                                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                                                     <button type="button"
@@ -129,14 +137,13 @@
                                                                         @method('DELETE')
                                                                         <button type="submit"
                                                                             class="btn btn-danger btn-sm">Iya,
-                                                                            Hapus!</button>
+                                                                            Nonaktifkan!</button>
                                                                     </form>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @endif
                                             @endforeach
                                         @endif
                                     </tbody>

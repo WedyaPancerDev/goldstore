@@ -82,6 +82,6 @@ class KategoriController extends Controller
                 'is_deleted' => true
             ]);
 
-        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dihapus');
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dinonaktifkan');
     }
 }
