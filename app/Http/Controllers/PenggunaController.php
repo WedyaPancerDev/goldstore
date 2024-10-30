@@ -11,6 +11,9 @@ class PenggunaController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    // t
+
     public function index()
     {
         $users = DB::table('users')

@@ -14,11 +14,23 @@ return new class extends Migration
         Schema::create('target_penjualan', function (Blueprint $table) {
             $table->id();
             $table->enum('bulan', [
-                'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-                'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+                'JAN',
+                'FEB',
+                'MAR',
+                'APR',
+                'MAY',
+                'JUN',
+
+                'JUL',
+                'AUG',
+                'SEP',
+                'OCT',
+                'NOV',
+                'DEC'
             ]);
             $table->integer("total")->default(0);
             $table->string("status")->default("TIDAK TERPENUHI");
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }

@@ -34,10 +34,7 @@ class KategoriController extends Controller
             'nama' => 'required|unique:kategori,nama',
         ]);
 
-        DB::transaction(function () use ($validated) {
-            Kategori::create($validated);
-        });
-
+        Kategori::create(attributes: $validated);
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
@@ -60,8 +57,8 @@ class KategoriController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'nama' => 'required|unique:kategori,nama,' . $id,
+        $validated = $request->validate([
+            'nama' => 'required|unique:kategori,nama,' . $kategori->id,
         ]);
 
         DB::transaction(function () use ($request, $id) {
@@ -80,10 +77,23 @@ class KategoriController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Kategori $kategori)
+    public function destroy(string $id)
     {
-        $kategori->delete();
+        DB::table('kategori')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dihapus');
+    }
+
+    public function restore($id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        $kategori->is_deleted = 0;
+        $kategori->save();
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diaktifkan kembali.');
     }
 }

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("nama");
             $table->double("total")->default(0);
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }

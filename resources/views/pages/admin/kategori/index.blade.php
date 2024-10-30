@@ -50,7 +50,7 @@
                                             <form class="crancy-header__form-inner" action="#">
                                                 <i class="ph ph-magnifying-glass fs-4 me-2"></i>
                                                 <input id="customSearchBox" name="s" type="text"
-                                                    placeholder="Cari kategori berdasarkan nama atau lainnya ..." />
+                                                    placeholder="Cari produk berdasarkan nama atau lainnya ..." />
                                             </form>
                                         </div>
                                     </div>
@@ -63,42 +63,99 @@
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                             <th class="crancy-table__column-2 crancy-table__h2">Nama Kategori</th>
                                             <th class="crancy-table__column-5 crancy-table__h5 text-center"
-                                                style="width: 1%;">Aksi</th> <!-- Set width ke fit-content -->
+                                                style="width: 1%;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody class="crancy-table__body">
                                         @if ($kategori->count() > 0)
+                                            @php
+                                                $iteration = 1;
+                                            @endphp
                                             @foreach ($kategori as $data)
                                                 <tr>
-                                                    <td class="crancy-table__column-1 fw-semibold">{{ $loop->iteration }}
-                                                    </td>
+                                                    <td class="crancy-table__column-1 fw-semibold">{{ $iteration }}</td>
                                                     <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 text-center">
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                            <button type="button"
-                                                                class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#editKategoriModal-{{ $data->id }}">
-                                                                Edit
-                                                            </button>
+                                                            @if ($data->is_deleted == 0)
+                                                                <!-- Tombol Edit -->
+                                                                <button type="button"
+                                                                    class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editKategoriModal-{{ $data->id }}">
+                                                                    Edit
+                                                                </button>
 
-                                                            <form
-                                                                action="{{ route('manajemen-kategori.destroy', $data->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2">
+                                                                <!-- Tombol Hapus -->
+                                                                <button type="button"
+                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#removeKategoriModal-{{ $data->id }}">
                                                                     Hapus
                                                                 </button>
-                                                            </form>
+                                                            @else
+                                                                <!-- Tombol Aktifkan jika is_deleted == 1 -->
+                                                                <form
+                                                                    action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button type="submit"
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                        Aktifkan
+                                                                    </button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                     </td>
                                                 </tr>
+
+                                                @php
+                                                    $iteration++;
+                                                @endphp
+
+                                                <!-- Modal Konfirmasi Hapus -->
+                                                <div id="removeKategoriModal-{{ $data->id }}" class="modal fade zoomIn"
+                                                    tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header border-0">
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center p-4">
+                                                                <div class="text-danger mb-4">
+                                                                    <i class="bi bi-trash display-4"></i>
+                                                                </div>
+                                                                <h4 class="mb-2">Apakah kamu yakin?</h4>
+                                                                <p class="text-muted mb-4">
+                                                                    Apakah kamu yakin ingin menghapus kategori ini?
+                                                                    <strong>Kategori yang dihapus tidak dapat
+                                                                        dikembalikan.</strong>
+                                                                </p>
+                                                                <div
+                                                                    class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                                    <button type="button" class="btn btn-light btn-sm"
+                                                                        data-bs-dismiss="modal">Batal</button>
+                                                                    <form
+                                                                        action="{{ route('manajemen-kategori.destroy', $data->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit"
+                                                                            class="btn btn-danger btn-sm">Iya,
+                                                                            Hapus!</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endforeach
                                         @endif
                                     </tbody>
+
                                 </table>
 
                                 {{-- End crancy Table --}}
@@ -147,45 +204,59 @@
         <div id="editKategoriModal-{{ $data->id }}" class="modal fade" tabindex="-1"
             aria-labelledby="editKategoriModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
-                <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}" class="modal-content"
-                    id="editKategoriForm">
+                <<<<<<< HEAD <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}"
+                    class="modal-content" id="editKategoriForm">
                     @csrf
                     @method('PUT')
 
-                    <div class="modal-header">
-                        <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    {{-- name kategori --}}
-                    <div class="modal-body p-4">
-                        <div class="mb-3 form-group">
-                            <label class="form-label" for="editNama-{{ $data->nama }}">Nama Kategori <span
-                                    class="text-danger">*</span></label>
-                            <input id="editNamaKategori-{{ $data->id }}" class="crancy-wc__form-input fw-semibold"
-                                type="text" name="nama" placeholder="Masukan nama kategori"
-                                value="{{ $data->nama }}" required />
-
-                            @if ($errors->has('nama'))
-                                <div class="pt-2">
-                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
-                                </div>
-                            @endif
+                    =======
+                    <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}"
+                        class="modal-content">
+                        @csrf
+                        @method('PUT')
+                        >>>>>>> b91b41becd59079363503b9c290b183e1fc0f1b3
+                        <div class="modal-header">
+                            <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
-                    </div>
 
-                    <div class="modal-footer">
-                        <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
-                    </div>
-                </form>
+                        <<<<<<< HEAD {{-- name kategori --}} <div class="modal-body p-4">
+                            <div class="mb-3 form-group">
+                                <label class="form-label" for="editNama-{{ $data->nama }}">Nama Kategori <span
+                                        class="text-danger">*</span></label>
+                                <input id="editNamaKategori-{{ $data->id }}"
+                                    class="crancy-wc__form-input fw-semibold" type="text" name="nama"
+                                    placeholder="Masukan nama kategori" value="{{ $data->nama }}" required />
+
+                                =======
+                                <div class="modal-body p-4">
+                                    <div class="mb-3 form-group">
+                                        <label class="form-label" for="editNama">Nama Kategori <span
+                                                class="text-danger">*</span></label>
+                                        <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold"
+                                            type="text" name="nama" value="{{ $data->nama }}" required />
+                                        >>>>>>> b91b41becd59079363503b9c290b183e1fc0f1b3
+                                        @if ($errors->has('nama'))
+                                            <div class="pt-2">
+                                                <span
+                                                    class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button id="btn-submit" type="submit" class="btn btn-primary">Simpan
+                                        Perubahan</button>
+                                    <button type="button" class="btn btn-light"
+                                        data-bs-dismiss="modal">Batalkan</button>
+                                </div>
+                    </form>
             </div>
         </div>
     @endforeach
-@endsection
-
-
-
-@section('scripts')
-    @include('layouts.datatables-scripts')
-@endsection
+    <<<<<<< HEAD @endsection @section('scripts')=======@endsection @section('script')>>>>>>>
+        b91b41becd59079363503b9c290b183e1fc0f1b3
+        @include('layouts.datatables-scripts')
+    @endsection

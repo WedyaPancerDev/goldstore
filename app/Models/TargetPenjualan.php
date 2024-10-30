@@ -9,7 +9,7 @@ class TargetPenjualan extends Model
 {
     use HasFactory;
 
-    protected $table = 'target-penjualan';
+    protected $table = 'target_penjualan';
     protected $guarded = [
         'created_at',
         'updated_at'
