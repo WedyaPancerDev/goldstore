@@ -30,6 +30,7 @@
                             readonly>
                     </div>
 
+
                     <form action="{{ route('manajemen-target-penjualan.update', $user->id) }}" method="POST">
                         @csrf
                         @method('PATCH')
@@ -119,17 +120,18 @@
 
             $('#show-filtered-product').click(function() {
                 var selectedMonth = $('#search_month').val();
-                var userId = "{{ $user->id }}";
 
                 $.ajax({
-                    url: "{{ route('manajemen-target-penjualan.detail', ['id' => $user->id]) }}",
+                    url: "{{ route('manajemen-target-penjualan.edits', $user->id) }}",
                     type: "GET",
                     data: {
                         month: selectedMonth
                     },
                     success: function(response) {
+                        console.log("Response dari server:", response);
                         var total = response.total !== null ? response.total : 0;
-                        var formattedTotal = formatNumber(total);
+                        var formattedTotal = formatNumber(
+                            total); // format total agar mudah dibaca
                         $('#total').val(formattedTotal).prop('disabled', false);
                         $('#status').val(response.status || 'Data tidak ditemukan');
                     },
@@ -139,6 +141,7 @@
                     }
                 });
             });
+
 
             $('#btn-reset-item').click(function() {
                 $('#search_month').val('none');

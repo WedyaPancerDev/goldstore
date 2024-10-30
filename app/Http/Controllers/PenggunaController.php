@@ -12,10 +12,7 @@ class PenggunaController extends Controller
      * Display a listing of the resource.
      */
 
-    // public function __construct()
-    // {
-    //     $this->middleware('role:staff');
-    // }
+    // t
 
     public function index()
     {
