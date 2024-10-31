@@ -204,59 +204,39 @@
         <div id="editKategoriModal-{{ $data->id }}" class="modal fade" tabindex="-1"
             aria-labelledby="editKategoriModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
-                <<<<<<< HEAD <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}"
-                    class="modal-content" id="editKategoriForm">
+                <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}" class="modal-content">
                     @csrf
                     @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-                    =======
-                    <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}"
-                        class="modal-content">
-                        @csrf
-                        @method('PUT')
-                        >>>>>>> b91b41becd59079363503b9c290b183e1fc0f1b3
-                        <div class="modal-header">
-                            <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                    <div class="modal-body p-4">
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="editNama">Nama Kategori <span
+                                    class="text-danger">*</span></label>
+                            <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold" type="text"
+                                name="nama" value="{{ $data->nama }}" required />
+                            @if ($errors->has('nama'))
+                                <div class="pt-2">
+                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
+                                </div>
+                            @endif
                         </div>
+                    </div>
 
-                        <<<<<<< HEAD {{-- name kategori --}} <div class="modal-body p-4">
-                            <div class="mb-3 form-group">
-                                <label class="form-label" for="editNama-{{ $data->nama }}">Nama Kategori <span
-                                        class="text-danger">*</span></label>
-                                <input id="editNamaKategori-{{ $data->id }}"
-                                    class="crancy-wc__form-input fw-semibold" type="text" name="nama"
-                                    placeholder="Masukan nama kategori" value="{{ $data->nama }}" required />
-
-                                =======
-                                <div class="modal-body p-4">
-                                    <div class="mb-3 form-group">
-                                        <label class="form-label" for="editNama">Nama Kategori <span
-                                                class="text-danger">*</span></label>
-                                        <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold"
-                                            type="text" name="nama" value="{{ $data->nama }}" required />
-                                        >>>>>>> b91b41becd59079363503b9c290b183e1fc0f1b3
-                                        @if ($errors->has('nama'))
-                                            <div class="pt-2">
-                                                <span
-                                                    class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button id="btn-submit" type="submit" class="btn btn-primary">Simpan
-                                        Perubahan</button>
-                                    <button type="button" class="btn btn-light"
-                                        data-bs-dismiss="modal">Batalkan</button>
-                                </div>
-                    </form>
+                    <div class="modal-footer">
+                        <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endforeach
-    <<<<<<< HEAD @endsection @section('scripts')=======@endsection @section('script')>>>>>>>
-        b91b41becd59079363503b9c290b183e1fc0f1b3
-        @include('layouts.datatables-scripts')
-    @endsection
+
+@endsection
+
+@section('script')
+    @include('layouts.datatables-scripts')
+@endsection

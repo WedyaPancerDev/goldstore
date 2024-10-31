@@ -50,25 +50,22 @@ class KategoriController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Kategori $kategori) {}
+    public function edit(Kategori $kategori)
+    {
+
+        return view("pages.admin.kategori.index", compact('kategori'));
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Kategori $kategori)
     {
         $validated = $request->validate([
             'nama' => 'required|unique:kategori,nama,' . $kategori->id,
         ]);
 
-        DB::transaction(function () use ($request, $id) {
-            $kategori = Kategori::find($id);
-
-            $kategori->update([
-                'nama' => $request->nama
-            ]);
-        });
-
+        $kategori->update($validated);
 
         return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diperbarui');
     }
