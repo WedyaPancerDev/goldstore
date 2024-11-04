@@ -3,6 +3,10 @@
     Toko Emas - Target Penjualan
 @endsection
 
+@section('title-section')
+    Target Penjualan
+@endsection
+
 @section('content')
     <section class="container container__bscreen mt-4">
         <div class="row mb-3">
@@ -35,21 +39,7 @@
                         <div class="tab-pane fade show active" id="crancy-table-tab-1" role="tabpanel"
                             aria-labelledby="crancy-table-tab-1">
                             <div class="crancy-table crancy-table--v3 mg-top-30">
-                                <div class="crancy-customer-filter crancy-customer-filter--inline">
-                                    <div class="crancy-customer-filter__single crancy-customer-filter__search">
-                                        <div class="crancy-header__form crancy-header__form--customer">
-                                            <form class="crancy-header__form-inner" action="#">
-                                                <i class="ph ph-magnifying-glass fs-4 me-2"></i>
-                                                <input id="customSearchBox" name="s" type="text"
-                                                    placeholder="Cari produk berdasarkan nama, kode, atau lainnya ..." />
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- Crancy Table --}}
                                 <table id="table-container" class="crancy-table__main crancy-table__main-v3">
-                                    {{-- Crancy Table Head --}}
                                     <thead class="crancy-table__head">
                                         <tr>
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
@@ -57,7 +47,6 @@
                                             <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
                                         </tr>
                                     </thead>
-                                    {{-- Crancy Table Body --}}
                                     <tbody class="crancy-table__body">
                                         @if ($targetPenjualan->count() > 0)
                                             @foreach ($targetPenjualan as $target)
@@ -66,7 +55,7 @@
                                                         {{ $loop->iteration }}
                                                     </td>
                                                     <td class="crancy-table__column-2 fw-semibold">
-                                                        {{ $target->fullname ?? '-' }}
+                                                        {{ $target->username ?? '-' }} <!-- Mengakses username langsung -->
                                                     </td>
                                                     <td class="crancy-table__column-3">
                                                         <div class="d-flex justify-content-evenly gap-2">
@@ -79,7 +68,6 @@
                                                                     </button>
                                                                 </a>
 
-
                                                                 <a
                                                                     href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
                                                                     <button
@@ -88,16 +76,15 @@
                                                                     </button>
                                                                 </a>
 
-
                                                                 <button type="button" class="btn-cst btn-danger px-3"
                                                                     data-bs-toggle="modal" style="width: 20%"
-                                                                    data-bs-target="#removeTargetModal-{{ $target->user_id }}">
+                                                                    data-bs-target="#removeTargetModal-">
                                                                     Nonaktifkan
                                                                 </button>
 
-                                                                <div id="removeTargetModal-{{ $target->user_id }}"
-                                                                    class="modal fade zoomIn" tabindex="-1"
-                                                                    aria-hidden="true">
+                                                                <!-- Modal untuk konfirmasi nonaktifkan -->
+                                                                <div id="removeTargetModal-" class="modal fade zoomIn"
+                                                                    tabindex="-1" aria-hidden="true">
                                                                     <div class="modal-dialog modal-dialog-centered">
                                                                         <div class="modal-content">
                                                                             <div class="modal-header border-0">
@@ -154,10 +141,7 @@
                                         @endif
                                     </tbody>
 
-                                    {{-- End Crancy Table Body --}}
                                 </table>
-                                {{-- End Crancy Table --}}
-
                             </div>
                         </div>
                     </div>
@@ -166,37 +150,36 @@
         </div>
     </section>
 
-    <!-- create -->
+    <!-- Modal untuk Menambah Target Penjualan -->
     <div id="addTargetPenjualan" class="modal fade" tabindex="-1" aria-labelledby="addTargetPenjualan" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="height: 75vh; max-height: 90vh;">
             <form method="POST" action="{{ route('manajemen-target-penjualan.store') }}" class="modal-content"
                 style="height: 100%;">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title fs-6" id="addTargetPenjualan">Tambah Target Penjualan Baru</h5>
+                    <h5 class="modal-title fs-6">Tambah Target Penjualan Baru</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="modal-body p-4 mb-4" style="overflow-y: auto;">
-                    <div class="mb-5 form-group">
-                        <label class="form-label">Pengguna <span class="text-danger">*</span></label>
-                        <select class="form-select crancy__item-input fw-semibold" name="user_id" required>
-                            <option value="" disabled selected>Pilih Pengguna</option>
-                            @foreach ($usersBelumTerdaftar as $user)
-                                <option value="{{ $user->id }}">{{ $user->fullname }} ({{ $user->username }})
-                                </option>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Pilih Pengguna <span class="text-danger">*</span></label>
+                        <select name="user_id" class="form-select">
+                            <option value="">Pilih Pengguna</option>
+                            @foreach ($availableUsers as $user)
+                                <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                <!-- Menampilkan username -->
                             @endforeach
                         </select>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button id="btn-submit" type="submit" class="btn btn-primary">Tambah Target Penjualan</button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
+                    <button type="submit" class="btn btn-primary">Tambah Target Penjualan</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
                 </div>
             </form>
         </div>
     </div>
+
 @endsection
 
 @section('script')
@@ -210,10 +193,6 @@
 
             $('#total').on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-            $(".js-select-2").select2({
-                theme: "default",
             });
         });
     </script>

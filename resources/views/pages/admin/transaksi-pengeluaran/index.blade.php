@@ -68,21 +68,24 @@
                                                 Nomor Order
                                             </th>
                                             <th class="crancy-table__column-3 crancy-table__h2">
+                                                Nama User
+                                            </th>
+                                            <th class="crancy-table__column-4 crancy-table__h2">
                                                 Produk
                                             </th>
-                                            <th class="crancy-table__column-4 crancy-table__h4">
+                                            <th class="crancy-table__column-5 crancy-table__h4">
                                                 Jumlah
                                             </th>
-                                            <th class="crancy-table__column-5 crancy-table__h4">
+                                            <th class="crancy-table__column-6 crancy-table__h4">
                                                 Total
                                             </th>
-                                            <th class="crancy-table__column-6 crancy-table__h5">
+                                            <th class="crancy-table__column-7 crancy-table__h5">
                                                 Deskripsi
                                             </th>
-                                            <th class="crancy-table__column-7 crancy-table__h5">
+                                            <th class="crancy-table__column-8 crancy-table__h5">
                                                 Tanggal Order
                                             </th>
-                                            <th class="crancy-table__column-8 crancy-table__h5">
+                                            <th class="crancy-table__column-9 crancy-table__h5">
                                                 Aksi
                                             </th>
                                         </tr>
@@ -99,18 +102,21 @@
                                                         {{ $transaksi->nomor_order ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-3 fw-semibold">
-                                                        {{ $transaksi->nama_produk ?? '-' }}
+                                                        {{ $transaksi->nama_user ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-4 fw-semibold">
-                                                        {{ $transaksi->quantity ?? '-' }}
+                                                        {{ $transaksi->nama_produk ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 fw-semibold">
-                                                        {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
+                                                        {{ $transaksi->quantity ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-6 fw-semibold">
-                                                        {{ $transaksi->deskripsi ?? '-' }}
+                                                        {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
                                                     </td>
                                                     <td class="crancy-table__column-7 fw-semibold">
+                                                        {{ $transaksi->deskripsi ?? '-' }}
+                                                    </td>
+                                                    <td class="crancy-table__column-8tar fw-semibold">
                                                         {{ $transaksi->order_date ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-8">
@@ -164,6 +170,22 @@
                         @if ($errors->has('product_id'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('product_id') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="mb-5 form-group">
+                        <label class="form-label" for="user_id">Pilih User <span class="text-danger">*</span></label>
+                        <select class="form-select" name="user_id" required>
+                            <option data-display="Pilih User" selected disabled></option>
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->username }}</option>
+                            @endforeach
+                        </select>
+
+                        @if ($errors->has('user_id'))
+                            <div class="pt-2">
+                                <span class="form-text text-danger">{{ $errors->first('user_id') }}</span>
                             </div>
                         @endif
                     </div>

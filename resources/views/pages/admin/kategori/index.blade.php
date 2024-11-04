@@ -68,28 +68,46 @@
                                     </thead>
                                     <tbody class="crancy-table__body">
                                         @if ($kategori->count() > 0)
+                                            @php
+                                                $iteration = 1;
+                                            @endphp
                                             @foreach ($kategori as $data)
                                                 <tr>
-                                                    <td class="crancy-table__column-1 fw-semibold">{{ $loop->iteration }}
-                                                    </td>
+                                                    <td class="crancy-table__column-1 fw-semibold">{{ $iteration }}</td>
                                                     <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 text-center">
                                                         @if ($data->is_deleted == 0)
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                            <button type="button"
-                                                                class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#editKategoriModal-{{ $data->id }}">
-                                                                Edit
-                                                            </button>
-                                                            
-                                                            <!-- Tombol Hapus -->
-                                                            <button type="button" class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#removeKategoriModal-{{ $data->id }}">
-                                                                Nonaktifkan
-                                                            </button>
+                                                            @if ($data->is_deleted == 0)
+                                                                <!-- Tombol Edit -->
+                                                                <button type="button"
+                                                                    class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editKategoriModal-{{ $data->id }}">
+                                                                    Edit
+                                                                </button>
+
+                                                                <!-- Tombol Hapus -->
+                                                                <button type="button"
+                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#removeKategoriModal-{{ $data->id }}">
+                                                                    Hapus
+                                                                </button>
+                                                            @else
+                                                                <!-- Tombol Aktifkan jika is_deleted == 1 -->
+                                                                <form
+                                                                    action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button type="submit"
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                        Aktifkan
+                                                                    </button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                         @else 
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
@@ -106,10 +124,14 @@
                                                         @endif
                                                     </td>
                                                 </tr>
-                                                
+
+                                                @php
+                                                    $iteration++;
+                                                @endphp
+
                                                 <!-- Modal Konfirmasi Hapus -->
-                                                <div id="removeKategoriModal-{{ $data->id }}"
-                                                    class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
+                                                <div id="removeKategoriModal-{{ $data->id }}" class="modal fade zoomIn"
+                                                    tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content">
                                                             <div class="modal-header border-0">
@@ -122,13 +144,13 @@
                                                                 </div>
                                                                 <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                 <p class="text-muted mb-4">
-                                                                    Apakah kamu yakin ingin nonaktifkan kategori ini?
-                                                                    <strong>Kategori yang dinonaktifkan bisa
-                                                                        diaktifkan lagi.</strong>
+                                                                    Apakah kamu yakin ingin menghapus kategori ini?
+                                                                    <strong>Kategori yang dihapus tidak dapat
+                                                                        dikembalikan.</strong>
                                                                 </p>
-                                                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                                                    <button type="button"
-                                                                        class="btn btn-light btn-sm"
+                                                                <div
+                                                                    class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                                    <button type="button" class="btn btn-light btn-sm"
                                                                         data-bs-dismiss="modal">Batal</button>
                                                                     <form
                                                                         action="{{ route('manajemen-kategori.destroy', $data->id) }}"
@@ -147,6 +169,7 @@
                                             @endforeach
                                         @endif
                                     </tbody>
+
                                 </table>
 
                                 {{-- End crancy Table --}}
@@ -192,37 +215,38 @@
 
     <!-- Modal Edit Kategori -->
     @foreach ($kategori as $data)
-    <div id="editKategoriModal-{{ $data->id }}" class="modal fade" tabindex="-1" aria-labelledby="editKategoriModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}" class="modal-content">
-                @csrf
-                @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body p-4">
-                    <div class="mb-3 form-group">
-                        <label class="form-label" for="editNama">Nama Kategori <span class="text-danger">*</span></label>
-                        <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold" type="text"
-                            name="nama" value="{{ $data->nama }}" required />
-                        @if ($errors->has('nama'))
-                            <div class="pt-2">
-                                <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
-                            </div>
-                        @endif
+        <div id="editKategoriModal-{{ $data->id }}" class="modal fade" tabindex="-1"
+            aria-labelledby="editKategoriModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <form method="POST" action="{{ route('manajemen-kategori.update', $data->id) }}" class="modal-content">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-6" id="editKategoriModalLabel">Edit Kategori</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
-                </div>
-            </form>
+                    <div class="modal-body p-4">
+                        <div class="mb-3 form-group">
+                            <label class="form-label" for="editNama">Nama Kategori <span
+                                    class="text-danger">*</span></label>
+                            <input id="editNamaKategori" class="crancy-wc__form-input fw-semibold" type="text"
+                                name="nama" value="{{ $data->nama }}" required />
+                            @if ($errors->has('nama'))
+                                <div class="pt-2">
+                                    <span class="form-text fw-semibold text-danger">{{ $errors->first('nama') }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="btn-submit" type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batalkan</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
     @endforeach
 
 @endsection

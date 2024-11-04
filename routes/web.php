@@ -71,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-kategori.destroy',
         ]);
 
+        Route::put('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+
+
         Route::resource('master-bonus', MasterBonusController::class)->names([
             'index' => 'manajemen-master-bonus.index',
             'create' => 'manajemen-master-bonus.create',
@@ -98,11 +101,14 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
 
-        Route::delete('/manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
-        Route::patch('/manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
-        Route::get('/manajemen-target-penjualan/{id}/detail', [TargetPenjualanController::class, 'detail'])->name('manajemen-target-penjualan.detail');
-        Route::get('manajemen-target-penjualan/edit/{id}', [TargetPenjualanController::class, 'edit'])->name('manajemen-target-penjualan.edit');
-        Route::patch('manajemen-target-penjualan/update/{id}', [TargetPenjualanController::class, 'update'])->name('manajemen-target-penjualan.update');
+        Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
+        Route::patch('manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
+        Route::get('manajemen-target-penjualan/detail/{userId}', [TargetPenjualanController::class, 'detail'])->name('manajemen-target-penjualan.detail');
+        Route::get('manajemen-target-penjualan/details/{userId}', [TargetPenjualanController::class, 'details'])->name('manajemen-target-penjualan.details');
+        Route::get('manajemen-target-penjualan/edit/{userId}', [TargetPenjualanController::class, 'edit'])->name('manajemen-target-penjualan.edit');
+        Route::get('manajemen-target-penjualan/edits/{userId}', [TargetPenjualanController::class, 'edits'])->name('manajemen-target-penjualan.edits');
+        Route::patch('manajemen-target-penjualan/update/{userId}', [TargetPenjualanController::class, 'update'])->name('manajemen-target-penjualan.update');
+
 
 
         Route::resource('transaksi-pengeluaran', TransaksiPengeluaranController::class)->names([

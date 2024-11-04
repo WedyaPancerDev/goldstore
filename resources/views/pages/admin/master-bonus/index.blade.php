@@ -4,7 +4,7 @@
 @endsection
 
 @section('title-section')
-    Pengguna
+    Master Bonus
 @endsection
 
 @section('css')

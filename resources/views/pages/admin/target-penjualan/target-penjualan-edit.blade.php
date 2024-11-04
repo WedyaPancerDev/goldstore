@@ -4,6 +4,10 @@
     Edit Target Penjualan
 @endsection
 
+@section('title-section')
+    Target Penjualan
+@endsection
+
 @section('content')
     <section class="container container__bscreen mt-4">
         <div class="row mb-3">
@@ -29,6 +33,7 @@
                         <input type="text" id="username" class="form-control" value="{{ $user->fullname ?? '' }}"
                             readonly>
                     </div>
+
 
                     <form action="{{ route('manajemen-target-penjualan.update', $user->id) }}" method="POST">
                         @csrf
@@ -119,17 +124,18 @@
 
             $('#show-filtered-product').click(function() {
                 var selectedMonth = $('#search_month').val();
-                var userId = "{{ $user->id }}";
 
                 $.ajax({
-                    url: "{{ route('manajemen-target-penjualan.detail', ['id' => $user->id]) }}",
+                    url: "{{ route('manajemen-target-penjualan.edits', $user->id) }}",
                     type: "GET",
                     data: {
                         month: selectedMonth
                     },
                     success: function(response) {
+                        console.log("Response dari server:", response);
                         var total = response.total !== null ? response.total : 0;
-                        var formattedTotal = formatNumber(total);
+                        var formattedTotal = formatNumber(
+                            total); // format total agar mudah dibaca
                         $('#total').val(formattedTotal).prop('disabled', false);
                         $('#status').val(response.status || 'Data tidak ditemukan');
                     },
@@ -139,6 +145,7 @@
                     }
                 });
             });
+
 
             $('#btn-reset-item').click(function() {
                 $('#search_month').val('none');
