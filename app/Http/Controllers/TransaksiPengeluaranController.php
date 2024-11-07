@@ -70,7 +70,6 @@ class TransaksiPengeluaranController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request
         $request->validate([
             'user_id' => 'required|exists:users,id',  // Add validation for user_id
             'product_id' => 'required|exists:produk,id',
@@ -79,32 +78,25 @@ class TransaksiPengeluaranController extends Controller
             'order_date' => 'required|date',
         ]);
 
-        // Use a transaction to ensure data integrity
         DB::transaction(function () use ($request) {
-            // Lock the product for update to prevent race conditions
             $product = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
 
-            // Check if there's enough stock
             if ($request->quantity > $product->stok) {
                 return back()->withErrors(['quantity' => 'Stok tidak mencukupi'])->withInput();
             }
 
-            // Deduct the stock
             DB::table('produk')
                 ->where('id', $request->product_id)
                 ->update(['stok' => $product->stok - $request->quantity]);
 
-            // Generate new order number
             $lastOrder = DB::table('transaksi_pengeluaran')->latest('id')->first();
             $newOrderNumber = $lastOrder ? 'INV-' . str_pad($lastOrder->id + 1, 3, '0', STR_PAD_LEFT) : 'INV-001';
 
-            // Calculate total price
             $totalPrice = $product->harga_jual * $request->quantity;
 
-            // Insert the new transaction
             DB::table('transaksi_pengeluaran')->insert([
                 'nomor_order' => $newOrderNumber,
-                'user_id' => $request->user_id,  // Add user_id to the insertion
+                'user_id' => $request->user_id,
                 'produk_id' => $request->product_id,
                 'quantity' => $request->quantity,
                 'total_price' => $totalPrice,
@@ -113,7 +105,7 @@ class TransaksiPengeluaranController extends Controller
             ]);
         });
 
-        // Redirect with a success message
+
         return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil ditambahkan');
     }
 

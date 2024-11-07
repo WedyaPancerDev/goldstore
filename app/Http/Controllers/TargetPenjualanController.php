@@ -15,19 +15,15 @@ class TargetPenjualanController extends Controller
      */
     public function index()
     {
-        // Ambil seluruh target penjualan yang terkait dengan bulan JAN dan pengguna yang terhubung
         $targetPenjualan = TargetPenjualan::select('target_penjualan.*', 'users.username')
             ->leftJoin('users', 'target_penjualan.user_id', '=', 'users.id')
-            ->where('target_penjualan.bulan', 'JAN') // Filter hanya untuk bulan Januari
+            ->where('target_penjualan.bulan', 'JAN')
             ->get();
 
-        // Ambil ID pengguna yang sudah terdaftar di target penjualan untuk bulan Januari
         $existingUserIds = $targetPenjualan->pluck('user_id')->toArray();
 
-        // Ambil pengguna yang belum terdaftar di target penjualan
         $availableUsers = User::whereNotIn('id', $existingUserIds)->get();
 
-        // Kembalikan view dengan data target penjualan, pengguna yang tersedia
         return view('pages.admin.target-penjualan.index', compact('targetPenjualan', 'availableUsers'));
     }
 
@@ -35,21 +31,16 @@ class TargetPenjualanController extends Controller
 
 
 
-
-
     public function detail(Request $request, $userId)
     {
-        // Fetch the target using user_id
         $target = TargetPenjualan::where('user_id', $userId)->first();
         if (!$target) {
-            // Handle case where target is not found
             return redirect()->back()->with('error', 'Target not found.');
         }
 
         $user = User::find($target->user_id);
         $transaksi = TransaksiPengeluaran::where("user_id", "=", $user->id)->get();
 
-        // Bulan dalam format angka
         $month = [
             'JAN' => "01",
             'FEB' => "02",
@@ -65,7 +56,6 @@ class TargetPenjualanController extends Controller
             'DEC' => "12",
         ];
 
-        // Daftar bulan
         $months = [
             'JAN',
             'FEB',
@@ -81,18 +71,14 @@ class TargetPenjualanController extends Controller
             'DEC',
         ];
 
-        // Dapatkan bulan dari target
         $targetMonth = $month[$target->bulan] ?? null;
 
         if ($targetMonth) {
-            // Filter transaksi yang sesuai dengan bulan target
             $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
-                // Ambil bulan dari order_date
                 $orderMonth = date('m', strtotime($t->order_date));
                 return $orderMonth === $targetMonth;
             });
 
-            // Jumlahkan total_price untuk transaksi yang cocok
             $totalPrice = $filteredTransactions->sum('total_price');
 
             $status = $totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
@@ -105,20 +91,16 @@ class TargetPenjualanController extends Controller
 
     public function details(Request $request, $userId)
     {
-        // Fetch the target using user_id
         $target = TargetPenjualan::where('user_id', $userId)->first();
         if (!$target) {
-            // Handle case where target is not found
             return response()->json(['error' => 'Target not found.'], 404);
         }
 
         $user = User::find($target->user_id);
         $transaksi = TransaksiPengeluaran::where("user_id", $user->id)->get();
 
-        // Retrieve selected month from the request
         $selectedMonth = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
 
-        // Filter transactions based on selected month
         $filteredTransactions = $transaksi->filter(function ($t) use ($selectedMonth) {
             $orderMonth = date('m', strtotime($t->order_date));
             return $orderMonth === $selectedMonth;
@@ -146,13 +128,11 @@ class TargetPenjualanController extends Controller
             ->where('bulan', $hasil_bulan)
             ->get();
 
-        // Calculate total price and determine status
         $totalPrice = $filteredTransactions->sum('total_price');
         $status = $totalPrice > $target_total[0]->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
 
 
 
-        // Return response in JSON format for AJAX handling
         return response()->json([
             'total' => $totalPrice,
             'target_total' => $target_total[0],
@@ -186,29 +166,25 @@ class TargetPenjualanController extends Controller
     {
         // Validasi input
         $request->validate([
-            'user_id' => 'required|exists:users,id', // Pastikan user_id ada di tabel users
+            'user_id' => 'required|exists:users,id',
         ]);
 
-        // Ambil user_id dari request
         $userId = $request->input('user_id');
 
-        // Buat array untuk menampung data bulan
         $months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
-        // Loop untuk menyimpan 12 target penjualan untuk masing-masing bulan
         foreach ($months as $month) {
             TargetPenjualan::create([
                 'user_id' => $userId,
                 'bulan' => $month,
-                'total' => 0, // Default total
-                'status' => 'TIDAK TERPENUHI', // Default status
-                'is_deleted' => false, // Default is_deleted
-                'created_at' => now(), // Timestamp untuk created_at
-                'updated_at' => now(), // Timestamp untuk updated_at
+                'total' => 0,
+                'status' => 'TIDAK TERPENUHI',
+                'is_deleted' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
 
-        // Redirect atau kembali ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('manajemen-target-penjualan.index')->with('success', 'Target penjualan berhasil ditambahkan.');
     }
 
@@ -227,7 +203,6 @@ class TargetPenjualanController extends Controller
 
     public function edit($userId)
     {
-        // Fetch the target associated with the specified user_id
         $target = TargetPenjualan::where('user_id', $userId)->first();
 
         if (!$target) {
@@ -235,9 +210,7 @@ class TargetPenjualanController extends Controller
         }
 
         $user = User::find($userId);
-        // dd($user->id);
 
-        // Assuming you have a way to get the months for the dropdown
         $months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
         return view('pages.admin.target-penjualan.target-penjualan-edit', compact('target', 'user', 'months'));
@@ -288,13 +261,11 @@ class TargetPenjualanController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the incoming request data
         $request->validate([
             'total' => 'required|numeric|min:0',
             'search_month' => 'required|in:1,2,3,4,5,6,7,8,9,10,11,12',
         ]);
 
-        // dd($request->input('search_month'));
 
         $month = [
             "1" => 'JAN',
@@ -313,11 +284,9 @@ class TargetPenjualanController extends Controller
 
         $searchMonth = $request->input('search_month');
         if (array_key_exists($searchMonth, $month)) {
-            $hasil_bulan = $month[$searchMonth]; // Get the corresponding month abbreviation
-
+            $hasil_bulan = $month[$searchMonth];
         }
 
-        // Fetch the target for the specified user based on ID
         $target = TargetPenjualan::find($id);
 
         if (!$target) {
@@ -331,9 +300,7 @@ class TargetPenjualanController extends Controller
                 'total' => $request->total,
             ]);
 
-        // Update the total based on the selected month
-        // $target->total = $request->input('total');
-        // $target->save(); // Save the changes
+
 
         return redirect()->route('manajemen-target-penjualan.index')->with('success', 'Target updated successfully.');
     }

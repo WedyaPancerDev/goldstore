@@ -12,6 +12,7 @@ use App\Http\Controllers\TargetPenjualanController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 use App\Models\AssignBonus;
 use App\Models\MasterBonus;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedController::class, 'index'])->name('ui.login');
@@ -27,9 +28,12 @@ Route::middleware(['auth'])->group(function () {
             'manajer' => route('manajer.root'),
             'akuntan' => route('akuntan.root'),
             'staff' => route('staff.root'),
+            default => null
         };
 
         if (is_null($redirectRoute)) {
+            Auth::logout();
+
             return redirect()->route('login')->with('error', 'Anda tidak memiliki akses');
         }
 
