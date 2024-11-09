@@ -105,6 +105,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
 
+        Route::get('/laporan/penjualan/pdf', [TargetPenjualanController::class, 'exportPDF'])->name('laporan.penjualan.pdf');
+
+
+
         Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
         Route::patch('manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
         Route::get('manajemen-target-penjualan/detail/{userId}', [TargetPenjualanController::class, 'detail'])->name('manajemen-target-penjualan.detail');

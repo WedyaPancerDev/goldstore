@@ -20,7 +20,6 @@ return new class extends Migration
                 'APR',
                 'MAY',
                 'JUN',
-
                 'JUL',
                 'AUG',
                 'SEP',

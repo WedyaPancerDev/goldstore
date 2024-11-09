@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -257,8 +259,6 @@ class TargetPenjualanController extends Controller
 
 
 
-
-
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -333,5 +333,75 @@ class TargetPenjualanController extends Controller
             ]);
 
         return redirect()->route('manajemen-target-penjualan.index')->with('success', 'Target penjualan berhasil diaktifkan.');
+    }
+
+
+    public function exportPDF()
+    {
+        // Ambil semua target penjualan
+        $targets = TargetPenjualan::where('is_deleted', false)->get();
+
+        // Siapkan data untuk laporan
+        $reportData = [];
+
+        foreach ($targets as $target) {
+            $user = User::find($target->user_id);
+            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+
+            // Menentukan bulan
+            $month = [
+                'JAN' => '01',
+                'FEB' => '02',
+                'MAR' => '03',
+                'APR' => '04',
+                'MAY' => '05',
+                'JUN' => '06',
+                'JUL' => '07',
+                'AUG' => '08',
+                'SEP' => '09',
+                'OCT' => '10',
+                'NOV' => '11',
+                'DEC' => '12',
+            ];
+
+            $targetMonth = $month[$target->bulan] ?? null;
+
+            // Filter transaksi berdasarkan bulan
+            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                $orderMonth = date('m', strtotime($t->order_date));
+                return $orderMonth === $targetMonth;
+            });
+
+            // Hitung total harga
+            $totalPrice = $filteredTransactions->sum('total_price');
+
+            // Tentukan status berdasarkan perbandingan antara target dan total price
+            if ($target->total == 0 && $totalPrice == 0) {
+                // Jika target dan total harga sama-sama 0, status TIDAK TERPENUHI
+                $status = 'TIDAK TERPENUHI';
+            } else {
+                // Jika total harga lebih besar atau sama dengan target, status TERPENUHI
+                $status = $totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
+            }
+
+            // Tambahkan data ke array
+            $reportData[] = [
+                'user' => $user->fullname,
+                'bulan' => $target->bulan,
+                'target' => $target->total,
+                'total_price' => $totalPrice,
+                'status' => $status
+            ];
+        }
+
+
+        // Generate PDF
+        $pdf = PDF::loadView('reports.target_penjualan', compact('reportData'));
+
+        $dateNow = Carbon::now()->format('Y-m-d_H-i-s   ');
+        $fileName = "laporan-target-penjualan-{$dateNow}.pdf";
+
+        // Return PDF as response
+        return $pdf->download($fileName);
     }
 }

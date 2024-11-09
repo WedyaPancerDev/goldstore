@@ -26,12 +26,24 @@
             <div class="crancy-body">
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
-                        <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
+                        <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-between">
                             <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                 data-bs-target="#addTargetPenjualan">
                                 <i class="ph ph-plus fs-5"></i>
                                 Tambah Target Penjualan
                             </button>
+                            <div class="d-flex gap-2 ">
+                                <a href="{{ route('laporan.penjualan.pdf') }}"
+                                    class="btn btn-danger font-bold p-2 d-flex align-items-center gap-2">
+                                    <i class="ph ph-note fs-5"></i>
+                                    Laporan PDF
+                                </a>
+
+                                <div class="btn btn-warning font-bold p-2 text-white d-flex align-items-center gap-2">
+                                    <i class="ph ph-note fs-5"></i>
+                                    laporan exel
+                                </div>
+                            </div>
                         </div>
                     </div>
 
