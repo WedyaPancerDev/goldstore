@@ -33,13 +33,14 @@
                                 Tambah Target Penjualan
                             </button>
                             <div class="d-flex gap-2 ">
-                                <a href="{{ route('laporan.penjualan.pdf') }}"
+                                <div data-bs-toggle="modal" data-bs-target="#laporanPDF"
                                     class="btn btn-danger font-bold p-2 d-flex align-items-center gap-2">
                                     <i class="ph ph-note fs-5"></i>
                                     Laporan PDF
-                                </a>
+                                </div>
 
-                                <div class="btn btn-warning font-bold p-2 text-white d-flex align-items-center gap-2">
+                                <div data-bs-toggle="modal" data-bs-target="#laporanEXEL"
+                                    class="btn btn-warning font-bold p-2 text-white d-flex align-items-center gap-2">
                                     <i class="ph ph-note fs-5"></i>
                                     laporan exel
                                 </div>
@@ -187,6 +188,53 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Tambah Target Penjualan</button>
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- modal pdf --}}
+    <div id="laporanPDF" class="modal fade" tabindex="-1" aria-labelledby="laporanPDF" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable d-flex align-items-center justify-content-center"
+            style="height: 75vh; max-height: 90vh;">
+            <form class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fs-6">Laporan Penjualan PDF</h5>
+                    <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <a href="{{ route('exportYearlyTargetPenjualan') }}"
+                            class="btn btn-danger form-control">Tahunan</a>
+                    </div>
+                    <div class="mb-3">
+                        <a href="{{ route('exportMonthlyPDF') }}" class="btn btn-danger form-control">Bulanan</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- modal exel --}}
+    <div id="laporanEXEL" class="modal fade" tabindex="-1" aria-labelledby="laporanEXEL" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable d-flex align-items-center justify-content-center"
+            style="height: 75vh; max-height: 90vh;">
+            <form class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fs-6">Laporan Penjualan Exel</h5>
+                    <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <a href="{{ route('export.yearly.excel') }}"
+                            class="btn btn-warning form-control font-bold text-white">Tahunan</a>
+                    </div>
+                    <div class="mb-3">
+                        <a href="{{ route('export.monthly.excel') }}"
+                            class="btn btn-warning form-control font-bold text-white">Bulanan</a>
+                    </div>
                 </div>
             </form>
         </div>

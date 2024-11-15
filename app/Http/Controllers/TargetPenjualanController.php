@@ -9,6 +9,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TargetPenjualanController extends Controller
 {
@@ -332,11 +335,11 @@ class TargetPenjualanController extends Controller
                 'is_deleted' => false
             ]);
 
-        return redirect()->route('manajemen-target-penjualan.index')->with('success', 'Target penjualan berhasil diaktifkan.');
+        return redirect()->route('manajemen-target-penjualan.')->with('success', 'Target penjualan berhasil diaktifkan.');
     }
 
 
-    public function exportPDF()
+    public function exportMonthlyPDF()
     {
         // Ambil semua target penjualan
         $targets = TargetPenjualan::where('is_deleted', false)->get();
@@ -396,12 +399,208 @@ class TargetPenjualanController extends Controller
 
 
         // Generate PDF
-        $pdf = PDF::loadView('reports.target_penjualan', compact('reportData'));
+        $pdf = PDF::loadView('reports.target_penjualan_monthly', compact('reportData'));
 
         $dateNow = Carbon::now()->format('Y-m-d_H-i-s   ');
         $fileName = "laporan-target-penjualan-{$dateNow}.pdf";
 
         // Return PDF as response
         return $pdf->download($fileName);
+    }
+
+    public function exportYearlyPDF()
+    {
+        // Get unique user IDs for non-deleted sales targets
+        $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
+
+        // Prepare data for the yearly report
+        $reportData = [];
+        $years = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year');
+
+        foreach ($years as $year) {
+            $yearlyData = [];
+            foreach ($userIds as $userId) {
+                $user = User::find($userId);
+
+                // Calculate total target for the user for the given year
+                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                    ->where('is_deleted', false)
+                    ->sum('total');
+
+                // Calculate total sales for the user for the given year
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                    ->whereYear('order_date', $year)
+                    ->sum('total_price');
+
+                // Determine status based on total target and sales for the year
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                // Only include users who have sales data for this year
+                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                    $yearlyData[] = [
+                        'user' => $user->fullname,
+                        'total_target' => $totalTargetTahun,
+                        'total_penjualan' => $totalPenjualanTahun,
+                        'status' => $status,
+                    ];
+                }
+            }
+            // Add data for the year if any user has data for that year
+            if (!empty($yearlyData)) {
+                $reportData[$year] = $yearlyData;
+            }
+        }
+
+        // Generate PDF with yearly report data
+        $pdf = PDF::loadView('reports.target_penjualan_yearly', compact('reportData'));
+
+        // Format the filename with the current date and time
+        $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
+        $fileName = "laporan-target-penjualan-tahunan-{$dateNow}.pdf";
+
+        // Download the PDF file
+        return $pdf->download($fileName);
+    }
+
+    // Fungsi ekspor bulanan
+    public function exportMonthlyExcel()
+    {
+        $targets = TargetPenjualan::where('is_deleted', false)->get();
+        $reportData = [];
+
+        foreach ($targets as $target) {
+            $user = User::find($target->user_id);
+            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+
+            $month = [
+                'JAN' => '01',
+                'FEB' => '02',
+                'MAR' => '03',
+                'APR' => '04',
+                'MAY' => '05',
+                'JUN' => '06',
+                'JUL' => '07',
+                'AUG' => '08',
+                'SEP' => '09',
+                'OCT' => '10',
+                'NOV' => '11',
+                'DEC' => '12',
+            ];
+
+            $targetMonth = $month[$target->bulan] ?? null;
+            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                return date('m', strtotime($t->order_date)) === $targetMonth;
+            });
+
+            $totalPrice = $filteredTransactions->sum('total_price');
+            $status = $target->total == 0 && $totalPrice == 0
+                ? 'TIDAK TERPENUHI'
+                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+            $reportData[] = [
+                'user' => $user->fullname,
+                'bulan' => $target->bulan,
+                'target' => $target->total,
+                'total_price' => $totalPrice,
+                'status' => $status
+            ];
+        }
+
+        $dateNow = now()->format('Y-m-d_H-i-s');
+        $fileName = "laporan-target-penjualan-bulanan-{$dateNow}.xlsx";
+
+        return Excel::download(new class($reportData) implements FromArray, WithHeadings {
+            protected $data;
+
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return ['User', 'Bulan', 'Target', 'Total Price', 'Status'];
+            }
+        }, $fileName);
+    }
+
+    // Fungsi ekspor tahunan
+    public function exportYearlyExcel()
+    {
+        $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
+        $reportData = [];
+        $years = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year');
+
+        foreach ($years as $year) {
+            $yearlyData = [];
+            foreach ($userIds as $userId) {
+                $user = User::find($userId);
+
+                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                    ->where('is_deleted', false)
+                    ->sum('total');
+
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                    ->whereYear('order_date', $year)
+                    ->sum('total_price');
+
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                    $yearlyData[] = [
+                        'user' => $user->fullname,
+                        'total_target' => $totalTargetTahun,
+                        'total_penjualan' => $totalPenjualanTahun,
+                        'status' => $status,
+                    ];
+                }
+            }
+
+            if (!empty($yearlyData)) {
+                $reportData[$year] = $yearlyData;
+            }
+        }
+
+        $dateNow = now()->format('Y-m-d_H-i-s');
+        $fileName = "laporan-target-penjualan-tahunan-{$dateNow}.xlsx";
+
+        return Excel::download(new class($reportData) implements FromArray, WithHeadings {
+            protected $data;
+
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                $data = [];
+                foreach ($this->data as $year => $yearlyData) {
+                    foreach ($yearlyData as $item) {
+                        $data[] = array_merge(['Year' => $year], $item);
+                    }
+                }
+                return $data;
+            }
+
+            public function headings(): array
+            {
+                return ['Year', 'User', 'Total Target', 'Total Penjualan', 'Status'];
+            }
+        }, $fileName);
     }
 }

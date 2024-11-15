@@ -104,8 +104,10 @@ Route::middleware(['auth'])->group(function () {
         ]);
 
         Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
-
-        Route::get('/laporan/penjualan/pdf', [TargetPenjualanController::class, 'exportPDF'])->name('laporan.penjualan.pdf');
+        Route::get('/laporan/penjualan/pdf', [TargetPenjualanController::class, 'exportMonthlyPDF'])->name('exportMonthlyPDF');
+        Route::get('/export-yearly-target-penjualan', [TargetPenjualanController::class, 'exportYearlyPDF'])->name('exportYearlyTargetPenjualan');
+        Route::get('/export-monthly-excel', [TargetPenjualanController::class, 'exportMonthlyExcel'])->name('export.monthly.excel');
+        Route::get('/export-yearly-excel', [TargetPenjualanController::class, 'exportYearlyExcel'])->name('export.yearly.excel');
 
 
 
