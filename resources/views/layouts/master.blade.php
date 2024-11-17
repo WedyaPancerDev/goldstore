@@ -35,6 +35,7 @@
     @include('layouts.bottom-scripts')
     @yield('scripts')
     {{-- <script src="https://wedyapancer.sgp1.cdn.digitaloceanspaces.com/cdn/index.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 
 </html>

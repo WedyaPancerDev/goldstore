@@ -93,7 +93,7 @@
                             </span>
                         </a>
                     </li>
-
+                    @if ($role !== 'staff')
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
                             href="{{ route('manajemen-assign-bonus.index') }}">
@@ -103,6 +103,7 @@
                             </span>
                         </a>
                     </li>
+                    @endif
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
