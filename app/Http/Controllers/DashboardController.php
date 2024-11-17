@@ -31,21 +31,19 @@ class DashboardController extends Controller
     }
 
     public function getTargetAndTransaksi(Request $request){
-        $userId = Auth::id(); // Mendapatkan ID user yang sedang login
+        $userId = Auth::id(); 
 
-        // Menghitung sum total_price berdasarkan bulan untuk transaksi_pengeluaran
+        
         $transaksiPengeluaranData = TransaksiPengeluaran::selectRaw('SUM(total_price) as total_price, MONTH(order_date) as month')
             ->where('user_id', $userId)
             ->groupByRaw('MONTH(order_date)')
             ->orderByRaw('MONTH(order_date)')
             ->get();
 
-        // Mengambil total pada target_penjualan berdasarkan bulan (dari kolom 'bulan') untuk user yang sedang login
         $targetPenjualanData = TargetPenjualan::select('total', 'bulan')
             ->where('user_id', $userId)
             ->get();
 
-        // Mapping dari bulan numerik ke nama bulan dalam enum
         $monthEnumMap = [
             1  => 'JAN',
             2  => 'FEB',
@@ -61,27 +59,23 @@ class DashboardController extends Controller
             12 => 'DEC',
         ];
 
-        // Format data untuk Chart.js
         $chartData = [
             'months' => [],
             'transaksi_pengeluaran' => [],
             'target_penjualan' => []
         ];
 
-        // Loop untuk menyusun data bulan
         foreach (range(1, 12) as $month) {
-            $monthName = date('F', mktime(0, 0, 0, $month, 10)); // Nama bulan dalam bahasa Inggris
+            $monthName = date('F', mktime(0, 0, 0, $month, 10));
             $chartData['months'][] = $monthName;
 
             $transaksi = $transaksiPengeluaranData->firstWhere('month', $month);
 
-            // Mendapatkan nilai enum bulan
+
             $bulanEnum = $monthEnumMap[$month];
 
-            // Mencari data target penjualan berdasarkan bulan enum
             $target = $targetPenjualanData->firstWhere('bulan', $bulanEnum);
 
-            // Menambahkan data ke array
             $chartData['transaksi_pengeluaran'][] = $transaksi ? $transaksi->total_price : 0;
             $chartData['target_penjualan'][] = $target ? $target->total : 0;
         }
