@@ -12,6 +12,7 @@ use App\Http\Controllers\TargetPenjualanController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 use App\Models\AssignBonus;
 use App\Models\MasterBonus;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedController::class, 'index'])->name('ui.login');
@@ -27,9 +28,12 @@ Route::middleware(['auth'])->group(function () {
             'manajer' => route('manajer.root'),
             'akuntan' => route('akuntan.root'),
             'staff' => route('staff.root'),
+            default => null
         };
 
         if (is_null($redirectRoute)) {
+            Auth::logout();
+
             return redirect()->route('login')->with('error', 'Anda tidak memiliki akses');
         }
 
@@ -100,6 +104,12 @@ Route::middleware(['auth'])->group(function () {
         ]);
 
         Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
+        Route::get('/laporan/penjualan/pdf', [TargetPenjualanController::class, 'exportMonthlyPDF'])->name('exportMonthlyPDF');
+        Route::get('/export-yearly-target-penjualan', [TargetPenjualanController::class, 'exportYearlyPDF'])->name('exportYearlyTargetPenjualan');
+        Route::get('/export-monthly-excel', [TargetPenjualanController::class, 'exportMonthlyExcel'])->name('export.monthly.excel');
+        Route::get('/export-yearly-excel', [TargetPenjualanController::class, 'exportYearlyExcel'])->name('export.yearly.excel');
+
+
 
         Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
         Route::patch('manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
