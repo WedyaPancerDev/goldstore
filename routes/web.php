@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:admin|akuntan|manajer|staff'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'indexAdmin'])->name('admin.root');
+        Route::get('/staff-chart-data', [DashboardController::class, 'getStaffChartData'])->name('staff.chart.data');
 
         Route::resource('produk', ProdukController::class)->names([
             'index' => 'manajemen-produk.index',
@@ -145,6 +146,5 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
         Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
-
     });
 });

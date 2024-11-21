@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -30,10 +31,11 @@ class DashboardController extends Controller
         return view('pages.staff.dashboard');
     }
 
-    public function getTargetAndTransaksi(Request $request){
-        $userId = Auth::id(); 
+    public function getTargetAndTransaksi(Request $request)
+    {
+        $userId = Auth::id();
 
-        
+
         $transaksiPengeluaranData = TransaksiPengeluaran::selectRaw('SUM(total_price) as total_price, MONTH(order_date) as month')
             ->where('user_id', $userId)
             ->groupByRaw('MONTH(order_date)')
@@ -82,6 +84,62 @@ class DashboardController extends Controller
 
         return response()->json($chartData);
     }
-    
-    
+
+    public function getStaffChartData(Request $request)
+    {
+        $monthParam = strtoupper($request->query('month'));
+
+        $validMonths = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        if ($monthParam && !in_array($monthParam, $validMonths)) {
+            return response()->json(['error' => 'Invalid month parameter'], 400);
+        }
+
+        $monthEnumMap = [
+            1  => 'JAN',
+            2  => 'FEB',
+            3  => 'MAR',
+            4  => 'APR',
+            5  => 'MAY',
+            6  => 'JUN',
+            7  => 'JUL',
+            8  => 'AUG',
+            9  => 'SEP',
+            10 => 'OCT',
+            11 => 'NOV',
+            12 => 'DEC',
+        ];
+
+        $staffUsers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'staff');
+        })->get();
+
+        $chartData = [];
+
+        $monthsToShow = $monthParam ? [$monthParam] : array_values($monthEnumMap);
+
+        foreach ($staffUsers as $user) {
+            $userChartData = [
+                'user' => $user->fullname,
+                'transaksi_pengeluaran' => [],
+                'target_penjualan' => [],
+                'months' => $monthsToShow,
+            ];
+
+            foreach ($monthsToShow as $month) {
+                $totalTransaksiPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)
+                    ->whereMonth('order_date', date('m', strtotime("01 $month")))
+                    ->sum('total_price');
+                $userChartData['transaksi_pengeluaran'][] = $totalTransaksiPengeluaran;
+
+                $totalTargetPenjualan = TargetPenjualan::where('user_id', $user->id)
+                    ->where('bulan', $month)
+                    ->sum('total');
+                $userChartData['target_penjualan'][] = $totalTargetPenjualan;
+            }
+
+            $chartData[] = $userChartData;
+        }
+
+        return response()->json($chartData);
+    }
 }
