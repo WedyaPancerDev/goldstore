@@ -87,18 +87,15 @@ class DashboardController extends Controller
 
     public function getStaffChartData(Request $request)
     {
-        // Ambil semua tahun unik dari transaksi pengeluaran (hanya tahun yang memiliki data)
         $availableYears = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
             ->distinct()
             ->orderBy('year')
             ->pluck('year');
 
-        // Query pengguna dengan peran "staff"
         $staffUsers = User::whereHas('roles', function ($query) {
             $query->where('name', 'staff');
         })->get();
 
-        // Data chart untuk respon JSON
         $chartData = [];
 
         foreach ($staffUsers as $user) {
@@ -116,7 +113,6 @@ class DashboardController extends Controller
                 ],
             ];
 
-            // --- Data Perbulan ---
             foreach ($userChartData['monthly']['months'] as $month) {
                 $totalTransaksiPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereMonth('order_date', date('m', strtotime("01 $month")))
@@ -130,9 +126,7 @@ class DashboardController extends Controller
                 $userChartData['monthly']['target_penjualan'][] = $totalTargetPenjualan;
             }
 
-            // --- Data Pertahun ---
             foreach ($availableYears as $year) {
-                // Hitung total transaksi pengeluaran dan target penjualan per tahun
                 $totalTransaksiPengeluaranTahun = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereYear('order_date', $year)
                     ->sum('total_price');
@@ -141,7 +135,6 @@ class DashboardController extends Controller
                     ->whereYear('created_at', $year)
                     ->sum('total');
 
-                // Hanya tambahkan data jika ada transaksi pengeluaran atau target penjualan pada tahun tersebut
                 if ($totalTransaksiPengeluaranTahun > 0 || $totalTargetPenjualanTahun > 0) {
                     $userChartData['yearly']['years'][] = $year;
                     $userChartData['yearly']['transaksi_pengeluaran'][] = $totalTransaksiPengeluaranTahun;

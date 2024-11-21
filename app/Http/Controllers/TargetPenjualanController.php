@@ -341,17 +341,14 @@ class TargetPenjualanController extends Controller
 
     public function exportMonthlyPDF()
     {
-        // Ambil semua target penjualan
         $targets = TargetPenjualan::where('is_deleted', false)->get();
 
-        // Siapkan data untuk laporan
         $reportData = [];
 
         foreach ($targets as $target) {
             $user = User::find($target->user_id);
             $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
 
-            // Menentukan bulan
             $month = [
                 'JAN' => '01',
                 'FEB' => '02',
@@ -369,25 +366,19 @@ class TargetPenjualanController extends Controller
 
             $targetMonth = $month[$target->bulan] ?? null;
 
-            // Filter transaksi berdasarkan bulan
             $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
                 $orderMonth = date('m', strtotime($t->order_date));
                 return $orderMonth === $targetMonth;
             });
 
-            // Hitung total harga
             $totalPrice = $filteredTransactions->sum('total_price');
 
-            // Tentukan status berdasarkan perbandingan antara target dan total price
             if ($target->total == 0 && $totalPrice == 0) {
-                // Jika target dan total harga sama-sama 0, status TIDAK TERPENUHI
                 $status = 'TIDAK TERPENUHI';
             } else {
-                // Jika total harga lebih besar atau sama dengan target, status TERPENUHI
                 $status = $totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
             }
 
-            // Tambahkan data ke array
             $reportData[] = [
                 'user' => $user->fullname,
                 'bulan' => $target->bulan,
@@ -398,22 +389,18 @@ class TargetPenjualanController extends Controller
         }
 
 
-        // Generate PDF
         $pdf = PDF::loadView('reports.target_penjualan_monthly', compact('reportData'));
 
         $dateNow = Carbon::now()->format('Y-m-d_H-i-s   ');
         $fileName = "laporan-target-penjualan-{$dateNow}.pdf";
 
-        // Return PDF as response
         return $pdf->download($fileName);
     }
 
     public function exportYearlyPDF()
     {
-        // Get unique user IDs for non-deleted sales targets
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
 
-        // Prepare data for the yearly report
         $reportData = [];
         $years = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
             ->distinct()
@@ -425,21 +412,17 @@ class TargetPenjualanController extends Controller
             foreach ($userIds as $userId) {
                 $user = User::find($userId);
 
-                // Calculate total target for the user for the given year
                 $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
                     ->where('is_deleted', false)
                     ->sum('total');
 
-                // Calculate total sales for the user for the given year
                 $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereYear('order_date', $year)
                     ->sum('total_price');
 
-                // Determine status based on total target and sales for the year
                 $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
                     : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                // Only include users who have sales data for this year
                 if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
                     $yearlyData[] = [
                         'user' => $user->fullname,
@@ -449,24 +432,19 @@ class TargetPenjualanController extends Controller
                     ];
                 }
             }
-            // Add data for the year if any user has data for that year
             if (!empty($yearlyData)) {
                 $reportData[$year] = $yearlyData;
             }
         }
 
-        // Generate PDF with yearly report data
         $pdf = PDF::loadView('reports.target_penjualan_yearly', compact('reportData'));
 
-        // Format the filename with the current date and time
         $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
         $fileName = "laporan-target-penjualan-tahunan-{$dateNow}.pdf";
 
-        // Download the PDF file
         return $pdf->download($fileName);
     }
 
-    // Fungsi ekspor bulanan
     public function exportMonthlyExcel()
     {
         $targets = TargetPenjualan::where('is_deleted', false)->get();
@@ -533,7 +511,6 @@ class TargetPenjualanController extends Controller
         }, $fileName);
     }
 
-    // Fungsi ekspor tahunan
     public function exportYearlyExcel()
     {
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
