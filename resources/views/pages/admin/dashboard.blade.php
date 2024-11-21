@@ -28,46 +28,62 @@
                 const container = document.getElementById('staffChartsContainer');
 
                 data.forEach(userData => {
-                    const chartCol = document.createElement('div');
-                    chartCol.classList.add('col-12', 'col-md-6', 'mb-4');
+                    const userSection = document.createElement('div');
+                    userSection.classList.add('col-12', 'mb-4');
 
-                    chartCol.innerHTML = `
+                    let yearlyChart = '';
+                    // Hanya tampilkan chart yearly jika data tersedia
+                    if (userData.yearly.years.length > 0) {
+                        yearlyChart = `
+                            <div class="col-md-6">
+                                <h5 class="text-center">Chart Pertahun</h5>
+                                <canvas id="chart-yearly-${userData.user.replace(/\s+/g, '-')}"></canvas>
+                            </div>
+                        `;
+                    }
+
+                    userSection.innerHTML = `
                         <div class="card">
                             <div class="card-header text-center">
-                                <h5>${userData.user}</h5>
+                                <h4>${userData.user}</h4>
                             </div>
                             <div class="card-body">
-                                <canvas id="chart-${userData.user.replace(/\s+/g, '-')}"></canvas>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="text-center">Chart Perbulan</h5>
+                                        <canvas id="chart-monthly-${userData.user.replace(/\s+/g, '-')}"></canvas>
+                                    </div>
+                                    ${yearlyChart}
+                                </div>
                             </div>
                         </div>
                     `;
-                    container.appendChild(chartCol);
+                    container.appendChild(userSection);
 
-                    const ctx = document.getElementById(`chart-${userData.user.replace(/\s+/g, '-')}`)
-                        .getContext('2d');
-                    new Chart(ctx, {
+                    // --- Render Chart Perbulan ---
+                    const ctxMonthly = document.getElementById(
+                        `chart-monthly-${userData.user.replace(/\s+/g, '-')}`).getContext('2d');
+                    new Chart(ctxMonthly, {
                         type: 'bar',
                         data: {
-                            labels: userData.months,
+                            labels: userData.monthly.months,
                             datasets: [{
                                     label: 'Transaksi Pengeluaran',
-                                    data: userData.transaksi_pengeluaran,
+                                    data: userData.monthly.transaksi_pengeluaran,
                                     backgroundColor: 'rgba(0, 51, 202, 0.72)',
-                                    borderWidth: 2
                                 },
                                 {
                                     label: 'Target Penjualan',
-                                    data: userData.target_penjualan,
+                                    data: userData.monthly.target_penjualan,
                                     backgroundColor: 'rgba(202, 59, 0, 0.72)',
-                                    borderWidth: 2
-                                }
-                            ]
+                                },
+                            ],
                         },
                         options: {
                             responsive: true,
                             plugins: {
                                 legend: {
-                                    position: 'top',
+                                    position: 'top'
                                 },
                             },
                             scales: {
@@ -83,10 +99,56 @@
                                         text: 'Total (Rp)'
                                     },
                                     beginAtZero: true
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     });
+
+                    // --- Render Chart Pertahun ---
+                    if (userData.yearly.years.length > 0) {
+                        const ctxYearly = document.getElementById(
+                            `chart-yearly-${userData.user.replace(/\s+/g, '-')}`).getContext('2d');
+                        new Chart(ctxYearly, {
+                            type: 'bar',
+                            data: {
+                                labels: userData.yearly.years,
+                                datasets: [{
+                                        label: 'Transaksi Pengeluaran',
+                                        data: userData.yearly.transaksi_pengeluaran,
+                                        backgroundColor: 'rgba(0, 102, 255, 0.72)',
+                                    },
+                                    {
+                                        label: 'Target Penjualan',
+                                        data: userData.yearly.target_penjualan,
+                                        backgroundColor: 'rgba(255, 102, 0, 0.72)',
+                                    },
+                                ],
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top'
+                                    },
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Tahun'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Total (Rp)'
+                                        },
+                                        beginAtZero: true
+                                    },
+                                },
+                            },
+                        });
+                    }
                 });
             })
             .catch(error => console.error('Error:', error));
