@@ -147,4 +147,30 @@ class DashboardController extends Controller
 
         return response()->json($chartData);
     }
+
+
+    public function getAllTransaksiandTarget()
+    {
+        $users = User::all();
+
+        $result = [];
+
+        foreach ($users as $user) {
+            $userData = [
+                'user' => $user->fullname,
+                'transaksi_pengeluaran' => [
+                    'total' => TransaksiPengeluaran::where('user_id', $user->id)->sum('total_price'),
+                    'count' => TransaksiPengeluaran::where('user_id', $user->id)->count(),
+                ],
+                'target_penjualan' => [
+                    'total' => TargetPenjualan::where('user_id', $user->id)->sum('total'),
+                    'count' => TargetPenjualan::where('user_id', $user->id)->count(),
+                ],
+            ];
+
+            $result[] = $userData;
+        }
+
+        return response()->json($result);
+    }
 }

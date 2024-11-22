@@ -137,6 +137,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:akuntan'])->group(function () {
         Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
+        Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
     });
 
     Route::middleware(['role:manajer'])->group(function () {
