@@ -79,7 +79,7 @@
                             href="{{ route('manajemen-transaksi-pengeluaran.index') }}">
                             <span class="menu-bar__text d-flex">
                                 <i class="ph ph-notebook fs-4 me-2"></i>
-                                <span class="menu-bar__name fs-6 fw-medium">Transaksi Pengeluaran</span>
+                                <span class="menu-bar__name fs-6 fw-medium">Transaksi Penjualan</span>
                             </span>
                         </a>
                     </li>
@@ -93,7 +93,7 @@
                             </span>
                         </a>
                     </li>
-
+                    @if ($role !== 'staff')
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
                             href="{{ route('manajemen-assign-bonus.index') }}">
@@ -103,6 +103,7 @@
                             </span>
                         </a>
                     </li>
+                    @endif
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
