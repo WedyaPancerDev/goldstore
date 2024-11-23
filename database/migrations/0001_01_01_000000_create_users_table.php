@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('account_status', ['active', 'inactive'])->default('active');
             $table->boolean('is_deleted')->default(false);
             $table->timestamp("last_login")->nullable();
+            $table->string('profile_picture')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

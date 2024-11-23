@@ -148,4 +148,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
         Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
     });
+
+    Route::get('/profile', [PenggunaController::class, 'getUserProfile'])->name('user.profile');
+    Route::post('/profile/update', [PenggunaController::class, 'putUserProfile'])->name('user.update');
 });
