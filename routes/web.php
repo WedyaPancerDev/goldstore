@@ -110,6 +110,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export-monthly-excel', [TargetPenjualanController::class, 'exportMonthlyExcel'])->name('export.monthly.excel');
         Route::get('/export-yearly-excel', [TargetPenjualanController::class, 'exportYearlyExcel'])->name('export.yearly.excel');
 
+        Route::get('export-yearly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportYearlyExcelByUser'])->name('export.yearly.excel.byuser');
+        Route::get('export-monthly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportMonthlyExcelByUser'])->name('export.monthly.excel.byuser');
+
+
+        Route::get('export-monthly-pdf/{userId}', [TargetPenjualanController::class, 'exportMonthlyPDFByUser'])->name('export.monthly.pdf.byuser');
+        Route::get('export-yearly-pdf/{userId}', [TargetPenjualanController::class, 'exportYearlyPDFByUser'])->name('export.yearly.pdf.byuser');
+
+
 
 
         Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');

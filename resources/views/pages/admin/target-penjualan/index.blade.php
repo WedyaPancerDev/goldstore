@@ -26,26 +26,28 @@
             <div class="crancy-body">
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
-                        <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-between">
-                            <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                data-bs-target="#addTargetPenjualan">
-                                <i class="ph ph-plus fs-5"></i>
-                                Tambah Target Penjualan
-                            </button>
-                            <div class="d-flex gap-2 ">
-                                <div data-bs-toggle="modal" data-bs-target="#laporanPDF"
-                                    class="btn btn-danger font-bold p-2 d-flex align-items-center gap-2">
-                                    <i class="ph ph-note fs-5"></i>
-                                    Laporan PDF
-                                </div>
+                        @role('admin|akuntan|manajer')
+                            <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-between">
+                                <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+                                    data-bs-target="#addTargetPenjualan">
+                                    <i class="ph ph-plus fs-5"></i>
+                                    Tambah Target Penjualan
+                                </button>
+                                <div class="d-flex gap-2 ">
+                                    <div data-bs-toggle="modal" data-bs-target="#laporanPDF"
+                                        class="btn btn-danger font-bold p-2 d-flex align-items-center gap-2">
+                                        <i class="ph ph-note fs-5"></i>
+                                        Laporan PDF
+                                    </div>
 
-                                <div data-bs-toggle="modal" data-bs-target="#laporanEXEL"
-                                    class="btn btn-warning font-bold p-2 text-white d-flex align-items-center gap-2">
-                                    <i class="ph ph-note fs-5"></i>
-                                    laporan exel
+                                    <div data-bs-toggle="modal" data-bs-target="#laporanEXEL"
+                                        class="btn btn-warning font-bold p-2 text-white d-flex align-items-center gap-2">
+                                        <i class="ph ph-note fs-5"></i>
+                                        laporan exel
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endrole
                     </div>
 
                     <div class="tab-content" id="nav-tabContent">
@@ -68,74 +70,105 @@
                                                         {{ $loop->iteration }}
                                                     </td>
                                                     <td class="crancy-table__column-2 fw-semibold">
-                                                        {{ $target->username ?? '-' }} <!-- Mengakses username langsung -->
+                                                        {{ $target->username ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-3">
-                                                        <div class="d-flex justify-content-evenly gap-2">
+                                                        <div class="d-flex justify-content-evenly gap-1">
                                                             @if ($target->is_deleted == 0)
-                                                                <a
-                                                                    href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
-                                                                    <button
-                                                                        class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold">
-                                                                        Detail
+                                                                @role('admin|akuntan|manajer')
+                                                                    <a
+                                                                        href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
+                                                                        <button
+                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold">
+                                                                            Detail
+                                                                        </button>
+                                                                    </a>
+
+                                                                    <!-- Edit Button -->
+                                                                    <a
+                                                                        href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
+                                                                        <button
+                                                                            class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold">
+                                                                            Ubah
+                                                                        </button>
+                                                                    </a>
+
+                                                                    <!-- Nonaktifkan Button & Modal Trigger -->
+                                                                    <button type="button" class="btn-cst btn-danger px-3 w-25"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#removeTargetModal-{{ $target->user_id }}">
+                                                                        Nonaktifkan
                                                                     </button>
-                                                                </a>
 
-                                                                <a
-                                                                    href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
-                                                                    <button
-                                                                        class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold">
-                                                                        Ubah
-                                                                    </button>
-                                                                </a>
-
-                                                                <button type="button" class="btn-cst btn-danger px-3"
-                                                                    data-bs-toggle="modal" style="width: 20%"
-                                                                    data-bs-target="#removeTargetModal-">
-                                                                    Nonaktifkan
-                                                                </button>
-
-                                                                <!-- Modal untuk konfirmasi nonaktifkan -->
-                                                                <div id="removeTargetModal-" class="modal fade zoomIn"
-                                                                    tabindex="-1" aria-hidden="true">
-                                                                    <div class="modal-dialog modal-dialog-centered">
-                                                                        <div class="modal-content">
-                                                                            <div class="modal-header border-0">
-                                                                                <button type="button" class="btn-close"
-                                                                                    data-bs-dismiss="modal"
-                                                                                    aria-label="Close"></button>
-                                                                            </div>
-                                                                            <div class="modal-body text-center p-4">
-                                                                                <div class="text-danger mb-4">
-                                                                                    <i class="bi bi-trash display-4"></i>
+                                                                    <!-- Modal for Deactivation -->
+                                                                    <div id="removeTargetModal-{{ $target->user_id }}"
+                                                                        class="modal fade zoomIn" tabindex="-1"
+                                                                        aria-hidden="true">
+                                                                        <div class="modal-dialog modal-dialog-centered">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header border-0">
+                                                                                    <button type="button" class="btn-close"
+                                                                                        data-bs-dismiss="modal"
+                                                                                        aria-label="Close"></button>
                                                                                 </div>
-                                                                                <h4 class="mb-2">Apakah kamu yakin?</h4>
-                                                                                <p class="text-muted mb-4">
-                                                                                    Apakah kamu yakin ingin menonaktifkan
-                                                                                    pengguna ini?
-                                                                                    <strong>Pengguna yang dinonaktifkan bisa
-                                                                                        diaktifkan lagi.</strong>
-                                                                                </p>
-                                                                                <div
-                                                                                    class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-light btn-sm"
-                                                                                        data-bs-dismiss="modal">Batal</button>
-                                                                                    <form
-                                                                                        action="{{ route('manajemen-target-penjualan.destroy', $target->user_id) }}"
-                                                                                        method="POST">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                            class="btn btn-danger btn-sm">Iya,
-                                                                                            Nonaktifkan!</button>
-                                                                                    </form>
+                                                                                <div class="modal-body text-center p-4">
+                                                                                    <div class="text-danger mb-4">
+                                                                                        <i class="bi bi-trash display-4"></i>
+                                                                                    </div>
+                                                                                    <h4 class="mb-2">Apakah kamu yakin?
+                                                                                    </h4>
+                                                                                    <p class="text-muted mb-4">
+                                                                                        Apakah kamu yakin ingin
+                                                                                        menonaktifkan pengguna ini?
+                                                                                        <strong>Pengguna yang dinonaktifkan
+                                                                                            bisa diaktifkan lagi.</strong>
+                                                                                    </p>
+                                                                                    <div
+                                                                                        class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-light btn-sm"
+                                                                                            data-bs-dismiss="modal">Batal</button>
+                                                                                        <form
+                                                                                            action="{{ route('manajemen-target-penjualan.destroy', $target->user_id) }}"
+                                                                                            method="POST">
+                                                                                            @csrf
+                                                                                            @method('DELETE')
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-danger btn-sm">Iya,
+                                                                                                Nonaktifkan!</button>
+                                                                                        </form>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
+                                                                @endrole
+
+                                                                @role('staff')
+                                                                    <div class="d-flex gap-2 fw-semibold">
+                                                                        <a href="{{ route('export.yearly.pdf.byuser', $target->user_id) }}"
+                                                                            class="btn btn-warning">
+                                                                            Laporan Tahunan PDF
+                                                                        </a>
+
+                                                                        <a href="{{ route('export.monthly.pdf.byuser', $target->user_id) }}"
+                                                                            class="btn btn-warning">
+                                                                            Laporan Bulanan PDF
+                                                                        </a>
+
+                                                                        <a href="{{ route('export.yearly.excel.byuser', $target->user_id) }}"
+                                                                            class="btn btn-success">
+                                                                            Laporan Tahunan Excel
+                                                                        </a>
+
+                                                                        <a href="{{ route('export.monthly.excel.byuser', $target->user_id) }}"
+                                                                            class="btn btn-success">
+                                                                            Laporan Bulanan Excel
+                                                                        </a>
+                                                                    </div>
+                                                                @endrole
                                                             @else
+                                                                <!-- Restore Button (Still available for everyone) -->
                                                                 <form
                                                                     action="{{ route('manajemen-target-penjualan.restore', $target->user_id) }}"
                                                                     method="POST">
@@ -152,8 +185,8 @@
                                                 </tr>
                                             @endforeach
                                         @endif
-                                    </tbody>
 
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
