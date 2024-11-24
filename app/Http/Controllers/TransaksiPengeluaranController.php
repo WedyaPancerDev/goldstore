@@ -71,7 +71,8 @@ class TransaksiPengeluaranController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',  // Add validation for user_id
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
             'product_id' => 'required|exists:produk,id',
             'quantity' => 'required|integer|min:1',
             'deskripsi' => 'required|string',
@@ -79,7 +80,12 @@ class TransaksiPengeluaranController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            // Ambil produk dan lock stok untuk transaksi
             $product = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
+
+            if (!$product) {
+                return back()->withErrors(['product_id' => 'Produk tidak ditemukan'])->withInput();
+            }
 
             if ($request->quantity > $product->stok) {
                 return back()->withErrors(['quantity' => 'Stok tidak mencukupi'])->withInput();
@@ -90,25 +96,32 @@ class TransaksiPengeluaranController extends Controller
                 ->update(['stok' => $product->stok - $request->quantity]);
 
             $lastOrder = DB::table('transaksi_pengeluaran')->latest('id')->first();
-            $newOrderNumber = $lastOrder ? 'INV-' . str_pad($lastOrder->id + 1, 3, '0', STR_PAD_LEFT) : 'INV-001';
+            $newOrderNumberBase = $lastOrder
+                ? 'INV-' . str_pad($lastOrder->id + 1, 3, '0', STR_PAD_LEFT)
+                : 'INV-001';
 
-            $totalPrice = $product->harga_jual * $request->quantity;
+            $totalPricePerUser = ceil(($product->harga_jual * $request->quantity) / count($request->user_ids));
 
-            DB::table('transaksi_pengeluaran')->insert([
-                'nomor_order' => $newOrderNumber,
-                'user_id' => $request->user_id,
-                'produk_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'total_price' => $totalPrice,
-                'deskripsi' => $request->deskripsi,
-                'order_date' => $request->order_date,
-            ]);
+            foreach ($request->user_ids as $userId) {
+                $newOrderNumber = $newOrderNumberBase . '-' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+
+                DB::table('transaksi_pengeluaran')->insert([
+                    'nomor_order' => $newOrderNumber,
+                    'user_id' => $userId,
+                    'produk_id' => $request->product_id,
+                    'quantity' => $request->quantity,
+                    'total_price' => $totalPricePerUser,
+                    'deskripsi' => $request->deskripsi,
+                    'order_date' => $request->order_date,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         });
 
-
-        return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil ditambahkan');
+        return redirect()->route('manajemen-transaksi-pengeluaran.index')
+            ->with('success', 'Transaksi berhasil ditambahkan untuk semua user yang dipilih.');
     }
-
 
 
     /**

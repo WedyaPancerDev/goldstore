@@ -154,7 +154,7 @@
                 </div>
 
                 <div class="modal-body p-4">
-
+                    <!-- Produk -->
                     <div class="mb-5 form-group">
                         <label class="form-label" for="product_id">Pilih Produk <span class="text-danger">*</span></label>
                         <select class="form-select crancy__item-input product-select" name="product_id" required>
@@ -165,8 +165,6 @@
                                 </option>
                             @endforeach
                         </select>
-
-
                         @if ($errors->has('product_id'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('product_id') }}</span>
@@ -174,30 +172,29 @@
                         @endif
                     </div>
 
+                    <!-- User -->
                     <div class="mb-5 form-group">
-                        <label class="form-label" for="user_id">Pilih User <span class="text-danger">*</span></label>
-                        <select class="form-select" name="user_id" required>
-                            <option data-display="Pilih User" selected disabled></option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->username }}</option>
-                            @endforeach
-                        </select>
-
-                        @if ($errors->has('user_id'))
-                            <div class="pt-2">
-                                <span class="form-text text-danger">{{ $errors->first('user_id') }}</span>
+                        <label class="form-label">Pilih User <span class="text-danger">*</span></label>
+                        <div id="user-selection-container">
+                            <div class="d-flex align-items-center mb-2 user-select-row">
+                                <select class="form-select user-select" name="user_ids[]" required>
+                                    <option data-display="Pilih User" selected disabled></option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-sm btn-success ms-2 add-user-btn">Tambah</button>
                             </div>
-                        @endif
+                        </div>
+                        <span class="form-text text-muted">Maksimal 3 user dapat dipilih.</span>
                     </div>
 
+                    <!-- Quantity -->
                     <div class="mb-3 pt-3 form-group">
                         <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
                         <input class="form-control quantity-input" type="text" name="quantity"
                             placeholder="Masukkan Quantity" required />
-
                         <span id="stock-warning" class="text-danger py-2 text-sm"></span>
-
-
                         @if ($errors->has('quantity'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('quantity') }}</span>
@@ -205,6 +202,7 @@
                         @endif
                     </div>
 
+                    <!-- Total Harga -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="total_price">Total Harga <span
                                 class="text-danger">*</span></label>
@@ -212,6 +210,7 @@
                             readonly />
                     </div>
 
+                    <!-- Deskripsi -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="deskripsi">Deskripsi <span class="text-danger">*</span></label>
                         <textarea id="deskripsi" class="crancy-wc__form-input fw-semibold" name="deskripsi"></textarea>
@@ -222,6 +221,7 @@
                         @endif
                     </div>
 
+                    <!-- Tanggal Order -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="order_date">Tanggal Order <span
                                 class="text-danger">*</span></label>
@@ -241,6 +241,7 @@
             </form>
         </div>
     </div>
+
 
     {{-- Edit Modal --}}
     @foreach ($transaksiPengeluaran as $transaksi)
@@ -333,6 +334,110 @@
     @include('layouts.datatables-scripts')
 
     <script>
+        $(document).ready(function() {
+            let maxUsers = 3;
+
+            function updateUserOptions() {
+                let selectedUsers = [];
+                $('.user-select').each(function() {
+                    let val = $(this).val();
+                    if (val) selectedUsers.push(val);
+                });
+
+                $('.user-select').each(function() {
+                    let currentSelect = $(this);
+                    currentSelect.find('option').each(function() {
+                        if ($(this).val() && selectedUsers.includes($(this).val()) && $(this)
+                            .val() !== currentSelect.val()) {
+                            $(this).hide();
+                        } else {
+                            $(this).show();
+                        }
+                    });
+                });
+            }
+
+            function calculateSplitTotal() {
+                let quantity = parseInt($('.quantity-input').val()) || 0;
+                let productPrice = parseFloat($('.product-select').find(':selected').data('price')) || 0;
+                let selectedUserCount = $('.user-select').filter(function() {
+                    return $(this).val() && $(this).val() !== '';
+                }).length;
+
+                let totalPrice = 0;
+                if (quantity > 0 && productPrice > 0 && selectedUserCount > 0) {
+                    let fullPrice = quantity * productPrice;
+                    totalPrice = Math.ceil(fullPrice / selectedUserCount);
+                }
+
+                $('#total_price').val(totalPrice.toLocaleString('id-ID', {
+                    minimumFractionDigits: 0
+                }));
+            }
+
+            function updateSubmitButtonState() {
+                let isProductSelected = $('.product-select').val() !== null;
+                let isQuantityValid = $('.quantity-input').val() > 0;
+                let isUserSelected = $('.user-select').filter(function() {
+                    return $(this).val() !== null;
+                }).length > 0;
+
+                if (isProductSelected && isQuantityValid && isUserSelected) {
+                    $('#btn-submit').prop('disabled', false);
+                } else {
+                    $('#btn-submit').prop('disabled', true);
+                }
+            }
+
+            $('#user-selection-container').on('click', '.add-user-btn', function() {
+                if ($('.user-select-row').length < maxUsers) {
+                    $('#user-selection-container').append(`
+                <div class="d-flex align-items-center mb-2 user-select-row">
+                    <select class="form-select user-select" name="user_ids[]" required>
+                        <option data-display="Pilih User" selected disabled></option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->username }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button" class="btn btn-sm btn-danger ms-2 remove-user-btn">Hapus</button>
+                </div>
+            `);
+                    updateUserOptions();
+                    calculateSplitTotal();
+                    updateSubmitButtonState();
+                }
+            });
+
+            $('.product-select').on('change', function() {
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            $('.quantity-input').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            $('#user-selection-container').on('change', '.user-select', function() {
+                updateUserOptions();
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            $('#user-selection-container').on('click', '.add-user-btn, .remove-user-btn', function() {
+                updateUserOptions();
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+
+            updateSubmitButtonState();
+            calculateSplitTotal();
+        });
+    </script>
+
+    {{-- <script>
         $(document).ready(function() {
             function debounce(func, delay) {
                 let timer;
@@ -469,5 +574,5 @@
                 updateEditButtonState($(this));
             });
         });
-    </script>
+    </script> --}}
 @endsection
