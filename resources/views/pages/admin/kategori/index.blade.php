@@ -77,7 +77,6 @@
                                                     <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 text-center">
-                                                        @if ($data->is_deleted == 0)
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
                                                             @if ($data->is_deleted == 0)
                                                                 <!-- Tombol Edit -->
@@ -96,12 +95,12 @@
                                                                     Hapus
                                                                 </button>
                                                             @else
-                                                                <!-- Tombol Aktifkan jika is_deleted == 1 -->
+                                                                <!-- Tombol Aktifkan -->
                                                                 <form
                                                                     action="{{ route('manajemen-kategori.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
-                                                                    @method('PUT')
+                                                                    @method('PATCH')
                                                                     <button type="submit"
                                                                         class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
                                                                         Aktifkan
@@ -109,20 +108,8 @@
                                                                 </form>
                                                             @endif
                                                         </div>
-                                                        @else 
-                                                        <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                            <form action="{{ route('manajemen-kategori.restore', $data->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <button type="submit"
-                                                                class="btn-edit btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
-                                                                    Aktifkan
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                        @endif
                                                     </td>
+
                                                 </tr>
 
                                                 @php

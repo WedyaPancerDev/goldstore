@@ -38,9 +38,10 @@ class TransaksiPengeluaranController extends Controller
         $products = DB::table('produk')
             ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
             ->select('produk.id', 'produk.nama', 'kategori.nama as kategori_nama', 'harga_jual')
+            ->where('produk.is_deleted', '=', 0)
             ->get();
 
-        $users = DB::table('users')->select('id', 'username')->get(); // Add this to get users
+        $users = DB::table('users')->select('id', 'username')->get();
 
         return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products", "users"));
     }

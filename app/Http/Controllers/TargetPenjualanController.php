@@ -149,13 +149,6 @@ class TargetPenjualanController extends Controller
 
 
 
-
-
-
-
-
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -335,7 +328,7 @@ class TargetPenjualanController extends Controller
                 'is_deleted' => false
             ]);
 
-        return redirect()->route('manajemen-target-penjualan.')->with('success', 'Target penjualan berhasil diaktifkan.');
+        return redirect()->route('manajemen-target-penjualan.index')->with('success', 'Target penjualan berhasil diaktifkan.');
     }
 
 

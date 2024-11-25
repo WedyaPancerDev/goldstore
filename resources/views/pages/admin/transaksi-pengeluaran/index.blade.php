@@ -336,6 +336,7 @@
 @section('script')
     @include('layouts.datatables-scripts')
 
+    {{-- script modal create --}}
     <script>
         $(document).ready(function() {
             let maxUsers = 3;
@@ -480,6 +481,131 @@
             calculateSplitTotal();
         });
     </script>
+
+    {{-- script modal edit --}}
+    <script>
+        $(document).ready(function() {
+            function debounce(func, delay) {
+                let timer;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Function to check if any changes have been made to the form
+            function updateEditButtonState(modal) {
+                let isChanged = false;
+
+                modal.find('.form-control, .crancy-wc__form-input').each(function() {
+                    const originalValue = $(this).data('original');
+                    const currentValue = $(this).val();
+
+                    if (currentValue !== originalValue) {
+                        isChanged = true;
+                        return false;
+                    }
+                });
+
+                const quantity = modal.find('.quantity-input').val();
+                const productSelected = modal.find('.product-select').val();
+
+                modal.find('#btn-submit').prop('disabled', !isChanged);
+            }
+
+            // Validate form and check if changes have been made
+            $('.modal').on('input change', function() {
+                updateEditButtonState($(this));
+            });
+
+            // Handle change in product selection
+            $('.product-select').on('change', function() {
+                calculateTotalPrice($(this));
+            });
+
+            // Handle input changes in quantity
+            $('.quantity-input').on('input', debounce(function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
+                if ($(this).val() === '' || $(this).val() == 0) {
+                    $(this).closest('.modal-body').find('#total_price').val(0);
+                } else {
+                    calculateTotalPrice($(this));
+                }
+            }, 500));
+
+            // Calculate total price based on selected quantity and product price
+            function calculateTotalPrice(quantityInput) {
+                let selectedProduct = quantityInput.closest('.modal-body').find('.product-select').find(
+                ':selected');
+                let price = selectedProduct.data('price') || 0;
+                let quantity = quantityInput.val();
+
+                if (quantity && price && quantity > 0) {
+                    checkStock(quantity, selectedProduct.val(), price, quantityInput);
+                } else {
+                    quantityInput.closest('.modal-body').find('#total_price').val(0);
+                }
+            }
+
+            // Check stock availability before calculating the total price
+            function checkStock(quantity, productId, price, quantityInput) {
+                if (productId) {
+                    $.ajax({
+                        url: '{{ route('check-stock') }}',
+                        type: 'GET',
+                        data: {
+                            product_id: productId
+                        },
+                        success: function(response) {
+                            const stok = response.stok;
+                            let stockWarning = quantityInput.closest('.modal-body').find(
+                                '#stock-warning');
+
+                            if (quantity > stok) {
+                                stockWarning.text(
+                                    'Jumlah quantity melebihi stok produk yang tersedia. Stok: ' +
+                                    stok);
+                                quantityInput.closest('.modal-body').find('#total_price').val(0);
+                                $('#btn-submit').prop('disabled', true);
+                            } else {
+                                stockWarning.text('');
+                                const totalPrice = parseFloat(price) * parseInt(quantity);
+                                quantityInput.closest('.modal-body').find('#total_price').val(totalPrice
+                                    .toLocaleString('id-ID', {
+                                        minimumFractionDigits: 0
+                                    }));
+
+                                validateForm(quantityInput);
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Validate form inputs to enable/disable submit button
+            function validateForm(element) {
+                let selectedProduct = element.closest('.modal-body').find('.product-select').val();
+                let quantity = element.closest('.modal-body').find('.quantity-input').val();
+
+                if (selectedProduct && quantity && quantity > 0) {
+                    $('#btn-submit').prop('disabled', false);
+                } else {
+                    $('#btn-submit').prop('disabled', true);
+                }
+            }
+
+            // Initialize the form and set up modal
+            $('.modal').on('show.bs.modal', function() {
+                updateEditButtonState($(this)); // Check if there are any changes when the modal is shown
+            });
+
+            // Set initial states
+            updateEditButtonState($('.modal'));
+            calculateTotalPrice($('.quantity-input'));
+        });
+    </script>
+
 
 
     {{-- <script>
