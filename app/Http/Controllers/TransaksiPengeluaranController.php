@@ -72,7 +72,7 @@ class TransaksiPengeluaranController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_ids' => 'required|array|min:1',
+            'user_ids' => 'required|array|min:1|max:3',  // Validasi maksimal 3 user
             'user_ids.*' => 'exists:users,id',
             'product_id' => 'required|exists:produk,id',
             'quantity' => 'required|integer|min:1',
@@ -101,10 +101,16 @@ class TransaksiPengeluaranController extends Controller
                 ? 'INV-' . str_pad($lastOrder->id + 1, 3, '0', STR_PAD_LEFT)
                 : 'INV-001';
 
+            // Jika memilih lebih dari 1 user, buat nomor order berdasarkan user
             $totalPricePerUser = ceil(($product->harga_jual * $request->quantity) / count($request->user_ids));
 
             foreach ($request->user_ids as $userId) {
-                $newOrderNumber = $newOrderNumberBase . '-' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                $newOrderNumber = $newOrderNumberBase;
+
+                // Jika lebih dari 1 user, tambahkan ID user pada nomor order
+                if (count($request->user_ids) > 1) {
+                    $newOrderNumber .= '-' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                }
 
                 DB::table('transaksi_pengeluaran')->insert([
                     'nomor_order' => $newOrderNumber,
@@ -123,6 +129,7 @@ class TransaksiPengeluaranController extends Controller
         return redirect()->route('manajemen-transaksi-pengeluaran.index')
             ->with('success', 'Transaksi berhasil ditambahkan untuk semua user yang dipilih.');
     }
+
 
 
     /**
