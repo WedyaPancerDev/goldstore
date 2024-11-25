@@ -202,6 +202,9 @@
                         @endif
                     </div>
 
+                    <span id="stock-warning" class="text-danger py-2 text-sm"></span>
+
+
                     <!-- Total Harga -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="total_price">Total Harga <span
@@ -337,6 +340,17 @@
         $(document).ready(function() {
             let maxUsers = 3;
 
+            // Fungsi untuk mencegah panggilan berulang (debounce)
+            function debounce(func, delay) {
+                let timer;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Memperbarui daftar pilihan pengguna agar tidak ada duplikasi pilihan
             function updateUserOptions() {
                 let selectedUsers = [];
                 $('.user-select').each(function() {
@@ -357,6 +371,43 @@
                 });
             }
 
+            // Memvalidasi tombol submit berdasarkan input
+            function updateSubmitButtonState() {
+                let isProductSelected = $('.product-select').val() !== null;
+                let isQuantityValid = $('.quantity-input').val() > 0;
+                let isUserSelected = $('.user-select').filter(function() {
+                    return $(this).val() !== null && $(this).val() !== '';
+                }).length > 0;
+
+                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected));
+            }
+
+            // Memeriksa stok produk dan menghitung total harga
+            function checkStock(quantity, productId, price, callback) {
+                if (productId) {
+                    $.ajax({
+                        url: '{{ route('check-stock') }}', // Pastikan route sesuai
+                        type: 'GET',
+                        data: {
+                            product_id: productId
+                        },
+                        success: function(response) {
+                            const stok = response.stok;
+                            if (quantity > stok) {
+                                $('#stock-warning').text(
+                                    `Stok tidak mencukupi. Stok tersedia: ${stok}`);
+                                $('#total_price').val(0);
+                                $('#btn-submit').prop('disabled', true);
+                            } else {
+                                $('#stock-warning').text('');
+                                callback(price * quantity);
+                            }
+                        },
+                    });
+                }
+            }
+
+            // Menghitung total harga yang dibagi rata
             function calculateSplitTotal() {
                 let quantity = parseInt($('.quantity-input').val()) || 0;
                 let productPrice = parseFloat($('.product-select').find(':selected').data('price')) || 0;
@@ -364,78 +415,72 @@
                     return $(this).val() && $(this).val() !== '';
                 }).length;
 
-                let totalPrice = 0;
                 if (quantity > 0 && productPrice > 0 && selectedUserCount > 0) {
-                    let fullPrice = quantity * productPrice;
-                    totalPrice = Math.ceil(fullPrice / selectedUserCount);
-                }
-
-                $('#total_price').val(totalPrice.toLocaleString('id-ID', {
-                    minimumFractionDigits: 0
-                }));
-            }
-
-            function updateSubmitButtonState() {
-                let isProductSelected = $('.product-select').val() !== null;
-                let isQuantityValid = $('.quantity-input').val() > 0;
-                let isUserSelected = $('.user-select').filter(function() {
-                    return $(this).val() !== null;
-                }).length > 0;
-
-                if (isProductSelected && isQuantityValid && isUserSelected) {
-                    $('#btn-submit').prop('disabled', false);
+                    checkStock(quantity, $('.product-select').val(), productPrice, (totalPrice) => {
+                        let splitPrice = Math.ceil(totalPrice / selectedUserCount);
+                        $('#total_price').val(splitPrice.toLocaleString('id-ID', {
+                            minimumFractionDigits: 0
+                        }));
+                        updateSubmitButtonState();
+                    });
                 } else {
-                    $('#btn-submit').prop('disabled', true);
+                    $('#total_price').val(0);
                 }
             }
 
+            // Menambah baris pilihan user
             $('#user-selection-container').on('click', '.add-user-btn', function() {
                 if ($('.user-select-row').length < maxUsers) {
                     $('#user-selection-container').append(`
-                <div class="d-flex align-items-center mb-2 user-select-row">
-                    <select class="form-select user-select" name="user_ids[]" required>
-                        <option data-display="Pilih User" selected disabled></option>
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->username }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" class="btn btn-sm btn-danger ms-2 remove-user-btn">Hapus</button>
-                </div>
-            `);
+                        <div class="d-flex align-items-center mb-2 user-select-row">
+                            <select class="form-select user-select" name="user_ids[]" required>
+                                <option data-display="Pilih User" selected disabled></option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-sm btn-danger ms-2 remove-user-btn">Hapus</button>
+                        </div>
+                    `);
                     updateUserOptions();
                     calculateSplitTotal();
                     updateSubmitButtonState();
                 }
             });
 
+            // Menghapus baris pilihan user
+            $('#user-selection-container').on('click', '.remove-user-btn', function() {
+                $(this).closest('.user-select-row').remove();
+                updateUserOptions();
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            // Event listener untuk perubahan produk atau kuantitas
             $('.product-select').on('change', function() {
                 calculateSplitTotal();
                 updateSubmitButtonState();
             });
 
-            $('.quantity-input').on('input', function() {
+            $('.quantity-input').on('input', debounce(function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
                 calculateSplitTotal();
                 updateSubmitButtonState();
-            });
+            }, 500));
 
+            // Event listener untuk perubahan pilihan user
             $('#user-selection-container').on('change', '.user-select', function() {
                 updateUserOptions();
                 calculateSplitTotal();
                 updateSubmitButtonState();
             });
 
-            $('#user-selection-container').on('click', '.add-user-btn, .remove-user-btn', function() {
-                updateUserOptions();
-                calculateSplitTotal();
-                updateSubmitButtonState();
-            });
-
-
+            // Inisialisasi awal
             updateSubmitButtonState();
             calculateSplitTotal();
         });
     </script>
+
 
     {{-- <script>
         $(document).ready(function() {
