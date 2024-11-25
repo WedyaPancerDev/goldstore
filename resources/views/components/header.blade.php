@@ -37,8 +37,12 @@
                                         <!-- Header Author -->
                                         <div class="crancy-header__single">
                                             <div class="crancy-header__author-img">
-                                                <img src="{{ URL::asset('assets/img/user-10.jpg') }}" alt="#" />
+                                                <img 
+                                                    src="{{ auth()->user()->profile_picture ? asset(auth()->user()->profile_picture) : asset('assets/img/user-10.jpg') }}" 
+                                                    alt="Profile Picture" 
+                                                />
                                             </div>
+                                            
                                             <!-- crancy Profile Hover -->
 
                                             <!-- Dropdown List -->
@@ -46,7 +50,7 @@
                                                 <div class="crancy-dropdown__hover--inner">
                                                     <ul class="crancy-dmenu">
                                                         <li>
-                                                            <a href="#">
+                                                            <a href="{{route('user.profile')}}">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                     height="24" viewBox="0 0 24 24" fill="none">
                                                                     <path
