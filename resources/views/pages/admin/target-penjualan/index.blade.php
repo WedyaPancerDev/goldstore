@@ -27,11 +27,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-between">
+                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                             <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                 data-bs-target="#addTargetPenjualan">
                                 <i class="ph ph-plus fs-5"></i>
                                 Tambah Target Penjualan
                             </button>
+                            @endif
                             <div class="d-flex gap-2 ">
                                 <div data-bs-toggle="modal" data-bs-target="#laporanPDF"
                                     class="btn btn-danger font-bold p-2 d-flex align-items-center gap-2">
@@ -57,7 +59,9 @@
                                         <tr>
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                             <th class="crancy-table__column-2 crancy-table__h2">Pengguna</th>
+                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                             <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody class="crancy-table__body">
@@ -73,6 +77,7 @@
                                                     <td class="crancy-table__column-3">
                                                         <div class="d-flex justify-content-evenly gap-2">
                                                             @if ($target->is_deleted == 0)
+                                                                @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                                 <a
                                                                     href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
                                                                     <button
@@ -134,6 +139,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                @endif
                                                                 </div>
                                                             @else
                                                                 <form

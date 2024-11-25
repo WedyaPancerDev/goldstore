@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-
+@role('admin|akuntan|manajer|staff')
     <section class="container container__bscreen mt-4">
         <div class="row mb-3">
             <div class="col-12">
@@ -32,11 +32,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
+                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                             <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                 data-bs-target="#addKategoriModal">
                                 <i class="ph ph-plus fs-5"></i>
                                 Tambah Kategori
                             </button>
+                            @endif
                         </div>
                     </div>
 
@@ -62,8 +64,10 @@
                                         <tr>
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                             <th class="crancy-table__column-2 crancy-table__h2">Nama Kategori</th>
+                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                             <th class="crancy-table__column-5 crancy-table__h5 text-center"
                                                 style="width: 1%;">Aksi</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody class="crancy-table__body">
@@ -76,53 +80,56 @@
                                                     <td class="crancy-table__column-1 fw-semibold">{{ $iteration }}</td>
                                                     <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                     </td>
-                                                    <td class="crancy-table__column-5 text-center">
-                                                        @if ($data->is_deleted == 0)
-                                                        <div class="d-flex align-items-center gap-2 justify-content-center">
+                                                    @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
+                                                    
+                                                        <td class="crancy-table__column-5 text-center">
                                                             @if ($data->is_deleted == 0)
-                                                                <!-- Tombol Edit -->
-                                                                <button type="button"
-                                                                    class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editKategoriModal-{{ $data->id }}">
-                                                                    Edit
-                                                                </button>
+                                                            <div class="d-flex align-items-center gap-2 justify-content-center">
+                                                                @if ($data->is_deleted == 0)
+                                                                    <!-- Tombol Edit -->
+                                                                    <button type="button"
+                                                                        class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editKategoriModal-{{ $data->id }}">
+                                                                        Edit
+                                                                    </button>
 
-                                                                <!-- Tombol Hapus -->
-                                                                <button type="button"
-                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#removeKategoriModal-{{ $data->id }}">
-                                                                    Hapus
-                                                                </button>
-                                                            @else
-                                                                <!-- Tombol Aktifkan jika is_deleted == 1 -->
-                                                                <form
-                                                                    action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                    <!-- Tombol Hapus -->
+                                                                    <button type="button"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#removeKategoriModal-{{ $data->id }}">
+                                                                        Hapus
+                                                                    </button>
+                                                                @else
+                                                                    <!-- Tombol Aktifkan jika is_deleted == 1 -->
+                                                                    <form
+                                                                        action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        @method('PUT')
+                                                                        <button type="submit"
+                                                                            class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                            Aktifkan
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </div>
+                                                            @else 
+                                                            <div class="d-flex align-items-center gap-2 justify-content-center">
+                                                                <form action="{{ route('manajemen-kategori.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
-                                                                    @method('PUT')
+                                                                    @method('PATCH')
                                                                     <button type="submit"
-                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                    class="btn-edit btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
                                                                         Aktifkan
                                                                     </button>
                                                                 </form>
+                                                            </div>
                                                             @endif
-                                                        </div>
-                                                        @else 
-                                                        <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                            <form action="{{ route('manajemen-kategori.restore', $data->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <button type="submit"
-                                                                class="btn-edit btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
-                                                                    Aktifkan
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                        @endif
-                                                    </td>
+                                                        </td>
+                                                    @endif
                                                 </tr>
 
                                                 @php
@@ -248,7 +255,7 @@
             </div>
         </div>
     @endforeach
-
+@endrole
 @endsection
 
 @section('script')

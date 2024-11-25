@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TransaksiPengeluaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TransaksiPengeluaranController extends Controller
 {
@@ -41,8 +42,9 @@ class TransaksiPengeluaranController extends Controller
             ->get();
 
         $users = DB::table('users')->select('id', 'username')->get(); // Add this to get users
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
 
-        return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products", "users"));
+        return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products", "users", 'userRole'));
     }
 
     public function checkStock(Request $request)

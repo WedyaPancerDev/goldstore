@@ -32,11 +32,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
+                            @if (empty(array_intersect(['akuntan'], $userRole)))
                             <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                 data-bs-target="#management-transaksi-pengeluaran-create">
                                 <i class="ph ph-plus fs-5"></i>
                                 Tambah Transaksi Pengeluaran
                             </button>
+                            @endif
                         </div>
                     </div>
 
@@ -85,9 +87,11 @@
                                             <th class="crancy-table__column-8 crancy-table__h5">
                                                 Tanggal Order
                                             </th>
+                                            @if (empty(array_intersect(['akuntan'], $userRole)))
                                             <th class="crancy-table__column-9 crancy-table__h5">
                                                 Aksi
                                             </th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     {{-- crancy Table Body --}}
@@ -119,6 +123,7 @@
                                                     <td class="crancy-table__column-8tar fw-semibold">
                                                         {{ $transaksi->order_date ?? '-' }}
                                                     </td>
+                                                    @if (empty(array_intersect(['akuntan'], $userRole)))
                                                     <td class="crancy-table__column-8">
                                                         <button type="button" class="btn-edit btn-cst btn-warning px-2"
                                                             data-bs-toggle="modal"
@@ -126,6 +131,7 @@
                                                             Ubah
                                                         </button>
                                                     </td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         @endif

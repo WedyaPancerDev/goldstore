@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class TargetPenjualanController extends Controller
 {
@@ -29,7 +30,9 @@ class TargetPenjualanController extends Controller
 
         $availableUsers = User::whereNotIn('id', $existingUserIds)->get();
 
-        return view('pages.admin.target-penjualan.index', compact('targetPenjualan', 'availableUsers'));
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+
+        return view('pages.admin.target-penjualan.index', compact('targetPenjualan', 'availableUsers', 'userRole'));
     }
 
 

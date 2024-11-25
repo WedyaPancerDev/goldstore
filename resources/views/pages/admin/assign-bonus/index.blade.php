@@ -31,11 +31,13 @@ Toko Emas - Assign Bonus
             <div class="crancy-dsinner">
                 <div class="crancy-table-meta mg-top-30">
                     <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
+                        @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                         <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                             data-bs-target="#addAssignBonusModal">
                             <i class="ph ph-plus fs-5"></i>
                             Tambah Assign Bonus
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -61,7 +63,9 @@ Toko Emas - Assign Bonus
                                         <th class="crancy-table__column-2 crancy-table__h2">User</th>
                                         <th class="crancy-table__column-2 crancy-table__h2">Transaksi</th>
                                         <th class="crancy-table__column-2 crancy-table__h2">Bonus</th>
+                                        @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                         <th class="crancy-table__column-5 crancy-table__h5 text-center" style="width: 1%;">Aksi</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody class="crancy-table__body">
@@ -76,6 +80,7 @@ Toko Emas - Assign Bonus
                                                 <td class="crancy-table__column-2 fw-semibold">{{ $item->users->fullname ?? '-' }}</td>
                                                 <td class="crancy-table__column-2 fw-semibold">{{ $item->transaksi_pengeluaran->nomor_order ?? '-' }}</td>
                                                 <td class="crancy-table__column-2 fw-semibold">{{ $item->bonus->nama ?? '-' }}</td>
+                                                @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                 <td class="crancy-table__column-5 text-center">
                                                     <div class="d-flex align-items-center gap-2 justify-content-center">
                                                         <!-- Tombol Edit -->
@@ -93,6 +98,7 @@ Toko Emas - Assign Bonus
                                                         </button>
                                                     </div>
                                                 </td>
+                                                @endif
                                             </tr>
                                             @php
                                                 $iteration++;

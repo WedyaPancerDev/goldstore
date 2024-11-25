@@ -41,8 +41,9 @@ class ProdukController extends Controller
         }
 
         $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
 
-        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk'));
+        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk', 'userRole'));
     }
 
     /**

@@ -35,7 +35,9 @@ class PenggunaController extends Controller
             ->orderBy('users.created_at', 'asc')
             ->get();
 
-        return view('pages.admin.pengguna.index', compact('users'));
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+
+        return view('pages.admin.pengguna.index', compact('users', 'userRole'));
     }
 
     /**

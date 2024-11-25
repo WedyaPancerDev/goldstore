@@ -8,6 +8,7 @@ use App\Models\TransaksiPengeluaran;
 use App\Models\MasterBonus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AssignBonusController extends Controller
 {
@@ -21,8 +22,10 @@ class AssignBonusController extends Controller
         $transaksis = TransaksiPengeluaran::all();
         $bonuses = MasterBonus::all();
 
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+
         // dd($assignBonuses);
-        return view("pages.admin.assign-bonus.index",compact('assignBonuses', 'users', 'transaksis', 'bonuses'));
+        return view("pages.admin.assign-bonus.index",compact('assignBonuses', 'users', 'transaksis', 'bonuses', 'userRole'));
     }
 
     /**
