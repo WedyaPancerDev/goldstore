@@ -163,31 +163,60 @@ class TransaksiPengeluaranController extends Controller
         DB::transaction(function () use ($request, $id) {
             $transaksi = DB::table('transaksi_pengeluaran')->where('id', $id)->first();
 
-            $oldProduct = DB::table('produk')->where('id', $transaksi->produk_id)->lockForUpdate()->first();
+            $batchNumber = explode('-', $transaksi->nomor_order)[1];
 
-            DB::table('produk')->where('id', $oldProduct->id)->update(['stok' => $oldProduct->stok + $transaksi->quantity]);
+            $relatedTransaksi = DB::table('transaksi_pengeluaran')
+                ->where('nomor_order', 'LIKE', "%-$batchNumber-%")
+                ->get();
+
+            $oldProduct = DB::table('produk')->where('id', $transaksi->produk_id)->lockForUpdate()->first();
 
             $newProduct = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
 
-            if ($request->quantity > $newProduct->stok) {
-                return back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk produk baru'])->withInput();
+            $jumlahUserTerkait = $relatedTransaksi->count();
+
+            foreach ($relatedTransaksi as $related) {
+                $stokAdjustment = $related->quantity - $request->quantity;
+
+                if ($related->produk_id == $oldProduct->id) {
+                    DB::table('produk')->where('id', $oldProduct->id)->update([
+                        'stok' => $oldProduct->stok + $stokAdjustment,
+                    ]);
+                }
+
+                if ($request->product_id != $oldProduct->id) {
+                    DB::table('produk')->where('id', $oldProduct->id)->update([
+                        'stok' => $oldProduct->stok + $related->quantity,
+                    ]);
+
+                    if ($request->quantity > $newProduct->stok) {
+                        throw new \Exception('Stok tidak mencukupi untuk produk baru');
+                    }
+
+                    DB::table('produk')->where('id', $newProduct->id)->update([
+                        'stok' => $newProduct->stok - $request->quantity,
+                    ]);
+                }
+
+                $newTotalPrice = ($newProduct->harga_jual * $request->quantity) / $jumlahUserTerkait;
+
+                DB::table('transaksi_pengeluaran')->where('id', $related->id)->update([
+                    'produk_id' => $request->product_id,
+                    'quantity' => $request->quantity,
+                    'total_price' => $newTotalPrice,
+                    'deskripsi' => $request->deskripsi,
+                    'order_date' => $request->order_date,
+                ]);
             }
-
-            DB::table('produk')->where('id', $newProduct->id)->update(['stok' => $newProduct->stok - $request->quantity]);
-
-            $totalPrice = $newProduct->harga_jual * $request->quantity;
-
-            DB::table('transaksi_pengeluaran')->where('id', $id)->update([
-                'produk_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'total_price' => $totalPrice,
-                'deskripsi' => $request->deskripsi,
-                'order_date' => $request->order_date,
-            ]);
         });
 
         return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil diperbarui');
     }
+
+
+
+
+
     /**
      * Remove the specified resource from storage.
      */
