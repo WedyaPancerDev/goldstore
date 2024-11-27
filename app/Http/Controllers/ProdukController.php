@@ -19,7 +19,7 @@ class ProdukController extends Controller
     {
         $produks = Produk::with('kategori')->get();
         $kategoris = Kategori::all();
-        $detailProduk = null; 
+        $detailProduk = null;
 
         if ($request->has('detail_id')) {
             $detailProduk = DB::table('produk')
@@ -70,24 +70,31 @@ class ProdukController extends Controller
             'kategori_id' => 'required',
         ]);
 
-        $validated['kode_produk'] = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+        $contoh = Produk::orderBy('id', 'desc')->first();
+
+        $lastCode = $contoh ? $contoh->kode_produk : null;
+        $validated['kode_produk'] = $lastCode
+            ? Text::generateCode($contoh, 'PRD', 4, 'kode_produk')
+            : 'PRD' . str_pad(1, 4, '0', STR_PAD_LEFT);
+
         $validated['created_by'] = Auth::user()->id;
 
         $image = $request->file('foto');
-
         $fileName = time() . str($request->nama)->slug();
         $resultFile = $image
             ? $image->storeAs('photos/product', "{$fileName}.{$image->extension()}")
             : null;
-            
-        $baseUrl = Storage::url($resultFile);
-        
-        $validated['foto'] = $baseUrl;
-        Produk::create($validated);
 
+        $baseUrl = Storage::url($resultFile);
+
+        $validated['foto'] = $baseUrl;
+
+
+        Produk::create($validated);
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
+
 
     /**
      * Display the specified resource.
@@ -132,7 +139,7 @@ class ProdukController extends Controller
 
         $validated['foto'] = $resultFile;
 
-        $produk->update($validated); 
+        $produk->update($validated);
         return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
@@ -149,5 +156,4 @@ class ProdukController extends Controller
 
         return redirect()->route('manajemen-produk.index')->with('success', 'Produk berhasil dihapus');
     }
-
 }

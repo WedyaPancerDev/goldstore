@@ -94,42 +94,29 @@
                                                                         Edit
                                                                     </button>
 
-                                                                    <!-- Tombol Hapus -->
-                                                                    <button type="button"
-                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#removeKategoriModal-{{ $data->id }}">
-                                                                        Hapus
-                                                                    </button>
-                                                                @else
-                                                                    <!-- Tombol Aktifkan jika is_deleted == 1 -->
-                                                                    <form
-                                                                        action="{{ route('manajemen-kategori.restore', $data->id) }}"
-                                                                        method="POST">
-                                                                        @csrf
-                                                                        @method('PUT')
-                                                                        <button type="submit"
-                                                                            class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
-                                                                            Aktifkan
-                                                                        </button>
-                                                                    </form>
-                                                                @endif
-                                                            </div>
-                                                            @else 
-                                                            <div class="d-flex align-items-center gap-2 justify-content-center">
-                                                                <form action="{{ route('manajemen-kategori.restore', $data->id) }}"
+                                                                <!-- Tombol Hapus -->
+                                                                <button type="button"
+                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#removeKategoriModal-{{ $data->id }}">
+                                                                    Hapus
+                                                                </button>
+                                                            @else
+                                                                <!-- Tombol Aktifkan -->
+                                                                <form
+                                                                    action="{{ route('manajemen-kategori.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
                                                                     @method('PATCH')
                                                                     <button type="submit"
-                                                                    class="btn-edit btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
                                                                         Aktifkan
                                                                     </button>
                                                                 </form>
-                                                            </div>
                                                             @endif
-                                                        </td>
-                                                    @endif
+                                                        </div>
+                                                    </td>
+
                                                 </tr>
 
                                                 @php
