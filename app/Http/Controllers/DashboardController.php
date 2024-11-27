@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
@@ -23,9 +24,15 @@ class DashboardController extends Controller
 
     public function indexAkuntan()
     {
-        return view('pages.akuntan.dasboard');
-    }
+        $users = DB::table('users')
+        ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id') // Relasi pivot
+        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id') // Relasi ke tabel roles
+        ->select('users.id as user_id', 'users.fullname', 'roles.name as role_name') // Kolom yang dipilih
+        ->where('roles.name', '=', 'staff') // Filter berdasarkan role
+        ->get();
 
+        return view('pages.akuntan.dasboard', compact('users'));
+    }
     public function indexStaff()
     {
         return view('pages.staff.dashboard');
@@ -149,6 +156,30 @@ class DashboardController extends Controller
     }
 
 
+    public function getStaffUsers()
+    {
+        // $users = DB::table('users')
+        // ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id') // Relasi pivot
+        // ->join('roles', 'model_has_roles.role_id', '=', 'roles.id') // Relasi ke tabel roles
+        // ->select('users.id as user_id', 'users.fullname', 'roles.name as role_name') // Kolom yang dipilih
+        // ->where('roles.name', '=', 'staff') // Filter berdasarkan role
+        // ->get();
+
+        return response()->json($users);
+    }
+    
+    public function getUserTransactions($userId)
+    {
+        $transaksiPengeluaran = TransaksiPengeluaran::where('user_id', $userId)->sum('total_price');
+        $targetPenjualan = TargetPenjualan::where('user_id', $userId)->sum('total');
+    
+        return response()->json([
+            'transaksi_pengeluaran' => $transaksiPengeluaran,
+            'target_penjualan' => $targetPenjualan,
+        ]);
+    }
+    
+
     public function getAllTransaksiandTarget()
     {
         $users = User::all();
@@ -156,21 +187,26 @@ class DashboardController extends Controller
         $result = [];
 
         foreach ($users as $user) {
-            $userData = [
-                'user' => $user->fullname,
-                'transaksi_pengeluaran' => [
-                    'total' => TransaksiPengeluaran::where('user_id', $user->id)->sum('total_price'),
-                    'count' => TransaksiPengeluaran::where('user_id', $user->id)->count(),
-                ],
-                'target_penjualan' => [
-                    'total' => TargetPenjualan::where('user_id', $user->id)->sum('total'),
-                    'count' => TargetPenjualan::where('user_id', $user->id)->count(),
-                ],
-            ];
+            $totalPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)->sum('total_price');
+            
+            if ($totalPengeluaran > 0) {
+                $userData = [
+                    'user' => $user->fullname,
+                    'transaksi_pengeluaran' => [
+                        'total' => $totalPengeluaran,
+                        'count' => TransaksiPengeluaran::where('user_id', $user->id)->count(),
+                    ],
+                    'target_penjualan' => [
+                        'total' => TargetPenjualan::where('user_id', $user->id)->sum('total'),
+                        'count' => TargetPenjualan::where('user_id', $user->id)->count(),
+                    ],
+                ];
 
-            $result[] = $userData;
+                $result[] = $userData;
+            }
         }
 
         return response()->json($result);
     }
+
 }

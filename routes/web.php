@@ -138,6 +138,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:akuntan'])->group(function () {
         Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
         Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
+        Route::get('/api/staff-users', [DashboardController::class, 'getStaffUsers']);
+        Route::get('/api/user-transactions/{userId}', [DashboardController::class, 'getUserTransactions']);
     });
 
     Route::middleware(['role:manajer'])->group(function () {
