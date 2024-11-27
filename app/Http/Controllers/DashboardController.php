@@ -98,13 +98,13 @@ class DashboardController extends Controller
             ->distinct()
             ->orderBy('year')
             ->pluck('year');
-
+    
         $staffUsers = User::whereHas('roles', function ($query) {
             $query->where('name', 'staff');
         })->get();
-
+    
         $chartData = [];
-
+    
         foreach ($staffUsers as $user) {
             $userChartData = [
                 'user' => $user->fullname,
@@ -119,41 +119,52 @@ class DashboardController extends Controller
                     'target_penjualan' => [],
                 ],
             ];
-
+    
+            $hasMonthlyData = false;
+            $hasYearlyData = false;
+    
             foreach ($userChartData['monthly']['months'] as $month) {
                 $totalTransaksiPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereMonth('order_date', date('m', strtotime("01 $month")))
                     ->sum('total_price');
-
+    
                 $totalTargetPenjualan = TargetPenjualan::where('user_id', $user->id)
                     ->where('bulan', $month)
                     ->sum('total');
-
+    
                 $userChartData['monthly']['transaksi_pengeluaran'][] = $totalTransaksiPengeluaran;
                 $userChartData['monthly']['target_penjualan'][] = $totalTargetPenjualan;
+    
+                if ($totalTransaksiPengeluaran > 0 || $totalTargetPenjualan > 0) {
+                    $hasMonthlyData = true;
+                }
             }
-
+    
             foreach ($availableYears as $year) {
                 $totalTransaksiPengeluaranTahun = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereYear('order_date', $year)
                     ->sum('total_price');
-
+    
                 $totalTargetPenjualanTahun = TargetPenjualan::where('user_id', $user->id)
                     ->whereYear('created_at', $year)
                     ->sum('total');
-
+    
                 if ($totalTransaksiPengeluaranTahun > 0 || $totalTargetPenjualanTahun > 0) {
                     $userChartData['yearly']['years'][] = $year;
                     $userChartData['yearly']['transaksi_pengeluaran'][] = $totalTransaksiPengeluaranTahun;
                     $userChartData['yearly']['target_penjualan'][] = $totalTargetPenjualanTahun;
+                    $hasYearlyData = true;
                 }
             }
-
-            $chartData[] = $userChartData;
+    
+            if ($hasMonthlyData || $hasYearlyData) {
+                $chartData[] = $userChartData;
+            }
         }
-
+    
         return response()->json($chartData);
     }
+    
 
 
     public function getStaffUsers()

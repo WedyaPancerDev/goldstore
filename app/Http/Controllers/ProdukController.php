@@ -18,13 +18,16 @@ class ProdukController extends Controller
     public function index(Request $request)
     {
         $produks = Produk::with('kategori')->get();
-        $kategoris = Kategori::all();
+
+        $kategoris = Kategori::where('is_deleted', 0)->get();
+
         $detailProduk = null;
 
         if ($request->has('detail_id')) {
             $detailProduk = DB::table('produk')
                 ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
                 ->where('produk.id', $request->input('detail_id'))
+                ->where('kategori.is_deleted', 0) 
                 ->select(
                     'produk.id as produk_id',
                     'produk.nama',
@@ -41,10 +44,12 @@ class ProdukController extends Controller
         }
 
         $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+
         $userRole = Auth::user()->roles->pluck('name')->toArray();
 
         return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk', 'userRole'));
     }
+
 
     /**
      * Show the form for creating a new resource.
