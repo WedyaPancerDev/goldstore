@@ -165,22 +165,25 @@ class TransaksiPengeluaranController extends Controller
         DB::transaction(function () use ($request, $id) {
             $transaksi = DB::table('transaksi_pengeluaran')->where('id', $id)->first();
 
-            $batchNumber = explode('-', $transaksi->nomor_order)[1];
+            if (!$transaksi) {
+                throw new \Exception('Transaksi tidak ditemukan.');
+            }
 
-            $relatedTransaksi = DB::table('transaksi_pengeluaran')
-                ->where('nomor_order', 'LIKE', "%-$batchNumber-%")
-                ->get();
+            $nomorOrderParts = explode('-', $transaksi->nomor_order);
+
+            $isSingleUser = count($nomorOrderParts) === 2;
 
             $oldProduct = DB::table('produk')->where('id', $transaksi->produk_id)->lockForUpdate()->first();
-
             $newProduct = DB::table('produk')->where('id', $request->product_id)->lockForUpdate()->first();
 
-            $jumlahUserTerkait = $relatedTransaksi->count();
+            $stokAdjustment = abs($transaksi->quantity - $request->quantity);
 
-            foreach ($relatedTransaksi as $related) {
-                $stokAdjustment = $related->quantity - $request->quantity;
-
-                if ($related->produk_id == $oldProduct->id) {
+            if ($isSingleUser) {
+                if ($request->quantity > $transaksi->quantity) {
+                    DB::table('produk')->where('id', $oldProduct->id)->update([
+                        'stok' => $oldProduct->stok - $stokAdjustment,
+                    ]);
+                } elseif ($request->quantity < $transaksi->quantity) {
                     DB::table('produk')->where('id', $oldProduct->id)->update([
                         'stok' => $oldProduct->stok + $stokAdjustment,
                     ]);
@@ -188,11 +191,11 @@ class TransaksiPengeluaranController extends Controller
 
                 if ($request->product_id != $oldProduct->id) {
                     DB::table('produk')->where('id', $oldProduct->id)->update([
-                        'stok' => $oldProduct->stok + $related->quantity,
+                        'stok' => $oldProduct->stok + $transaksi->quantity,
                     ]);
 
                     if ($request->quantity > $newProduct->stok) {
-                        throw new \Exception('Stok tidak mencukupi untuk produk baru');
+                        throw new \Exception('Stok tidak mencukupi untuk produk baru.');
                     }
 
                     DB::table('produk')->where('id', $newProduct->id)->update([
@@ -200,20 +203,76 @@ class TransaksiPengeluaranController extends Controller
                     ]);
                 }
 
-                $newTotalPrice = ($newProduct->harga_jual * $request->quantity) / $jumlahUserTerkait;
+                $newTotalPrice = $newProduct->harga_jual * $request->quantity;
 
-                DB::table('transaksi_pengeluaran')->where('id', $related->id)->update([
+                DB::table('transaksi_pengeluaran')->where('id', $id)->update([
                     'produk_id' => $request->product_id,
                     'quantity' => $request->quantity,
                     'total_price' => $newTotalPrice,
                     'deskripsi' => $request->deskripsi,
                     'order_date' => $request->order_date,
                 ]);
+            } else {
+                $batchNumber = $nomorOrderParts[1];
+                $relatedTransaksi = DB::table('transaksi_pengeluaran')
+                    ->where('nomor_order', 'LIKE', "%-$batchNumber-%")
+                    ->get();
+
+                foreach ($relatedTransaksi as $related) {
+                    $stokAdjustment = abs($related->quantity - $request->quantity);
+
+
+                    if ($related->produk_id == $oldProduct->id) {
+                        if ($request->quantity > $related->quantity) {
+                            DB::table('produk')->where('id', $oldProduct->id)->update([
+                                'stok' => $oldProduct->stok - $stokAdjustment,
+                            ]);
+                        } elseif ($request->quantity < $related->quantity) {
+                            DB::table('produk')->where('id', $oldProduct->id)->update([
+                                'stok' => $oldProduct->stok + $stokAdjustment,
+                            ]);
+                        }
+                    }
+
+
+                    if ($request->product_id != $oldProduct->id) {
+                        // Kembalikan stok produk lama
+                        DB::table('produk')->where('id', $oldProduct->id)->update([
+                            'stok' => $oldProduct->stok + $related->quantity,
+                        ]);
+
+
+                        if ($request->quantity > $newProduct->stok) {
+                            throw new \Exception('Stok tidak mencukupi untuk produk baru');
+                        }
+
+
+                        DB::table('produk')->where('id', $newProduct->id)->update([
+                            'stok' => $newProduct->stok - $request->quantity,
+                        ]);
+                    }
+
+
+                    $newTotalPrice = ($newProduct->harga_jual * $request->quantity) / count($relatedTransaksi);
+
+
+                    DB::table('transaksi_pengeluaran')->where('id', $related->id)->update([
+                        'produk_id' => $request->product_id,
+                        'quantity' => $request->quantity,
+                        'total_price' => $newTotalPrice,
+                        'deskripsi' => $request->deskripsi,
+                        'order_date' => $request->order_date,
+                    ]);
+                }
             }
         });
 
         return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil diperbarui');
     }
+
+
+
+
 
 
 
