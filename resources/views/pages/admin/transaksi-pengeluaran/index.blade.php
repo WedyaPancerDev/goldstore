@@ -33,11 +33,11 @@
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
                             @if (empty(array_intersect(['akuntan'], $userRole)))
-                            <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                data-bs-target="#management-transaksi-pengeluaran-create">
-                                <i class="ph ph-plus fs-5"></i>
-                                Tambah Transaksi Pengeluaran
-                            </button>
+                                <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+                                    data-bs-target="#management-transaksi-pengeluaran-create">
+                                    <i class="ph ph-plus fs-5"></i>
+                                    Tambah Transaksi Pengeluaran
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -88,9 +88,11 @@
                                                 Tanggal Order
                                             </th>
                                             @if (empty(array_intersect(['akuntan'], $userRole)))
-                                            <th class="crancy-table__column-9 crancy-table__h5">
-                                                Aksi
-                                            </th>
+                                                @role('admin|akuntan|manajer')
+                                                    <th class="crancy-table__column-9 crancy-table__h5">
+                                                        Aksi
+                                                    </th>
+                                                @endrole
                                             @endif
                                         </tr>
                                     </thead>
@@ -124,13 +126,15 @@
                                                         {{ $transaksi->order_date ?? '-' }}
                                                     </td>
                                                     @if (empty(array_intersect(['akuntan'], $userRole)))
-                                                    <td class="crancy-table__column-8">
-                                                        <button type="button" class="btn-edit btn-cst btn-warning px-2"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
-                                                            Ubah
-                                                        </button>
-                                                    </td>
+                                                        @role('admin|akuntan|manajer')
+                                                            <td class="crancy-table__column-8">
+                                                                <button type="button" class="btn-edit btn-cst btn-warning px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
+                                                                    Ubah
+                                                                </button>
+                                                            </td>
+                                                        @endrole
                                                     @endif
                                                 </tr>
                                             @endforeach
@@ -543,7 +547,7 @@
             // Calculate total price based on selected quantity and product price
             function calculateTotalPrice(quantityInput) {
                 let selectedProduct = quantityInput.closest('.modal-body').find('.product-select').find(
-                ':selected');
+                    ':selected');
                 let price = selectedProduct.data('price') || 0;
                 let quantity = quantityInput.val();
 

@@ -60,7 +60,7 @@
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                             <th class="crancy-table__column-2 crancy-table__h2">Pengguna</th>
                                             @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
-                                            <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
+                                                <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
                                             @endif
                                         </tr>
                                     </thead>
@@ -187,7 +187,6 @@
                                                 </tr>
                                             @endforeach
                                         @endif
-
                                     </tbody>
                                 </table>
                             </div>

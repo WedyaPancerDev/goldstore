@@ -52,17 +52,37 @@
                                 </span>
                             </a>
                         </li>
-                    @endif
 
-                    <li class="pb-2">
-                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-kategori.index') ? 'active-bg' : '' }}"
-                            href="{{ route('manajemen-kategori.index') }}">
-                            <span class="menu-bar__text d-flex">
-                                <i class="ph ph-package fs-4 me-2"></i>
-                                <span class="menu-bar__name fs-6 fw-medium">Kategori<span>
-                                    </span>
-                        </a>
-                    </li>
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('manajemen-kategori.index') ? 'active-bg' : '' }}"
+                                href="{{ route('manajemen-kategori.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-package fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Kategori<span>
+                                        </span>
+                            </a>
+                        </li>
+
+
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
+                                href="{{ route('manajemen-assign-bonus.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-note fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('manajemen-master-bonus.index') ? 'active-bg' : '' }}"
+                                href="{{ route('manajemen-master-bonus.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-note fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endif
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-produk.index') ? 'active-bg' : '' }}"
@@ -73,6 +93,8 @@
                             </span>
                         </a>
                     </li>
+
+
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
@@ -85,27 +107,6 @@
                     </li>
 
                     <li class="pb-2">
-                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-master-bonus.index') ? 'active-bg' : '' }}"
-                            href="{{ route('manajemen-master-bonus.index') }}">
-                            <span class="menu-bar__text d-flex">
-                                <i class="ph ph-note fs-4 me-2"></i>
-                                <span class="menu-bar__name fs-6 fw-medium">Master Bonus</span>
-                            </span>
-                        </a>
-                    </li>
-                    @if ($role !== 'staff')
-                    <li class="pb-2">
-                        <a class="collapsed links px-2 {{ request()->routeIs('manajemen-assign-bonus.index') ? 'active-bg' : '' }}"
-                            href="{{ route('manajemen-assign-bonus.index') }}">
-                            <span class="menu-bar__text d-flex">
-                                <i class="ph ph-note fs-4 me-2"></i>
-                                <span class="menu-bar__name fs-6 fw-medium">Assign Bonus</span>
-                            </span>
-                        </a>
-                    </li>
-                    @endif
-
-                    <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-target-penjualan.index') ? 'active-bg' : '' }}"
                             href="{{ route('manajemen-target-penjualan.index') }}">
                             <span class="menu-bar__text d-flex">
@@ -114,6 +115,8 @@
                             </span>
                         </a>
                     </li>
+
+
                 @endrole
             </ul>
         </div>
