@@ -36,7 +36,7 @@
                                 <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                     data-bs-target="#management-transaksi-pengeluaran-create">
                                     <i class="ph ph-plus fs-5"></i>
-                                    Tambah Transaksi Pengeluaran
+                                    Tambah Transaksi Penjualan
                                 </button>
                             @endif
                         </div>

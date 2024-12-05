@@ -97,8 +97,6 @@
                     @endif
 
 
-
-
                     @if ($role !== 'manajer')
                         <li class="pb-2">
                             <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"

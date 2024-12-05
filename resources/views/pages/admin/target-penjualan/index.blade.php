@@ -59,11 +59,10 @@
                                         <tr>
                                             <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                             <th class="crancy-table__column-2 crancy-table__h2">Pengguna</th>
-                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
-                                                <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
-                                            @endif
+                                            <th class="crancy-table__column-3 crancy-table__h5">Aksi</th>
                                         </tr>
                                     </thead>
+
                                     <tbody class="crancy-table__body">
                                         @if ($targetPenjualan->count() > 0)
                                             @foreach ($targetPenjualan as $target)
@@ -77,6 +76,7 @@
                                                     <td class="crancy-table__column-3">
                                                         <div class="d-flex justify-content-evenly gap-1">
                                                             @if ($target->is_deleted == 0)
+                                                                {{-- Aksi untuk admin, akuntan, atau manajer --}}
                                                                 @role('admin|akuntan|manajer')
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
@@ -85,8 +85,6 @@
                                                                             Detail
                                                                         </button>
                                                                     </a>
-
-                                                                    <!-- Edit Button -->
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
                                                                         <button
@@ -94,14 +92,11 @@
                                                                             Ubah
                                                                         </button>
                                                                     </a>
-
-                                                                    <!-- Nonaktifkan Button & Modal Trigger -->
                                                                     <button type="button" class="btn-cst btn-danger px-3 w-25"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeTargetModal-{{ $target->user_id }}">
                                                                         Nonaktifkan
                                                                     </button>
-
                                                                     <!-- Modal for Deactivation -->
                                                                     <div id="removeTargetModal-{{ $target->user_id }}"
                                                                         class="modal fade zoomIn" tabindex="-1"
@@ -117,13 +112,12 @@
                                                                                     <div class="text-danger mb-4">
                                                                                         <i class="bi bi-trash display-4"></i>
                                                                                     </div>
-                                                                                    <h4 class="mb-2">Apakah kamu yakin?
-                                                                                    </h4>
+                                                                                    <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                                     <p class="text-muted mb-4">
-                                                                                        Apakah kamu yakin ingin
-                                                                                        menonaktifkan pengguna ini?
-                                                                                        <strong>Pengguna yang dinonaktifkan
-                                                                                            bisa diaktifkan lagi.</strong>
+                                                                                        Apakah kamu yakin ingin menonaktifkan
+                                                                                        pengguna ini?
+                                                                                        <strong>Pengguna yang dinonaktifkan bisa
+                                                                                            diaktifkan lagi.</strong>
                                                                                     </p>
                                                                                     <div
                                                                                         class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -146,23 +140,21 @@
                                                                     </div>
                                                                 @endrole
 
+                                                                {{-- Aksi untuk staff --}}
                                                                 @role('staff')
                                                                     <div class="d-flex gap-2 fw-semibold">
                                                                         <a href="{{ route('export.yearly.pdf.byuser', $target->user_id) }}"
                                                                             class="btn btn-warning">
                                                                             Laporan Tahunan PDF
                                                                         </a>
-
                                                                         <a href="{{ route('export.monthly.pdf.byuser', $target->user_id) }}"
                                                                             class="btn btn-warning">
                                                                             Laporan Bulanan PDF
                                                                         </a>
-
                                                                         <a href="{{ route('export.yearly.excel.byuser', $target->user_id) }}"
                                                                             class="btn btn-success">
                                                                             Laporan Tahunan Excel
                                                                         </a>
-
                                                                         <a href="{{ route('export.monthly.excel.byuser', $target->user_id) }}"
                                                                             class="btn btn-success">
                                                                             Laporan Bulanan Excel
@@ -170,7 +162,7 @@
                                                                     </div>
                                                                 @endrole
                                                             @else
-                                                                <!-- Restore Button (Still available for everyone) -->
+                                                                {{-- Tombol Aktifkan untuk semua pengguna --}}
                                                                 <form
                                                                     action="{{ route('manajemen-target-penjualan.restore', $target->user_id) }}"
                                                                     method="POST">
@@ -184,6 +176,7 @@
                                                             @endif
                                                         </div>
                                                     </td>
+
                                                 </tr>
                                             @endforeach
                                         @endif
