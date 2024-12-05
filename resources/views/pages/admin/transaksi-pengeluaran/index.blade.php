@@ -20,7 +20,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Transaksi Pengeluaran</li>
+                            <li class="breadcrumb-item active">Transaksi Penjualan</li>
                         </ol>
                     </div>
                 </div>

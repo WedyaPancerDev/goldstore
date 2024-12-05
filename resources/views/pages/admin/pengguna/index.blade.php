@@ -31,12 +31,12 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
-                            <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                data-bs-target="#management-user-create">
-                                <i class="ph ph-plus fs-5"></i>
-                                Tambah Pengguna
-                            </button>
+                            @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+                                    data-bs-target="#management-user-create">
+                                    <i class="ph ph-plus fs-5"></i>
+                                    Tambah Pengguna
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -80,10 +80,10 @@
                                             <th class="crancy-table__column-7 crancy-table__h5">
                                                 Terakhir Login
                                             </th>
-                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
-                                            <th class="crancy-table__column-8 crancy-table__h5">
-                                                Aksi
-                                            </th>
+                                            @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                                <th class="crancy-table__column-8 crancy-table__h5">
+                                                    Aksi
+                                                </th>
                                             @endif
                                         </tr>
                                     </thead>
@@ -129,92 +129,96 @@
                                                             {{ \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') ?? '-' }}
                                                         @endif
                                                     </td>
-                                                    @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
-                                                    <td class="crancy-table__column-8">
-                                                        <div class="d-flex justify-content-center gap-2">
-                                                            @if ($user->is_deleted == 0)
-                                                                {{-- EDIT --}}
-                                                                <button type="button"
-                                                                    class="btn-edit btn-cst btn-warning px-2"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editUserModal-{{ $user->id }}">
-                                                                    Ubah
-                                                                </button>
+                                                    @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                                        <td class="crancy-table__column-8">
+                                                            <div class="d-flex justify-content-center gap-2">
+                                                                @if ($user->is_deleted == 0)
+                                                                    {{-- EDIT --}}
+                                                                    <button type="button"
+                                                                        class="btn-edit btn-cst btn-warning px-2"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editUserModal-{{ $user->id }}">
+                                                                        Ubah
+                                                                    </button>
 
 
-                                                                {{-- DELETE / DEACTIVATE --}}
-                                                                <button type="button"
-                                                                    class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#removeNotificationModal-{{ $loop->iteration }}">
-                                                                    Non Aktifkan
-                                                                </button>
+                                                                    {{-- DELETE / DEACTIVATE --}}
+                                                                    <button type="button"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#removeNotificationModal-{{ $loop->iteration }}">
+                                                                        Non Aktifkan
+                                                                    </button>
 
-                                                                <!-- Modal for Deactivation Confirmation -->
-                                                                <div id="removeNotificationModal-{{ $loop->iteration }}"
-                                                                    class="modal fade zoomIn" tabindex="-1"
-                                                                    aria-hidden="true">
-                                                                    <div class="modal-dialog modal-dialog-centered">
-                                                                        <div class="modal-content">
-                                                                            <!-- Modal Header -->
-                                                                            <div class="modal-header border-0">
-                                                                                <button type="button" class="btn-close"
-                                                                                    data-bs-dismiss="modal"
-                                                                                    aria-label="Close"></button>
-                                                                            </div>
-
-                                                                            <!-- Modal Body -->
-                                                                            <div class="modal-body text-center p-4">
-                                                                                <div class="text-danger mb-4">
-                                                                                    <i class="bi bi-trash display-4"></i>
+                                                                    <!-- Modal for Deactivation Confirmation -->
+                                                                    <div id="removeNotificationModal-{{ $loop->iteration }}"
+                                                                        class="modal fade zoomIn" tabindex="-1"
+                                                                        aria-hidden="true">
+                                                                        <div class="modal-dialog modal-dialog-centered">
+                                                                            <div class="modal-content">
+                                                                                <!-- Modal Header -->
+                                                                                <div class="modal-header border-0">
+                                                                                    <button type="button" class="btn-close"
+                                                                                        data-bs-dismiss="modal"
+                                                                                        aria-label="Close"></button>
                                                                                 </div>
-                                                                                <h4 class="mb-2">Apakah kamu yakin?</h4>
-                                                                                <p class="text-muted mb-4">
-                                                                                    Apakah kamu yakin ingin menonaktifkan
-                                                                                    pengguna ini?
-                                                                                    <strong>Pengguna yang dinonaktifkan bisa
-                                                                                        diaktifkan lagi.</strong>
-                                                                                </p>
 
-                                                                                <!-- Action Buttons -->
-                                                                                <div
-                                                                                    class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-light btn-sm"
-                                                                                        data-bs-dismiss="modal">
-                                                                                        Batal
-                                                                                    </button>
-                                                                                    <form
-                                                                                        action="{{ route('admin.manajemen-pengguna.destroy', $user->id) }}"
-                                                                                        method="POST">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                            class="btn btn-danger btn-sm">
-                                                                                            Iya, Nonaktifkan!
+                                                                                <!-- Modal Body -->
+                                                                                <div class="modal-body text-center p-4">
+                                                                                    <div class="text-danger mb-4">
+                                                                                        <i
+                                                                                            class="bi bi-trash display-4"></i>
+                                                                                    </div>
+                                                                                    <h4 class="mb-2">Apakah kamu yakin?
+                                                                                    </h4>
+                                                                                    <p class="text-muted mb-4">
+                                                                                        Apakah kamu yakin ingin
+                                                                                        menonaktifkan
+                                                                                        pengguna ini?
+                                                                                        <strong>Pengguna yang dinonaktifkan
+                                                                                            bisa
+                                                                                            diaktifkan lagi.</strong>
+                                                                                    </p>
+
+                                                                                    <!-- Action Buttons -->
+                                                                                    <div
+                                                                                        class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-light btn-sm"
+                                                                                            data-bs-dismiss="modal">
+                                                                                            Batal
                                                                                         </button>
-                                                                                    </form>
+                                                                                        <form
+                                                                                            action="{{ route('admin.manajemen-pengguna.destroy', $user->id) }}"
+                                                                                            method="POST">
+                                                                                            @csrf
+                                                                                            @method('DELETE')
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-danger btn-sm">
+                                                                                                Iya, Nonaktifkan!
+                                                                                            </button>
+                                                                                        </form>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            @else
-                                                                {{-- ACTIVATE --}}
-                                                                <form
-                                                                    action="{{ route('admin.manajemen-pengguna.restore', $user->id) }}"
-                                                                    method="POST">
-                                                                    @csrf
-                                                                    @method('PATCH')
+                                                                @else
+                                                                    {{-- ACTIVATE --}}
+                                                                    <form
+                                                                        action="{{ route('admin.manajemen-pengguna.restore', $user->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        @method('PATCH')
 
-                                                                    <button type="submit"
-                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center px-2">
-                                                                        Aktifkan
-                                                                    </button>
-                                                                </form>
-                                                            @endif
-                                                        </div>
-                                                    </td>
+                                                                        <button type="submit"
+                                                                            class="btn-cst btn-success d-flex align-items-center justify-content-center px-2">
+                                                                            Aktifkan
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </div>
+                                                        </td>
                                                     @endif
                                                 </tr>
                                             @endforeach
