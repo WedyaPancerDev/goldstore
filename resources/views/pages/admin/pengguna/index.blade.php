@@ -31,7 +31,7 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                            @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                 <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                     data-bs-target="#management-user-create">
                                     <i class="ph ph-plus fs-5"></i>
@@ -80,7 +80,7 @@
                                             <th class="crancy-table__column-7 crancy-table__h5">
                                                 Terakhir Login
                                             </th>
-                                            @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                 <th class="crancy-table__column-8 crancy-table__h5">
                                                     Aksi
                                                 </th>
@@ -129,7 +129,7 @@
                                                             {{ \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') ?? '-' }}
                                                         @endif
                                                     </td>
-                                                    @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                                    @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                         <td class="crancy-table__column-8">
                                                             <div class="d-flex justify-content-center gap-2">
                                                                 @if ($user->is_deleted == 0)

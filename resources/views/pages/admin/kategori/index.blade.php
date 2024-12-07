@@ -32,7 +32,7 @@
                     <div class="crancy-dsinner">
                         <div class="crancy-table-meta mg-top-30">
                             <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                                @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                     <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                         data-bs-target="#addKategoriModal">
                                         <i class="ph ph-plus fs-5"></i>
@@ -64,7 +64,7 @@
                                             <tr>
                                                 <th class="crancy-table__column-1 crancy-table__h2">No</th>
                                                 <th class="crancy-table__column-2 crancy-table__h2">Nama Kategori</th>
-                                                @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                                @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                     <th class="crancy-table__column-5 crancy-table__h5 text-center"
                                                         style="width: 1%;">Aksi</th>
                                                 @endif
@@ -80,7 +80,7 @@
                                                         <td class="crancy-table__column-1 fw-semibold">{{ $iteration }}</td>
                                                         <td class="crancy-table__column-2 fw-semibold">{{ $data->nama ?? '-' }}
                                                         </td>
-                                                        @if (empty(array_intersect(['staff', 'akuntan', 'manajer'], $userRole)))
+                                                        @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                             <td class="crancy-table__column-5 text-center">
                                                                 @if ($data->is_deleted == 0)
                                                                     <div
