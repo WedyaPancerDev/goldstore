@@ -30,7 +30,7 @@ class Text
 
     public static function generateCode($model, $prefix, $length, $field)
     {
-        $lastData = $model::latest()->first();
+        $lastData = $model::orderBy('id', 'desc')->first();
         if (!$lastData) {
             return $prefix . str_pad(1, $length, '0', STR_PAD_LEFT);
         }

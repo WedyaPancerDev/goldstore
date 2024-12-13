@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\MasterBonus;
+use App\Models\AssignBonus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class MasterBonusController extends Controller
 {
@@ -13,8 +15,27 @@ class MasterBonusController extends Controller
      */
     public function index()
     {
-        $bonuses = MasterBonus::all();
-        return view("pages.admin.master-bonus.index", compact('bonuses'));
+        $user = Auth::user();
+        $userRole = $user->roles->pluck('name')->first();
+
+        if (in_array($userRole, ['admin', 'manajer', 'akuntan'])) {
+            $bonuses = DB::table('master-bonus')
+                ->where('is_deleted', 0)
+                ->get();
+        } else if ($userRole === 'staff') {
+            $bonuses = DB::table('master-bonus as mb')
+                ->join('assign_bonus as ab', 'mb.id', '=', 'ab.bonus_id')
+                ->where('ab.user_id', $user->id)
+                ->where('ab.is_deleted', 0)
+                ->where('mb.is_deleted', 0)
+                ->select('mb.*')
+                ->get();
+        } else {
+            $bonuses = collect([]);
+        }
+        
+        $userRoleBtn = Auth::user()->roles->pluck('name')->toArray();
+        return view("pages.admin.master-bonus.index", compact('bonuses', 'userRole', 'userRoleBtn'));
     }
 
     /**

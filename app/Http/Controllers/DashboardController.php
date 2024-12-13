@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
@@ -23,9 +24,15 @@ class DashboardController extends Controller
 
     public function indexAkuntan()
     {
-        return view('pages.akuntan.dasboard');
-    }
+        $users = DB::table('users')
+        ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id') // Relasi pivot
+        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id') // Relasi ke tabel roles
+        ->select('users.id as user_id', 'users.fullname', 'roles.name as role_name') // Kolom yang dipilih
+        ->where('roles.name', '=', 'staff') // Filter berdasarkan role
+        ->get();
 
+        return view('pages.akuntan.dasboard', compact('users'));
+    }
     public function indexStaff()
     {
         return view('pages.staff.dashboard');
@@ -91,13 +98,13 @@ class DashboardController extends Controller
             ->distinct()
             ->orderBy('year')
             ->pluck('year');
-
+    
         $staffUsers = User::whereHas('roles', function ($query) {
             $query->where('name', 'staff');
         })->get();
-
+    
         $chartData = [];
-
+    
         foreach ($staffUsers as $user) {
             $userChartData = [
                 'user' => $user->fullname,
@@ -112,39 +119,105 @@ class DashboardController extends Controller
                     'target_penjualan' => [],
                 ],
             ];
-
+    
+            $hasMonthlyData = false;
+            $hasYearlyData = false;
+    
             foreach ($userChartData['monthly']['months'] as $month) {
                 $totalTransaksiPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereMonth('order_date', date('m', strtotime("01 $month")))
                     ->sum('total_price');
-
+    
                 $totalTargetPenjualan = TargetPenjualan::where('user_id', $user->id)
                     ->where('bulan', $month)
                     ->sum('total');
-
+    
                 $userChartData['monthly']['transaksi_pengeluaran'][] = $totalTransaksiPengeluaran;
                 $userChartData['monthly']['target_penjualan'][] = $totalTargetPenjualan;
+    
+                if ($totalTransaksiPengeluaran > 0 || $totalTargetPenjualan > 0) {
+                    $hasMonthlyData = true;
+                }
             }
-
+    
             foreach ($availableYears as $year) {
                 $totalTransaksiPengeluaranTahun = TransaksiPengeluaran::where('user_id', $user->id)
                     ->whereYear('order_date', $year)
                     ->sum('total_price');
-
+    
                 $totalTargetPenjualanTahun = TargetPenjualan::where('user_id', $user->id)
                     ->whereYear('created_at', $year)
                     ->sum('total');
-
+    
                 if ($totalTransaksiPengeluaranTahun > 0 || $totalTargetPenjualanTahun > 0) {
                     $userChartData['yearly']['years'][] = $year;
                     $userChartData['yearly']['transaksi_pengeluaran'][] = $totalTransaksiPengeluaranTahun;
                     $userChartData['yearly']['target_penjualan'][] = $totalTargetPenjualanTahun;
+                    $hasYearlyData = true;
                 }
             }
-
-            $chartData[] = $userChartData;
+    
+            if ($hasMonthlyData || $hasYearlyData) {
+                $chartData[] = $userChartData;
+            }
         }
-
+    
         return response()->json($chartData);
     }
+    
+
+
+    public function getStaffUsers()
+    {
+        // $users = DB::table('users')
+        // ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id') // Relasi pivot
+        // ->join('roles', 'model_has_roles.role_id', '=', 'roles.id') // Relasi ke tabel roles
+        // ->select('users.id as user_id', 'users.fullname', 'roles.name as role_name') // Kolom yang dipilih
+        // ->where('roles.name', '=', 'staff') // Filter berdasarkan role
+        // ->get();
+
+        return response()->json($users);
+    }
+    
+    public function getUserTransactions($userId)
+    {
+        $transaksiPengeluaran = TransaksiPengeluaran::where('user_id', $userId)->sum('total_price');
+        $targetPenjualan = TargetPenjualan::where('user_id', $userId)->sum('total');
+    
+        return response()->json([
+            'transaksi_pengeluaran' => $transaksiPengeluaran,
+            'target_penjualan' => $targetPenjualan,
+        ]);
+    }
+    
+
+    public function getAllTransaksiandTarget()
+    {
+        $users = User::all();
+
+        $result = [];
+
+        foreach ($users as $user) {
+            $totalPengeluaran = TransaksiPengeluaran::where('user_id', $user->id)->sum('total_price');
+            
+            if ($totalPengeluaran > 0) {
+                $userData = [
+                    'user' => $user->fullname,
+                    'transaksi_pengeluaran' => [
+                        'total' => $totalPengeluaran,
+                        'count' => TransaksiPengeluaran::where('user_id', $user->id)->count(),
+                    ],
+                    'target_penjualan' => [
+                        'total' => TargetPenjualan::where('user_id', $user->id)->sum('total'),
+                        'count' => TargetPenjualan::where('user_id', $user->id)->count(),
+                    ],
+                ];
+
+                $result[] = $userData;
+            }
+        }
+
+        return response()->json($result);
+    }
+
 }

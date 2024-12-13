@@ -32,11 +32,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
+                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                             <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                 data-bs-target="#addProdukModal">
                                 <i class="ph ph-plus fs-5"></i>
                                 Tambah Produk
                             </button>
+                            @endif
                         </div>
                     </div>
 
@@ -67,8 +69,10 @@
                                             <th class="crancy-table__column-3 crancy-table__h2">Harga Beli</th>
                                             <th class="crancy-table__column-3 crancy-table__h2">Harga Jual</th>
                                             <th class="crancy-table__column-3 crancy-table__h2">Stok</th>
+                                            @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                             <th class="crancy-table__column-5 crancy-table__h5 text-center"
                                                 style="width: 1%;">Aksi</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody class="crancy-table__body">
@@ -86,6 +90,7 @@
                                                         <td class="crancy-table__column-3 fw-semibold">{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                                                         <td class="crancy-table__column-3 fw-semibold">{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
                                                         <td class="crancy-table__column-3 fw-semibold">{{ $item->stok }}</td>
+                                                        @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
                                                         <td class="crancy-table__column-5 text-center">
                                                         <div class="d-flex align-items-center gap-2 justify-content-center">
                                                             <button type="button" class="btn-edit btn-cst btn-light d-flex align-items-center justify-content-center w-auto px-2" 
@@ -106,6 +111,7 @@
                                                                 Hapus
                                                             </button>
                                                         </div>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                                 @php

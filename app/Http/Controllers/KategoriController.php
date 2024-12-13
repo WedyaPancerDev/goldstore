@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
@@ -14,7 +15,8 @@ class KategoriController extends Controller
     public function index()
     {
         $kategori = Kategori::all();
-        return view("pages.admin.kategori.index", compact('kategori'));
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+        return view("pages.admin.kategori.index", compact('kategori', 'userRole'));
     }
 
     /**

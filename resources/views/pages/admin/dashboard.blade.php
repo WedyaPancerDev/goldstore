@@ -16,8 +16,6 @@
                 </div>
             </div>
         </div>
-        >
-
         <div class="row" id="staffChartsContainer">
         </div>
     </section>

@@ -20,7 +20,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Transaksi Pengeluaran</li>
+                            <li class="breadcrumb-item active">Transaksi Penjualan</li>
                         </ol>
                     </div>
                 </div>
@@ -32,11 +32,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                            <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                data-bs-target="#management-transaksi-pengeluaran-create">
-                                <i class="ph ph-plus fs-5"></i>
-                                Tambah Transaksi Pengeluaran
-                            </button>
+                            @if (empty(array_intersect(['akuntan'], $userRole)))
+                                <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+                                    data-bs-target="#management-transaksi-pengeluaran-create">
+                                    <i class="ph ph-plus fs-5"></i>
+                                    Tambah Transaksi Penjualan
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -85,9 +87,13 @@
                                             <th class="crancy-table__column-8 crancy-table__h5">
                                                 Tanggal Order
                                             </th>
-                                            <th class="crancy-table__column-9 crancy-table__h5">
-                                                Aksi
-                                            </th>
+                                            @if (empty(array_intersect(['akuntan'], $userRole)))
+                                                @role('admin|akuntan|manajer')
+                                                    <th class="crancy-table__column-9 crancy-table__h5">
+                                                        Aksi
+                                                    </th>
+                                                @endrole
+                                            @endif
                                         </tr>
                                     </thead>
                                     {{-- crancy Table Body --}}
@@ -119,13 +125,17 @@
                                                     <td class="crancy-table__column-8tar fw-semibold">
                                                         {{ $transaksi->order_date ?? '-' }}
                                                     </td>
-                                                    <td class="crancy-table__column-8">
-                                                        <button type="button" class="btn-edit btn-cst btn-warning px-2"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
-                                                            Ubah
-                                                        </button>
-                                                    </td>
+                                                    @if (empty(array_intersect(['akuntan'], $userRole)))
+                                                        @role('admin|akuntan|manajer')
+                                                            <td class="crancy-table__column-8">
+                                                                <button type="button" class="btn-edit btn-cst btn-warning px-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
+                                                                    Ubah
+                                                                </button>
+                                                            </td>
+                                                        @endrole
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         @endif
@@ -154,7 +164,7 @@
                 </div>
 
                 <div class="modal-body p-4">
-
+                    <!-- Produk -->
                     <div class="mb-5 form-group">
                         <label class="form-label" for="product_id">Pilih Produk <span class="text-danger">*</span></label>
                         <select class="form-select crancy__item-input product-select" name="product_id" required>
@@ -165,8 +175,6 @@
                                 </option>
                             @endforeach
                         </select>
-
-
                         @if ($errors->has('product_id'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('product_id') }}</span>
@@ -174,30 +182,29 @@
                         @endif
                     </div>
 
+                    <!-- User -->
                     <div class="mb-5 form-group">
-                        <label class="form-label" for="user_id">Pilih User <span class="text-danger">*</span></label>
-                        <select class="form-select" name="user_id" required>
-                            <option data-display="Pilih User" selected disabled></option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->username }}</option>
-                            @endforeach
-                        </select>
-
-                        @if ($errors->has('user_id'))
-                            <div class="pt-2">
-                                <span class="form-text text-danger">{{ $errors->first('user_id') }}</span>
+                        <label class="form-label">Pilih User <span class="text-danger">*</span></label>
+                        <div id="user-selection-container">
+                            <div class="d-flex align-items-center mb-2 user-select-row">
+                                <select class="form-select user-select" name="user_ids[]" required>
+                                    <option data-display="Pilih User" selected disabled></option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-sm btn-success ms-2 add-user-btn">Tambah</button>
                             </div>
-                        @endif
+                        </div>
+                        <span class="form-text text-muted">Maksimal 3 user dapat dipilih.</span>
                     </div>
 
+                    <!-- Quantity -->
                     <div class="mb-3 pt-3 form-group">
                         <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
                         <input class="form-control quantity-input" type="text" name="quantity"
                             placeholder="Masukkan Quantity" required />
-
                         <span id="stock-warning" class="text-danger py-2 text-sm"></span>
-
-
                         @if ($errors->has('quantity'))
                             <div class="pt-2">
                                 <span class="form-text text-danger">{{ $errors->first('quantity') }}</span>
@@ -205,6 +212,10 @@
                         @endif
                     </div>
 
+                    <span id="stock-warning" class="text-danger py-2 text-sm"></span>
+
+
+                    <!-- Total Harga -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="total_price">Total Harga <span
                                 class="text-danger">*</span></label>
@@ -212,6 +223,7 @@
                             readonly />
                     </div>
 
+                    <!-- Deskripsi -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="deskripsi">Deskripsi <span class="text-danger">*</span></label>
                         <textarea id="deskripsi" class="crancy-wc__form-input fw-semibold" name="deskripsi"></textarea>
@@ -222,6 +234,7 @@
                         @endif
                     </div>
 
+                    <!-- Tanggal Order -->
                     <div class="mb-3 form-group">
                         <label class="form-label" for="order_date">Tanggal Order <span
                                 class="text-danger">*</span></label>
@@ -241,6 +254,7 @@
             </form>
         </div>
     </div>
+
 
     {{-- Edit Modal --}}
     @foreach ($transaksiPengeluaran as $transaksi)
@@ -332,7 +346,279 @@
 @section('script')
     @include('layouts.datatables-scripts')
 
+    {{-- script modal create --}}
     <script>
+        $(document).ready(function() {
+            let maxUsers = 3;
+
+            // Fungsi untuk mencegah panggilan berulang (debounce)
+            function debounce(func, delay) {
+                let timer;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Memperbarui daftar pilihan pengguna agar tidak ada duplikasi pilihan
+            function updateUserOptions() {
+                let selectedUsers = [];
+                $('.user-select').each(function() {
+                    let val = $(this).val();
+                    if (val) selectedUsers.push(val);
+                });
+
+                $('.user-select').each(function() {
+                    let currentSelect = $(this);
+                    currentSelect.find('option').each(function() {
+                        if ($(this).val() && selectedUsers.includes($(this).val()) && $(this)
+                            .val() !== currentSelect.val()) {
+                            $(this).hide();
+                        } else {
+                            $(this).show();
+                        }
+                    });
+                });
+            }
+
+            // Memvalidasi tombol submit berdasarkan input
+            function updateSubmitButtonState() {
+                let isProductSelected = $('.product-select').val() !== null;
+                let isQuantityValid = $('.quantity-input').val() > 0;
+                let isUserSelected = $('.user-select').filter(function() {
+                    return $(this).val() !== null && $(this).val() !== '';
+                }).length > 0;
+
+                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected));
+            }
+
+            // Memeriksa stok produk dan menghitung total harga
+            function checkStock(quantity, productId, price, callback) {
+                if (productId) {
+                    $.ajax({
+                        url: '{{ route('check-stock') }}', // Pastikan route sesuai
+                        type: 'GET',
+                        data: {
+                            product_id: productId
+                        },
+                        success: function(response) {
+                            const stok = response.stok;
+                            if (quantity > stok) {
+                                $('#stock-warning').text(
+                                    `Stok tidak mencukupi. Stok tersedia: ${stok}`);
+                                $('#total_price').val(0);
+                                $('#btn-submit').prop('disabled', true);
+                            } else {
+                                $('#stock-warning').text('');
+                                callback(price * quantity);
+                            }
+                        },
+                    });
+                }
+            }
+
+            // Menghitung total harga yang dibagi rata
+            function calculateSplitTotal() {
+                let quantity = parseInt($('.quantity-input').val()) || 0;
+                let productPrice = parseFloat($('.product-select').find(':selected').data('price')) || 0;
+                let selectedUserCount = $('.user-select').filter(function() {
+                    return $(this).val() && $(this).val() !== '';
+                }).length;
+
+                if (quantity > 0 && productPrice > 0 && selectedUserCount > 0) {
+                    checkStock(quantity, $('.product-select').val(), productPrice, (totalPrice) => {
+                        let splitPrice = Math.ceil(totalPrice / selectedUserCount);
+                        $('#total_price').val(splitPrice.toLocaleString('id-ID', {
+                            minimumFractionDigits: 0
+                        }));
+                        updateSubmitButtonState();
+                    });
+                } else {
+                    $('#total_price').val(0);
+                }
+            }
+
+            // Menambah baris pilihan user
+            $('#user-selection-container').on('click', '.add-user-btn', function() {
+                if ($('.user-select-row').length < maxUsers) {
+                    $('#user-selection-container').append(`
+                        <div class="d-flex align-items-center mb-2 user-select-row">
+                            <select class="form-select user-select" name="user_ids[]" required>
+                                <option data-display="Pilih User" selected disabled></option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-sm btn-danger ms-2 remove-user-btn">Hapus</button>
+                        </div>
+                    `);
+                    updateUserOptions();
+                    calculateSplitTotal();
+                    updateSubmitButtonState();
+                }
+            });
+
+            // Menghapus baris pilihan user
+            $('#user-selection-container').on('click', '.remove-user-btn', function() {
+                $(this).closest('.user-select-row').remove();
+                updateUserOptions();
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            // Event listener untuk perubahan produk atau kuantitas
+            $('.product-select').on('change', function() {
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            $('.quantity-input').on('input', debounce(function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            }, 500));
+
+            // Event listener untuk perubahan pilihan user
+            $('#user-selection-container').on('change', '.user-select', function() {
+                updateUserOptions();
+                calculateSplitTotal();
+                updateSubmitButtonState();
+            });
+
+            // Inisialisasi awal
+            updateSubmitButtonState();
+            calculateSplitTotal();
+        });
+    </script>
+
+    {{-- script modal edit --}}
+    <script>
+        $(document).ready(function() {
+            function debounce(func, delay) {
+                let timer;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Function to check if any changes have been made to the form
+            function updateEditButtonState(modal) {
+                let isChanged = false;
+
+                modal.find('.form-control, .crancy-wc__form-input').each(function() {
+                    const originalValue = $(this).data('original');
+                    const currentValue = $(this).val();
+
+                    if (currentValue !== originalValue) {
+                        isChanged = true;
+                        return false;
+                    }
+                });
+
+                const quantity = modal.find('.quantity-input').val();
+                const productSelected = modal.find('.product-select').val();
+
+                modal.find('#btn-submit').prop('disabled', !isChanged);
+            }
+
+            // Validate form and check if changes have been made
+            $('.modal').on('input change', function() {
+                updateEditButtonState($(this));
+            });
+
+            // Handle change in product selection
+            $('.product-select').on('change', function() {
+                calculateTotalPrice($(this));
+            });
+
+            // Handle input changes in quantity
+            $('.quantity-input').on('input', debounce(function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
+                if ($(this).val() === '' || $(this).val() == 0) {
+                    $(this).closest('.modal-body').find('#total_price').val(0);
+                } else {
+                    calculateTotalPrice($(this));
+                }
+            }, 500));
+
+            // Calculate total price based on selected quantity and product price
+            function calculateTotalPrice(quantityInput) {
+                let selectedProduct = quantityInput.closest('.modal-body').find('.product-select').find(
+                    ':selected');
+                let price = selectedProduct.data('price') || 0;
+                let quantity = quantityInput.val();
+
+                if (quantity && price && quantity > 0) {
+                    checkStock(quantity, selectedProduct.val(), price, quantityInput);
+                } else {
+                    quantityInput.closest('.modal-body').find('#total_price').val(0);
+                }
+            }
+
+            // Check stock availability before calculating the total price
+            function checkStock(quantity, productId, price, quantityInput) {
+                if (productId) {
+                    $.ajax({
+                        url: '{{ route('check-stock') }}',
+                        type: 'GET',
+                        data: {
+                            product_id: productId
+                        },
+                        success: function(response) {
+                            const stok = response.stok;
+                            let stockWarning = quantityInput.closest('.modal-body').find(
+                                '#stock-warning');
+
+                            if (quantity > stok) {
+                                stockWarning.text(
+                                    'Jumlah quantity melebihi stok produk yang tersedia. Stok: ' +
+                                    stok);
+                                quantityInput.closest('.modal-body').find('#total_price').val(0);
+                                $('#btn-submit').prop('disabled', true);
+                            } else {
+                                stockWarning.text('');
+                                const totalPrice = parseFloat(price) * parseInt(quantity);
+                                quantityInput.closest('.modal-body').find('#total_price').val(totalPrice
+                                    .toLocaleString('id-ID', {
+                                        minimumFractionDigits: 0
+                                    }));
+
+                                validateForm(quantityInput);
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Validate form inputs to enable/disable submit button
+            function validateForm(element) {
+                let selectedProduct = element.closest('.modal-body').find('.product-select').val();
+                let quantity = element.closest('.modal-body').find('.quantity-input').val();
+
+                if (selectedProduct && quantity && quantity > 0) {
+                    $('#btn-submit').prop('disabled', false);
+                } else {
+                    $('#btn-submit').prop('disabled', true);
+                }
+            }
+
+            // Initialize the form and set up modal
+            $('.modal').on('show.bs.modal', function() {
+                updateEditButtonState($(this)); // Check if there are any changes when the modal is shown
+            });
+
+            // Set initial states
+            updateEditButtonState($('.modal'));
+            calculateTotalPrice($('.quantity-input'));
+        });
+    </script>
+
+
+
+    {{-- <script>
         $(document).ready(function() {
             function debounce(func, delay) {
                 let timer;
@@ -469,5 +755,5 @@
                 updateEditButtonState($(this));
             });
         });
-    </script>
+    </script> --}}
 @endsection

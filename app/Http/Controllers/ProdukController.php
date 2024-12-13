@@ -18,13 +18,16 @@ class ProdukController extends Controller
     public function index(Request $request)
     {
         $produks = Produk::with('kategori')->get();
-        $kategoris = Kategori::all();
-        $detailProduk = null; 
+
+        $kategoris = Kategori::where('is_deleted', 0)->get();
+
+        $detailProduk = null;
 
         if ($request->has('detail_id')) {
             $detailProduk = DB::table('produk')
                 ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
                 ->where('produk.id', $request->input('detail_id'))
+                ->where('kategori.is_deleted', 0) 
                 ->select(
                     'produk.id as produk_id',
                     'produk.nama',
@@ -42,8 +45,11 @@ class ProdukController extends Controller
 
         $kodeProduk = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
 
-        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk'));
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+
+        return view("pages.admin.produk.index", compact('produks', 'kategoris', 'kodeProduk', 'detailProduk', 'userRole'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -69,24 +75,31 @@ class ProdukController extends Controller
             'kategori_id' => 'required',
         ]);
 
-        $validated['kode_produk'] = Text::generateCode(Produk::class, 'PRD', 4, 'kode_produk');
+        $contoh = Produk::orderBy('id', 'desc')->first();
+
+        $lastCode = $contoh ? $contoh->kode_produk : null;
+        $validated['kode_produk'] = $lastCode
+            ? Text::generateCode($contoh, 'PRD', 4, 'kode_produk')
+            : 'PRD' . str_pad(1, 4, '0', STR_PAD_LEFT);
+
         $validated['created_by'] = Auth::user()->id;
 
         $image = $request->file('foto');
-
         $fileName = time() . str($request->nama)->slug();
         $resultFile = $image
             ? $image->storeAs('photos/product', "{$fileName}.{$image->extension()}")
             : null;
-            
-        $baseUrl = Storage::url($resultFile);
-        
-        $validated['foto'] = $baseUrl;
-        Produk::create($validated);
 
+        $baseUrl = Storage::url($resultFile);
+
+        $validated['foto'] = $baseUrl;
+
+
+        Produk::create($validated);
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
+
 
     /**
      * Display the specified resource.
@@ -131,7 +144,7 @@ class ProdukController extends Controller
 
         $validated['foto'] = $resultFile;
 
-        $produk->update($validated); 
+        $produk->update($validated);
         return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
@@ -148,5 +161,4 @@ class ProdukController extends Controller
 
         return redirect()->route('manajemen-produk.index')->with('success', 'Produk berhasil dihapus');
     }
-
 }

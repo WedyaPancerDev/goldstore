@@ -76,7 +76,8 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-kategori.destroy',
         ]);
 
-        Route::put('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+        Route::patch('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+
 
 
         Route::resource('master-bonus', MasterBonusController::class)->names([
@@ -110,6 +111,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export-monthly-excel', [TargetPenjualanController::class, 'exportMonthlyExcel'])->name('export.monthly.excel');
         Route::get('/export-yearly-excel', [TargetPenjualanController::class, 'exportYearlyExcel'])->name('export.yearly.excel');
 
+        Route::get('export-yearly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportYearlyExcelByUser'])->name('export.yearly.excel.byuser');
+        Route::get('export-monthly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportMonthlyExcelByUser'])->name('export.monthly.excel.byuser');
+
+
+        Route::get('export-monthly-pdf/{userId}', [TargetPenjualanController::class, 'exportMonthlyPDFByUser'])->name('export.monthly.pdf.byuser');
+        Route::get('export-yearly-pdf/{userId}', [TargetPenjualanController::class, 'exportYearlyPDFByUser'])->name('export.yearly.pdf.byuser');
+
+
 
 
         Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
@@ -137,6 +146,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:akuntan'])->group(function () {
         Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
+        Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
+        Route::get('/api/staff-users', [DashboardController::class, 'getStaffUsers']);
+        Route::get('/api/user-transactions/{userId}', [DashboardController::class, 'getUserTransactions']);
     });
 
     Route::middleware(['role:manajer'])->group(function () {
@@ -147,4 +159,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
         Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
     });
+
+    Route::get('/profile', [PenggunaController::class, 'getUserProfile'])->name('user.profile');
+    Route::post('/profile/update', [PenggunaController::class, 'putUserProfile'])->name('user.update');
 });
