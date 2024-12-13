@@ -9,7 +9,7 @@ class TransaksiPengeluaran extends Model
 {
     use HasFactory;
 
-    protected $table = 'transaksi-pengeluaran';
+    protected $table = 'transaksi_pengeluaran';
 
     protected $guarded = [
         "created_at",

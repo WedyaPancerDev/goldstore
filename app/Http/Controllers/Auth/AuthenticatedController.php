@@ -16,10 +16,10 @@ class AuthenticatedController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $request->validate(
             [
-                'username' => 'required|string|min:5', 
+                'username' => 'required|string|min:5',
                 'password' => 'required',
             ],
             [
@@ -31,9 +31,13 @@ class AuthenticatedController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
-            $user = User::where('username', $credentials['username'])->first();
+            $findUser = User::where('username', $credentials['username'])->first();
 
-            if ($user && $user->is_deleted) {
+            $findUser->update([
+                'last_login' => now(),
+            ]);
+
+            if ($findUser && $findUser->is_deleted) {
                 Auth::logout();
 
                 return back()->with('error', 'Akun anda telah dihapus oleh admin. Silahkan hubungi admin untuk informasi lebih lanjut.');

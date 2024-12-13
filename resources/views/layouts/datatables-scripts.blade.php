@@ -1,7 +1,7 @@
 <script src="{{ URL::asset('assets/js/datatables.min.js') }}"></script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         let table = $("#table-container").DataTable({
             searching: true,
             info: true,
@@ -23,12 +23,12 @@
         });
 
         // Hubungkan form pencarian kustom dengan DataTables
-        $('#customSearchBox').on('keyup', function () {
+        $('#customSearchBox').on('keyup', function() {
             table.search(this.value).draw();
         });
 
         // Jika Anda ingin melakukan pencarian ketika tombol search diklik
-        $('.search-btn').on('click', function (e) {
+        $('.search-btn').on('click', function(e) {
             e.preventDefault();
             table.search($('#customSearchBox').val()).draw();
         });

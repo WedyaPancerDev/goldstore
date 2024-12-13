@@ -12,6 +12,7 @@ use App\Http\Controllers\TargetPenjualanController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 use App\Models\AssignBonus;
 use App\Models\MasterBonus;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedController::class, 'index'])->name('ui.login');
@@ -27,9 +28,12 @@ Route::middleware(['auth'])->group(function () {
             'manajer' => route('manajer.root'),
             'akuntan' => route('akuntan.root'),
             'staff' => route('staff.root'),
+            default => null
         };
 
         if (is_null($redirectRoute)) {
+            Auth::logout();
+
             return redirect()->route('login')->with('error', 'Anda tidak memiliki akses');
         }
 
@@ -39,8 +43,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthenticatedController::class, 'destroy'])->name('logout');
 
 
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:admin|akuntan|manajer|staff'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'indexAdmin'])->name('admin.root');
+        Route::get('/staff-chart-data', [DashboardController::class, 'getStaffChartData'])->name('staff.chart.data');
 
         Route::resource('produk', ProdukController::class)->names([
             'index' => 'manajemen-produk.index',
@@ -51,13 +56,16 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-produk.destroy',
         ]);
 
+
         Route::resource('pengguna', PenggunaController::class)->names([
             'index' => 'manajemen-pengguna.index',
             'store' => 'manajemen-pengguna.store',
             'edit' => 'manajemen-pengguna.edit',
             'update' => 'manajemen-pengguna.update',
-            'destroy' => 'manajemen-pengguna.destroy',
         ]);
+
+        Route::delete("/admin/manajemen-pengguna/{id}/delete", [PenggunaController::class, 'destroy'])->name("admin.manajemen-pengguna.destroy");
+        Route::patch("/admin/manajemen-pengguna/{id}/restore", [PenggunaController::class, 'restore'])->name("admin.manajemen-pengguna.restore");
 
         Route::resource('kategori', KategoriController::class)->names([
             'index' => 'manajemen-kategori.index',
@@ -67,6 +75,10 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'manajemen-kategori.update',
             'destroy' => 'manajemen-kategori.destroy',
         ]);
+
+        Route::patch('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+
+
 
         Route::resource('master-bonus', MasterBonusController::class)->names([
             'index' => 'manajemen-master-bonus.index',
@@ -90,10 +102,34 @@ Route::middleware(['auth'])->group(function () {
             'index' => 'manajemen-target-penjualan.index',
             'create' => 'manajemen-target-penjualan.create',
             'store' => 'manajemen-target-penjualan.store',
-            'edit' => 'manajemen-target-penjualan.edit',
-            'update' => 'manajemen-target-penjualan.update',
-            'destroy' => 'manajemen-target-penjualan.destroy',
+
         ]);
+
+        Route::get('/get-total-by-month', [TargetPenjualanController::class, 'getTotalByMonth'])->name('getTotalByMonth');
+        Route::get('/laporan/penjualan/pdf', [TargetPenjualanController::class, 'exportMonthlyPDF'])->name('exportMonthlyPDF');
+        Route::get('/export-yearly-target-penjualan', [TargetPenjualanController::class, 'exportYearlyPDF'])->name('exportYearlyTargetPenjualan');
+        Route::get('/export-monthly-excel', [TargetPenjualanController::class, 'exportMonthlyExcel'])->name('export.monthly.excel');
+        Route::get('/export-yearly-excel', [TargetPenjualanController::class, 'exportYearlyExcel'])->name('export.yearly.excel');
+
+        Route::get('export-yearly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportYearlyExcelByUser'])->name('export.yearly.excel.byuser');
+        Route::get('export-monthly-excel-byuser/{userId}', [TargetPenjualanController::class, 'exportMonthlyExcelByUser'])->name('export.monthly.excel.byuser');
+
+
+        Route::get('export-monthly-pdf/{userId}', [TargetPenjualanController::class, 'exportMonthlyPDFByUser'])->name('export.monthly.pdf.byuser');
+        Route::get('export-yearly-pdf/{userId}', [TargetPenjualanController::class, 'exportYearlyPDFByUser'])->name('export.yearly.pdf.byuser');
+
+
+
+
+        Route::delete('manajemen-target-penjualan/{id}', [TargetPenjualanController::class, 'destroy'])->name('manajemen-target-penjualan.destroy');
+        Route::patch('manajemen-target-penjualan/{id}/restore', [TargetPenjualanController::class, 'restore'])->name('manajemen-target-penjualan.restore');
+        Route::get('manajemen-target-penjualan/detail/{userId}', [TargetPenjualanController::class, 'detail'])->name('manajemen-target-penjualan.detail');
+        Route::get('manajemen-target-penjualan/details/{userId}', [TargetPenjualanController::class, 'details'])->name('manajemen-target-penjualan.details');
+        Route::get('manajemen-target-penjualan/edit/{userId}', [TargetPenjualanController::class, 'edit'])->name('manajemen-target-penjualan.edit');
+        Route::get('manajemen-target-penjualan/edits/{userId}', [TargetPenjualanController::class, 'edits'])->name('manajemen-target-penjualan.edits');
+        Route::patch('manajemen-target-penjualan/update/{userId}', [TargetPenjualanController::class, 'update'])->name('manajemen-target-penjualan.update');
+
+
 
         Route::resource('transaksi-pengeluaran', TransaksiPengeluaranController::class)->names([
             'index' => 'manajemen-transaksi-pengeluaran.index',
@@ -103,19 +139,27 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'manajemen-transaksi-pengeluaran.update',
             'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
         ]);
+
+        Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
+    });
+
+
+    Route::middleware(['role:akuntan'])->group(function () {
+        Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
+        Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
+        Route::get('/api/staff-users', [DashboardController::class, 'getStaffUsers']);
+        Route::get('/api/user-transactions/{userId}', [DashboardController::class, 'getUserTransactions']);
     });
 
     Route::middleware(['role:manajer'])->group(function () {
         Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
     });
 
-    Route::middleware(['role:akuntan'])->group(function () {
-        Route::get('/akuntan/dashboard', [DashboardController::class, 'indexAkuntan'])->name('akuntan.root');
-    });
-
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
-
+        Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
     });
 
+    Route::get('/profile', [PenggunaController::class, 'getUserProfile'])->name('user.profile');
+    Route::post('/profile/update', [PenggunaController::class, 'putUserProfile'])->name('user.update');
 });

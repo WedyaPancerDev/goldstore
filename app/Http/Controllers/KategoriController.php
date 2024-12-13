@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
@@ -12,7 +14,9 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        return view("pages.admin.kategori.index");
+        $kategori = Kategori::all();
+        $userRole = Auth::user()->roles->pluck('name')->toArray();
+        return view("pages.admin.kategori.index", compact('kategori', 'userRole'));
     }
 
     /**
@@ -28,7 +32,13 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nama' => 'required|unique:kategori,nama',
+        ]);
+
+        Kategori::create(attributes: $validated);
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
 
     /**
@@ -44,7 +54,8 @@ class KategoriController extends Controller
      */
     public function edit(Kategori $kategori)
     {
-        //
+
+        return view("pages.admin.kategori.index", compact('kategori'));
     }
 
     /**
@@ -52,14 +63,36 @@ class KategoriController extends Controller
      */
     public function update(Request $request, Kategori $kategori)
     {
-        //
+        $validated = $request->validate([
+            'nama' => 'required|unique:kategori,nama,' . $kategori->id,
+        ]);
+
+        $kategori->update($validated);
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diperbarui');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Kategori $kategori)
+    public function destroy(string $id)
     {
-        //
+        DB::table('kategori')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => true
+            ]);
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil dinonaktifkan');
+    }
+
+    public function restore($id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        $kategori->is_deleted = 0;
+        $kategori->save();
+
+        return redirect()->route('manajemen-kategori.index')->with('success', 'Kategori berhasil diaktifkan kembali.');
     }
 }

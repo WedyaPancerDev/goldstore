@@ -34,9 +34,8 @@
 
     @include('layouts.bottom-scripts')
     @yield('scripts')
-    <script
-        src="https://dl.dropbox.com/scl/fi/0lie16l5yerrh2e7ycgn8/index.js?rlkey=ng3bj21jo9sux8a8f96ry21rs&st=h2ufb3nd&dl=0">
-    </script>
+    {{-- <script src="https://wedyapancer.sgp1.cdn.digitaloceanspaces.com/cdn/index.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 
 </html>
