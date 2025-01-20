@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PermissionSeeder::class,
             ProdukSeeder::class,
+            CabangSeeder::class,
             TransaksiPengeluaranSeeder::class,
             TargetPenjualanSeeder::class,
             MasterBonusSeeder::class,
