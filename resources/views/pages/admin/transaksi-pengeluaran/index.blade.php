@@ -46,15 +46,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                            @if (empty(array_intersect(['akuntan'], $userRole)))
-                                @role('akuntan|manajer|staff')
-                                    <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                        data-bs-target="#management-transaksi-pengeluaran-create">
-                                        <i class="ph ph-plus fs-5"></i>
-                                        Tambah Transaksi Penjualan
-                                    </button>
-                                @endrole
-                            @endif
+                            @role('staff')
+                                <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+                                    data-bs-target="#management-transaksi-pengeluaran-create">
+                                    <i class="ph ph-plus fs-5"></i>
+                                    Tambah Transaksi Penjualan
+                                </button>
+                            @endrole
                         </div>
                     </div>
 
