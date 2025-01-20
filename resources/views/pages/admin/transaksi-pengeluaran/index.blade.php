@@ -19,7 +19,21 @@
                 <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @role('admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('manajer')
+                                <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('akuntan')
+                                <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('staff')
+                                <li class="breadcrumb-item"><a href="{{ route('staff.root') }}">Dashboard</a></li>
+                            @endrole
                             <li class="breadcrumb-item active">Transaksi Penjualan</li>
                         </ol>
                     </div>
@@ -77,6 +91,9 @@
                                             <th class="crancy-table__column-4 crancy-table__h2">
                                                 Produk
                                             </th>
+                                            <th class="crancy-table__column-4 crancy-table__h2">
+                                                Cabang
+                                            </th>
                                             <th class="crancy-table__column-5 crancy-table__h4">
                                                 Jumlah
                                             </th>
@@ -114,6 +131,9 @@
                                                     </td>
                                                     <td class="crancy-table__column-4 fw-semibold">
                                                         {{ $transaksi->nama_produk ?? '-' }}
+                                                    </td>
+                                                    <td class="crancy-table__column-4 fw-semibold">
+                                                        {{ $transaksi->nama_cabang ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-5 fw-semibold">
                                                         {{ $transaksi->quantity ?? '-' }}
@@ -199,6 +219,24 @@
                             </div>
                         </div>
                         <span class="form-text text-muted">Maksimal 3 user dapat dipilih.</span>
+                    </div>
+
+                    <!-- Cabang -->
+                    <div class="mb-5 form-group">
+                        <label class="form-label" for="cabang_id">Pilih Cabang <span class="text-danger">*</span></label>
+                        <select class="form-select crancy__item-input cabang-select" name="cabang_id" required>
+                            <option data-display="Tentukan Cabang" selected disabled></option>
+                            @foreach ($cabang as $cabg)
+                                <option value="{{ $cabg->id }}">
+                                    {{ $cabg->nama_cabang }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($errors->has('cabang_id'))
+                            <div class="pt-2">
+                                <span class="form-text text-danger">{{ $errors->first('cabang_id') }}</span>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Quantity -->
@@ -391,8 +429,10 @@
                 let isUserSelected = $('.user-select').filter(function() {
                     return $(this).val() !== null && $(this).val() !== '';
                 }).length > 0;
+                let isCabangSelected = $('.cabang-select').val() !== null;
 
-                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected));
+                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected &&
+                    isCabangSelected));
             }
 
             // Memeriksa stok produk dan menghitung total harga
