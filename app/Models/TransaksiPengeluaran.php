@@ -15,4 +15,19 @@ class TransaksiPengeluaran extends Model
         "created_at",
         "updated_at"
     ];
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class);
+    }
 }
