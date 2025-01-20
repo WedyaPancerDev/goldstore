@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cabang', function (Blueprint $table) {
             $table->id();
             $table->string('nama_cabang');
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }

@@ -49,7 +49,7 @@ class TransaksiPengeluaranController extends Controller
         $users = DB::table('users')->select('id', 'username')->get(); // Add this to get users
         $userRole = Auth::user()->roles->pluck('name')->toArray();
 
-        $cabang = Cabang::all();
+        $cabang = Cabang::where('is_deleted', 0)->get();
 
         return view("pages.admin.transaksi-pengeluaran.index", [
             "transaksiPengeluaran" => $transaksiPengeluaran,

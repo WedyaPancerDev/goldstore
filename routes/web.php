@@ -1,18 +1,19 @@
 <?php
 
-use App\Http\Controllers\AssignBonusController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthenticatedController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\MasterBonusController;
-use App\Http\Controllers\PenggunaController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\TargetPenjualanController;
-use App\Http\Controllers\TransaksiPengeluaranController;
 use App\Models\AssignBonus;
 use App\Models\MasterBonus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CabangController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AssignBonusController;
+use App\Http\Controllers\MasterBonusController;
+use App\Http\Controllers\TargetPenjualanController;
+use App\Http\Controllers\Auth\AuthenticatedController;
+use App\Http\Controllers\TransaksiPengeluaranController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedController::class, 'index'])->name('ui.login');
@@ -77,8 +78,19 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'manajemen-kategori.update',
             'destroy' => 'manajemen-kategori.destroy',
         ]);
-
         Route::patch('manajemen-kategori/restore/{id}', [KategoriController::class, 'restore'])->name('manajemen-kategori.restore');
+
+
+        Route::resource('cabang', CabangController::class)->names([
+            'index' => 'manajemen-cabang.index',
+            'create' => 'manajemen-cabang.create',
+            'store' => 'manajemen-cabang.store',
+            'edit' => 'manajemen-cabang.edit',
+            'update' => 'manajemen-cabang.update',
+            'destroy' => 'manajemen-cabang.destroy',
+        ]);
+
+        Route::patch('manajemen-cabang/restore/{id}', [CabangController::class, 'restore'])->name('manajemen-cabang.restore');
 
 
 

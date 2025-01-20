@@ -97,6 +97,19 @@
                     @endif
 
 
+                    @role('admin|manajer')
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('manajemen-cabang.index') ? 'active-bg' : '' }}"
+                                href="{{ route('manajemen-cabang.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-map-pin fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Cabang</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endrole
+
+
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
