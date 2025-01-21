@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\BiayaOperasional;
 
 class BiayaOperasionalController extends Controller
 {
     public function index()
     {
-        //
+        return view('pages.akuntan.biaya-operasional.index');
     }
 
     /**
@@ -24,7 +25,18 @@ class BiayaOperasionalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            // 
+        ]);
+
+        $create_biaya_operasional = BiayaOperasional::create([
+            //
+        ]);
+
+        if ($create_biaya_operasional) {
+            return redirect()->route('biaya-operasional.index')->with('success', 'Berhasil menambahkan biaya operasional');
+        }
+        return redirect()->route('biaya-operasional.index')->with('error', 'Gagal menambahkan biaya operasional');
     }
 
     /**
@@ -32,7 +44,8 @@ class BiayaOperasionalController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $biaya = BiayaOperasional::find($id);
+        return view('pages.akuntan.biaya-operasional.show', compact('biaya'));
     }
 
     /**

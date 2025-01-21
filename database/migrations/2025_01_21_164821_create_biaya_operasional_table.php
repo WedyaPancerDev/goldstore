@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('biaya_operasional', function (Blueprint $table) {
             $table->id();
             $table->string('nama_biaya_operasional');
-            $table->double('jumlah_biaya_operasional');
             $table->softDeletes();
             $table->timestamps();
         });

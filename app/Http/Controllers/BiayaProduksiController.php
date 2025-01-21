@@ -8,7 +8,7 @@ class BiayaProduksiController extends Controller
 {
     public function index()
     {
-        //
+        return view('pages.akuntan.biaya-produksi.index');
     }
 
     /**

@@ -10,7 +10,6 @@ class BiayaProduksi extends Model
 
     protected $fillable = [
         'nama_biaya_produksi',
-        'jumlah_biaya_produksi',
     ];
 
     protected $guarded = [
@@ -18,4 +17,9 @@ class BiayaProduksi extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function hargaProduksi()
+    {
+        return $this->hasMany(HargaProduksi::class);
+    }
 }

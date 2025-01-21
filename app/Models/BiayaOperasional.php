@@ -10,7 +10,6 @@ class BiayaOperasional extends Model
 
     protected $fillable = [
         'nama_biaya_operasional',
-        'jumlah_biaya_operasional'
     ];
 
     protected $guarded = [
@@ -18,4 +17,9 @@ class BiayaOperasional extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function harga_operasional()
+    {
+        return $this->hasMany(HargaOperasional::class);
+    }
 }

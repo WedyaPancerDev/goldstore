@@ -168,7 +168,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
         Route::get('/api/staff-users', [DashboardController::class, 'getStaffUsers']);
         Route::get('/api/user-transactions/{userId}', [DashboardController::class, 'getUserTransactions']);
+    });
 
+    Route::middleware(['role:manajer'])->group(function () {
+        Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
+    });
+
+    Route::middleware(['role:staff'])->group(function () {
+        Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
+        Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
+    });
+
+    Route::get('/profile', [PenggunaController::class, 'getUserProfile'])->name('user.profile');
+    Route::post('/profile/update', [PenggunaController::class, 'putUserProfile'])->name('user.update');
+
+    //new feature
+    Route::middleware(['role:manajer|akuntan'])->group(function () {
         //part of laba
         Route::get('laba-rugi', [LabaRugiController::class, 'index'])->name('laba-rugi.index');
         //biaya operasional
@@ -198,26 +213,5 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'biaya-produksi.update',
             'destroy' => 'biaya-produksi.destroy',
         ]);
-        //biaya lainya
-        Route::resource('biaya-lainya', BiayaLainyaController::class)->names([
-            'index' => 'biaya-lainya.index',
-            'create' => 'biaya-lainya.create',
-            'store' => 'biaya-lainya.store',
-            'edit' => 'biaya-lainya.edit',
-            'update' => 'biaya-lainya.update',
-            'destroy' => 'biaya-lainya.destroy',
-        ]);
     });
-
-    Route::middleware(['role:manajer'])->group(function () {
-        Route::get('/manajer/dashboard', [DashboardController::class, 'indexManajer'])->name('manajer.root');
-    });
-
-    Route::middleware(['role:staff'])->group(function () {
-        Route::get('/staff/dashboard', [DashboardController::class, 'indexStaff'])->name('staff.root');
-        Route::get('/getTargetAndTransaksi', [DashboardController::class, 'getTargetAndTransaksi'])->name('getTargetAndTransaksi');
-    });
-
-    Route::get('/profile', [PenggunaController::class, 'getUserProfile'])->name('user.profile');
-    Route::post('/profile/update', [PenggunaController::class, 'putUserProfile'])->name('user.update');
 });

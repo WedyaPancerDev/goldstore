@@ -9,8 +9,7 @@ class BiayaGaji extends Model
     protected $table = 'biaya_gaji';
 
     protected $fillable = [
-        'nama_biaya_gaji',
-        'jumlah_biaya_gaji',
+        'user_id',
     ];
 
     protected $guarded = [
@@ -18,4 +17,14 @@ class BiayaGaji extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function hargaGaji()
+    {
+        return $this->hasMany(HargaGaji::class);
+    }
 }

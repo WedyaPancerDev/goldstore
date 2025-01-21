@@ -8,7 +8,7 @@ class BiayaGajiController extends Controller
 {
     public function index()
     {
-        //
+        return view('pages.akuntan.biaya-gaji.index');
     }
 
     /**

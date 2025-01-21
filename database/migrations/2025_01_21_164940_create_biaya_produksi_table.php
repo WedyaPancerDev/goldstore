@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('biaya_produksi', function (Blueprint $table) {
             $table->id();
             $table->string('nama_biaya_produksi');
-            $table->double('jumlah_biaya_produksi');
             $table->softDeletes();
             $table->timestamps();
         });

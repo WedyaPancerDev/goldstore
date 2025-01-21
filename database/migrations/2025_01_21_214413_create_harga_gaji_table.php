@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('biaya_lainya', function (Blueprint $table) {
+        Schema::create('harga_gaji', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_biaya_lainya');
-            $table->double('jumlah_biaya_lainya');
-            $table->softDeletes();
+            $table->foreignId('biaya_gaji_id')
+            ->references('id')
+                ->on('biaya_gaji')
+                ->onDelete('cascade');
+            $table->double('harga')->nullable();
+            $table->integer('bulan')->length(2)->nullable();
+            $table->integer('tahun')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('biaya_lainya');
+        Schema::dropIfExists('harga_gaji');
     }
 };
