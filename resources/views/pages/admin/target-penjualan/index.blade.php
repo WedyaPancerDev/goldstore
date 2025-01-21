@@ -14,7 +14,23 @@
                 <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @role('admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('manajer')
+                                <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('akuntan')
+                                <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('staff')
+                                <li class="breadcrumb-item"><a href="{{ route('staff.root') }}">Dashboard</a></li>
+                            @endrole
+
+
                             <li class="breadcrumb-item active">Target Penjualan</li>
                         </ol>
                     </div>
@@ -191,7 +207,8 @@
     </section>
 
     <!-- Modal untuk Menambah Target Penjualan -->
-    <div id="addTargetPenjualan" class="modal fade" tabindex="-1" aria-labelledby="addTargetPenjualan" aria-hidden="true">
+    <div id="addTargetPenjualan" class="modal fade" tabindex="-1" aria-labelledby="addTargetPenjualan"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="height: 75vh; max-height: 90vh;">
             <form method="POST" action="{{ route('manajemen-target-penjualan.store') }}" class="modal-content"
                 style="height: 100%;">

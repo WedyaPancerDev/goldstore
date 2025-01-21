@@ -19,7 +19,18 @@
                     <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                                @role('admin')
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                                @endrole
+
+                                @role('manajer')
+                                    <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                                @endrole
+
+                                @role('akuntan')
+                                    <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                                @endrole
+
                                 <li class="breadcrumb-item active">Kategori</li>
                             </ol>
                         </div>
