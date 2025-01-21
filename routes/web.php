@@ -190,13 +190,14 @@ Route::middleware(['auth'])->group(function () {
         //biaya operasional
         Route::get('biaya-operasional', [BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
         Route::post('biaya-operasional', [BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
-        Route::get('biaya-operasional/{id}', [BiayaOperasionalController::class, 'show'])->name('biaya-operasional.show');
-        Route::patch('biaya-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('biaya-operasional.update');
+        Route::put('biaya-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('biaya-operasional.update');
         Route::delete('biaya-operasional/{id}', [BiayaOperasionalController::class, 'destroy'])->name('biaya-operasional.destroy');
         Route::patch('biaya-operasional/{id}/restore', [BiayaOperasionalController::class, 'restore'])->name('biaya-operasional.restore');
+        //show harga operasional by biaya
+        Route::get('biaya-operasional/{id}', [BiayaOperasionalController::class, 'show'])->name('biaya-operasional.show');
         //harga operasional
         Route::post('harga-operasional/{id}', [HargaOperasionalController::class, 'store'])->name('harga-operasional.store');
-        Route::patch('harga-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('harga-operasional.update');
+        Route::put('harga-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('harga-operasional.update');
         Route::delete('harga-operasional/{id}', [BiayaOperasionalController::class, 'destroy'])->name('harga-operasional.destroy');
 
 

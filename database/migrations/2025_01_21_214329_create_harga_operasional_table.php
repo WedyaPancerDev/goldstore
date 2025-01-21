@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('biaya_operasional_id')
                 ->references('id')
                 ->on('biaya_operasional')
+                ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->double('harga')->nullable();
             $table->integer('bulan')->length(2)->nullable();

@@ -1,10 +1,10 @@
 @extends('layouts.master')
 @section('title')
-    Toko Emas - Biaya Operasional
+    Toko Emas - Harga Operasional
 @endsection
 
 @section('title-section')
-    Biaya Operasional
+    Harga Operasional
 @endsection
 
 @section('css')
@@ -26,7 +26,8 @@
                                 @role('manajer')
                                     <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
                                 @endrole
-                                <li class="breadcrumb-item active">Biaya Operasional</li>
+                                <li class="breadcrumb-item active">Harga Operasional dari {{ $biaya->nama_biaya_operasional }}
+                                </li>
                             </ol>
                         </div>
                     </div>
@@ -86,7 +87,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
                                                                     <!-- Tombol Detail -->
-                                                                    <a href="{{ route('biaya-operasional.show', $data->id) }}"
+                                                                    <a
                                                                         class="btn-detail rounded-lg btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2">
                                                                         <i class="ph ph-eye fs-5"></i>
                                                                         Details
@@ -109,10 +110,6 @@
                                                                         Hapus
                                                                     </button>
                                                                 </div>
-                                                            @else
-                                                                {{-- restore form --}}
-
-                                                                {{-- end restore form --}}
                                                             @endif
                                                         </td>
                                                     </tr>
