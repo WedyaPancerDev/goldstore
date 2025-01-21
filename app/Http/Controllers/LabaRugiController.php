@@ -8,6 +8,6 @@ class LabaRugiController extends Controller
 {
     public function index()
     {
-        return view('laba-rugi.index');
+        return view('pages.akuntan.laba-rugi.index');
     }
 }

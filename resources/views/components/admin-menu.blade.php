@@ -133,6 +133,18 @@
                         </a>
                     </li>
 
+                    @role('akuntan')
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('laba-rugi.index') ? 'active-bg' : '' }}"
+                                href="{{ route('laba-rugi.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-scales fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Laba Rugi</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endrole
+
 
                 @endrole
             </ul>
