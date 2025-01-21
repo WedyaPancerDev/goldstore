@@ -9,15 +9,8 @@ class BiayaOperasionalController extends Controller
 {
     public function index()
     {
-        return view('pages.akuntan.biaya-operasional.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $biaya_operasional = BiayaOperasional::all();
+        return view('pages.akuntan.biaya-operasional.index', compact('biaya_operasional'));
     }
 
     /**
@@ -26,11 +19,15 @@ class BiayaOperasionalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // 
+            'nama_biaya_operasional' => 'required|string|max:255',
+        ], [
+            'nama_biaya_operasional.required' => 'Nama biaya operasional harus diisi',
+            'nama_biaya_operasional.string' => 'Nama biaya operasional harus berupa string',
+            'nama_biaya_operasional.max' => 'Nama biaya operasional maksimal 255 karakter',
         ]);
 
         $create_biaya_operasional = BiayaOperasional::create([
-            //
+            'nama_biaya_operasional' => $request->nama_biaya_operasional,
         ]);
 
         if ($create_biaya_operasional) {
@@ -45,6 +42,9 @@ class BiayaOperasionalController extends Controller
     public function show(string $id)
     {
         $biaya = BiayaOperasional::find($id);
+        if (!$biaya) {
+            return redirect()->route('biaya-operasional.index')->with('error', 'Biaya operasional tidak ditemukan');
+        }
         return view('pages.akuntan.biaya-operasional.show', compact('biaya'));
     }
 

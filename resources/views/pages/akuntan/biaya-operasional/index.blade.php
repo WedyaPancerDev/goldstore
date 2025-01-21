@@ -67,29 +67,35 @@
                                         <thead class="crancy-table__head">
                                             <tr>
                                                 <th class="crancy-table__column-1 crancy-table__h2">No</th>
-                                                <th class="crancy-table__column-2 crancy-table__h2">Nama Cabang</th>
+                                                <th class="crancy-table__column-2 crancy-table__h2">Nama Biaya Operasional</th>
                                                 <th class="crancy-table__column-5 crancy-table__h5 text-center"
                                                     style="width: 1%;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody class="crancy-table__body">
-                                            {{-- @if ($cabang->count() > 0)
-                                                @foreach ($cabang as $data)
+                                            @if ($biaya_operasional->count() > 0)
+                                                @foreach ($biaya_operasional as $data)
                                                     <tr>
                                                         <td class="crancy-table__column-1 fw-semibold">{{ $loop->iteration }}
                                                         </td>
                                                         <td class="crancy-table__column-2 fw-semibold">
-                                                            {{ $data->nama_cabang ?? '-' }}
+                                                            {{ $data->nama_biaya_operasional ?? '-' }}
                                                         </td>
                                                         <td class="crancy-table__column-5 text-center">
                                                             @if ($data->is_deleted == 0)
                                                                 <div
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
+                                                                    <!-- Tombol Detail -->
+                                                                    <a
+                                                                        class="btn-detail rounded-lg btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2">
+                                                                        <i class="ph ph-eye fs-5"></i>
+                                                                        Details
+                                                                    </a>
                                                                     <!-- Tombol Edit -->
                                                                     <button type="button"
                                                                         class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2"
                                                                         data-bs-toggle="modal"
-                                                                        data-bs-target="#editCabangModal-{{ $data->id }}">
+                                                                        data-bs-target="#editBiayaOperasionalModal-{{ $data->id }}">
                                                                         <i class="ph ph-pencil fs-5"></i>
                                                                         Edit
                                                                     </button>
@@ -98,7 +104,7 @@
                                                                     <button type="button"
                                                                         class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                         data-bs-toggle="modal"
-                                                                        data-bs-target="#removeCabangModal-{{ $data->id }}">
+                                                                        data-bs-target="#removeBiayaOperasionalModal-{{ $data->id }}">
                                                                         <i class="ph ph-trash fs-5"></i>
                                                                         Hapus
                                                                     </button>
@@ -106,7 +112,7 @@
                                                             @else
                                                                 <!-- Tombol Aktifkan -->
                                                                 <form
-                                                                    action="{{ route('manajemen-cabang.restore', $data->id) }}"
+                                                                    action="{{ route('biaya-operasional.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
                                                                     @method('PATCH')
@@ -121,8 +127,8 @@
                                                     </tr>
 
                                                     <!-- Modal Konfirmasi Hapus -->
-                                                    <div id="removeCabangModal-{{ $data->id }}" class="modal fade zoomIn"
-                                                        tabindex="-1" aria-hidden="true">
+                                                    <div id="removeBiayaOperasionalModal-{{ $data->id }}"
+                                                        class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
                                                                 <div class="modal-header border-0">
@@ -135,8 +141,8 @@
                                                                     </div>
                                                                     <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                     <p class="text-muted mb-4">
-                                                                        Apakah kamu yakin ingin menghapus cabang ini?
-                                                                        <strong>Cabang yang dihapus tidak dapat
+                                                                        Apakah kamu yakin ingin menghapus biaya operasional ini?
+                                                                        <strong>Biaya Operasional yang dihapus tidak dapat
                                                                             dikembalikan.</strong>
                                                                     </p>
                                                                     <div
@@ -144,7 +150,7 @@
                                                                         <button type="button" class="btn btn-light btn-sm"
                                                                             data-bs-dismiss="modal">Batal</button>
                                                                         <form
-                                                                            action="{{ route('manajemen-cabang.destroy', $data->id) }}"
+                                                                            action="{{ route('biaya-operasional.destroy', $data->id) }}"
                                                                             method="POST">
                                                                             @csrf
                                                                             @method('DELETE')
@@ -158,17 +164,7 @@
                                                         </div>
                                                     </div>
                                                 @endforeach
-                                            @endif --}}
-
-
-                                            {{-- @if ($cabangs->count() == 0) --}}
-                                            <tr>
-                                                <td colspan="7" class="text-center">
-                                                    <p class="mb-0">Tidak ada data.</p>
-                                                </td>
-                                            </tr>
-                                            {{-- @endif --}}
-
+                                            @endif
 
                                         </tbody>
 

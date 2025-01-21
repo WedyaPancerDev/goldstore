@@ -17,6 +17,7 @@ use App\Http\Controllers\MasterBonusController;
 use App\Http\Controllers\BiayaProduksiController;
 use App\Http\Controllers\TargetPenjualanController;
 use App\Http\Controllers\BiayaOperasionalController;
+use App\Http\Controllers\HargaOperasionalController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 
@@ -187,14 +188,19 @@ Route::middleware(['auth'])->group(function () {
         //part of laba
         Route::get('laba-rugi', [LabaRugiController::class, 'index'])->name('laba-rugi.index');
         //biaya operasional
-        Route::resource('biaya-operasional', BiayaOperasionalController::class)->names([
-            'index' => 'biaya-operasional.index',
-            'create' => 'biaya-operasional.create',
-            'store' => 'biaya-operasional.store',
-            'edit' => 'biaya-operasional.edit',
-            'update' => 'biaya-operasional.update',
-            'destroy' => 'biaya-operasional.destroy',
-        ]);
+        Route::get('biaya-operasional', [BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
+        Route::post('biaya-operasional', [BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
+        Route::get('biaya-operasional/{id}', [BiayaOperasionalController::class, 'show'])->name('biaya-operasional.show');
+        Route::patch('biaya-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('biaya-operasional.update');
+        Route::delete('biaya-operasional/{id}', [BiayaOperasionalController::class, 'destroy'])->name('biaya-operasional.destroy');
+        Route::patch('biaya-operasional/{id}/restore', [BiayaOperasionalController::class, 'restore'])->name('biaya-operasional.restore');
+        //harga operasional
+        Route::post('harga-operasional/{id}', [HargaOperasionalController::class, 'store'])->name('harga-operasional.store');
+        Route::patch('harga-operasional/{id}', [BiayaOperasionalController::class, 'update'])->name('harga-operasional.update');
+        Route::delete('harga-operasional/{id}', [BiayaOperasionalController::class, 'destroy'])->name('harga-operasional.destroy');
+
+
+
         //biaya gaji
         Route::resource('biaya-gaji', BiayaGajiController::class)->names([
             'index' => 'biaya-gaji.index',
