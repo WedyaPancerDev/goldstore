@@ -148,9 +148,11 @@
                                                     @if (empty(array_intersect(['akuntan'], $userRole)))
                                                         @role('admin|akuntan|manajer')
                                                             <td class="crancy-table__column-8">
-                                                                <button type="button" class="btn-edit btn-cst btn-warning px-2"
+                                                                <button type="button"
+                                                                    class="btn-edit btn-cst btn-warning px-2 d-flex align-items-center justify-content-center gap-2"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
+                                                                    <i class="ph ph-pencil"></i>
                                                                     Ubah
                                                                 </button>
                                                             </td>
