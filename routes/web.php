@@ -7,11 +7,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LabaRugiController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\BiayaGajiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AssignBonusController;
+use App\Http\Controllers\BiayaLainyaController;
 use App\Http\Controllers\MasterBonusController;
+use App\Http\Controllers\BiayaProduksiController;
 use App\Http\Controllers\TargetPenjualanController;
+use App\Http\Controllers\BiayaOperasionalController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 
@@ -163,6 +168,45 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/getAllTransaksiandTarget', [DashboardController::class, 'getAllTransaksiandTarget'])->name('getAllTransaksiandTarget');
         Route::get('/api/staff-users', [DashboardController::class, 'getStaffUsers']);
         Route::get('/api/user-transactions/{userId}', [DashboardController::class, 'getUserTransactions']);
+
+        //part of laba
+        Route::get('laba-rugi', [LabaRugiController::class, 'index'])->name('laba-rugi.index');
+        //biaya operasional
+        Route::resource('biaya-operasional', BiayaOperasionalController::class)->names([
+            'index' => 'biaya-operasional.index',
+            'create' => 'biaya-operasional.create',
+            'store' => 'biaya-operasional.store',
+            'edit' => 'biaya-operasional.edit',
+            'update' => 'biaya-operasional.update',
+            'destroy' => 'biaya-operasional.destroy',
+        ]);
+        //biaya gaji
+        Route::resource('biaya-gaji', BiayaGajiController::class)->names([
+            'index' => 'biaya-gaji.index',
+            'create' => 'biaya-gaji.create',
+            'store' => 'biaya-gaji.store',
+            'edit' => 'biaya-gaji.edit',
+            'update' => 'biaya-gaji.update',
+            'destroy' => 'biaya-gaji.destroy',
+        ]);
+        //biaya produksi
+        Route::resource('biaya-produksi', BiayaProduksiController::class)->names([
+            'index' => 'biaya-produksi.index',
+            'create' => 'biaya-produksi.create',
+            'store' => 'biaya-produksi.store',
+            'edit' => 'biaya-produksi.edit',
+            'update' => 'biaya-produksi.update',
+            'destroy' => 'biaya-produksi.destroy',
+        ]);
+        //biaya lainya
+        Route::resource('biaya-lainya', BiayaLainyaController::class)->names([
+            'index' => 'biaya-lainya.index',
+            'create' => 'biaya-lainya.create',
+            'store' => 'biaya-lainya.store',
+            'edit' => 'biaya-lainya.edit',
+            'update' => 'biaya-lainya.update',
+            'destroy' => 'biaya-lainya.destroy',
+        ]);
     });
 
     Route::middleware(['role:manajer'])->group(function () {
