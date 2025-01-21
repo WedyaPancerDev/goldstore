@@ -97,20 +97,24 @@
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
                                                                         <button
-                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold">
+                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-eye fs-5"></i>
                                                                             Detail
                                                                         </button>
                                                                     </a>
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
                                                                         <button
-                                                                            class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold">
+                                                                            class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-pencil fs-5"></i>
                                                                             Ubah
                                                                         </button>
                                                                     </a>
-                                                                    <button type="button" class="btn-cst btn-danger px-3 w-25"
+                                                                    <button type="button"
+                                                                        class="btn-cst btn-danger px-3 w-25 d-flex justcontent-center align-items-center gap-2 justify-content-center"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeTargetModal-{{ $target->user_id }}">
+                                                                        <i class="ph ph-trash fs-5"></i>
                                                                         Nonaktifkan
                                                                     </button>
                                                                     <!-- Modal for Deactivation -->
@@ -161,6 +165,7 @@
                                                                     <div class="d-flex gap-2 fw-semibold">
                                                                         <a href="{{ route('export.yearly.pdf.byuser', $target->user_id) }}"
                                                                             class="btn btn-warning">
+
                                                                             Laporan Tahunan PDF
                                                                         </a>
                                                                         <a href="{{ route('export.monthly.pdf.byuser', $target->user_id) }}"

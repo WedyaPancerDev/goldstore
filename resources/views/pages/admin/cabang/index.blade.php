@@ -87,17 +87,19 @@
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
                                                                     <!-- Tombol Edit -->
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editCabangModal-{{ $data->id }}">
+                                                                        <i class="ph ph-pencil fs-5"></i>
                                                                         Edit
                                                                     </button>
 
                                                                     <!-- Tombol Hapus -->
                                                                     <button type="button"
-                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeCabangModal-{{ $data->id }}">
+                                                                        <i class="ph ph-trash fs-5"></i>
                                                                         Hapus
                                                                     </button>
                                                                 </div>
@@ -109,7 +111,8 @@
                                                                     @csrf
                                                                     @method('PATCH')
                                                                     <button type="submit"
-                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2 gap-2">
+                                                                        <i class="ph ph-check fs-5"></i>
                                                                         Aktifkan
                                                                     </button>
                                                                 </form>

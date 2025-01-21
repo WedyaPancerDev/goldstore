@@ -146,18 +146,20 @@
                                                                 @if ($user->is_deleted == 0)
                                                                     {{-- EDIT --}}
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-warning px-2"
+                                                                        class="btn-edit btn-cst btn-warning px-2 d-flex justify-content-center align-items-center gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editUserModal-{{ $user->id }}">
+                                                                        <i class="ph ph-pencil"></i>
                                                                         Ubah
                                                                     </button>
 
 
                                                                     {{-- DELETE / DEACTIVATE --}}
                                                                     <button type="button"
-                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2 gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeNotificationModal-{{ $loop->iteration }}">
+                                                                        <i class="ph ph-trash"></i>
                                                                         Non Aktifkan
                                                                     </button>
 

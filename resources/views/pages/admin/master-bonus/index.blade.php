@@ -121,9 +121,10 @@
                                                                 <div class="d-flex align-items-center gap-2">
                                                                     <!-- Tombol Edit -->
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-warning px-2"
+                                                                        class="btn-edit btn-cst btn-warning px-2 d-flex justify-content-center align-items-center gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editBonusModal-{{ $bonus->id }}">
+                                                                        <i class="ph ph-pencil fs-5"></i>
                                                                         Edit
                                                                     </button>
                                                                 </div>
