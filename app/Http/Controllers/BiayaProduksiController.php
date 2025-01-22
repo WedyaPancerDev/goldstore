@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BiayaProduksi;
 use Illuminate\Http\Request;
 
 class BiayaProduksiController extends Controller
 {
     public function index()
     {
-        return view('pages.akuntan.biaya-produksi.index');
+        $biaya_produksi = BiayaProduksi::all();
+        return view('pages.akuntan.biaya-produksi.index', compact('biaya_produksi'));
     }
 
     /**
