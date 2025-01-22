@@ -400,6 +400,7 @@ class TargetPenjualanController extends Controller
 
     public function exportYearlyPDF()
     {
+        $cabangs = Cabang::where('is_deleted', false)->with('transaksiPengeluaran')->get(); // Ambil semua cabang yang aktif
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
 
         $reportData = [];
@@ -409,35 +410,46 @@ class TargetPenjualanController extends Controller
             ->pluck('year');
 
         foreach ($years as $year) {
-            $yearlyData = [];
-            foreach ($userIds as $userId) {
-                $user = User::find($userId);
+            foreach ($cabangs as $cabang) {
+                $yearlyData = [];
+                foreach ($userIds as $userId) {
+                    $user = User::find($userId);
 
-                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
-                    ->where('is_deleted', false)
-                    ->sum('total');
+                    // Ambil target penjualan berdasarkan user dan cabang
+                    $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                        ->where('is_deleted', false)
+                        ->whereIn('user_id', function ($query) use ($cabang) {
+                            $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+                        })
+                        ->sum('total');
 
-                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
-                    ->whereYear('order_date', $year)
-                    ->sum('total_price');
+                    // Ambil total penjualan berdasarkan user, cabang dan tahun
+                    $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                        ->whereYear('order_date', $year)
+                        ->where('cabang_id', $cabang->id)
+                        ->sum('total_price');
 
-                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
-                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                    $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
+                        : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
-                    $yearlyData[] = [
-                        'user' => $user->fullname,
-                        'total_target' => $totalTargetTahun,
-                        'total_penjualan' => $totalPenjualanTahun,
-                        'status' => $status,
-                    ];
+                    if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                        $yearlyData[] = [
+                            'cabang' => $cabang->nama_cabang,  // Nama cabang yang ingin ditampilkan
+                            'user' => $user->fullname,
+                            'total_target' => $totalTargetTahun,
+                            'total_penjualan' => $totalPenjualanTahun,
+                            'status' => $status,
+                        ];
+                    }
                 }
-            }
-            if (!empty($yearlyData)) {
-                $reportData[$year] = $yearlyData;
+
+                if (!empty($yearlyData)) {
+                    $reportData[$year][$cabang->id] = $yearlyData; // Menyimpan berdasarkan tahun dan cabang
+                }
             }
         }
 
+        // Generate PDF
         $pdf = PDF::loadView('reports.target_penjualan_yearly', compact('reportData'));
 
         $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
