@@ -1,10 +1,10 @@
 @extends('layouts.master')
 @section('title')
-    Toko Emas - Biaya Operasional
+    Toko Emas - Biaya Produksi
 @endsection
 
 @section('title-section')
-    Biaya Operasional
+    Biaya Produksi
 @endsection
 
 @section('css')
@@ -26,7 +26,7 @@
                                 @role('manajer')
                                     <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
                                 @endrole
-                                <li class="breadcrumb-item active">Biaya Operasional</li>
+                                <li class="breadcrumb-item active">Biaya Produksi</li>
                             </ol>
                         </div>
                     </div>
@@ -39,9 +39,9 @@
                         <div class="crancy-table-meta mg-top-30">
                             <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
                                 <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-                                    data-bs-target="#addBiayaOperasionalModal">
+                                    data-bs-target="#addBiayaProduksiModal">
                                     <i class="ph ph-plus fs-5"></i>
-                                    Tambah Biaya Operasional
+                                    Tambah Biaya Produksi
                                 </button>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                                         <thead class="crancy-table__head">
                                             <tr>
                                                 <th class="crancy-table__column-1 crancy-table__h2">No</th>
-                                                <th class="crancy-table__column-2 crancy-table__h2">Nama Biaya Operasional</th>
+                                                <th class="crancy-table__column-2 crancy-table__h2">Nama Biaya Produksi</th>
                                                 <th class="crancy-table__column-5 crancy-table__h5 text-center"
                                                     style="width: 1%;">Aksi</th>
                                             </tr>
@@ -95,7 +95,7 @@
                                                                     <button type="button"
                                                                         class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2"
                                                                         data-bs-toggle="modal"
-                                                                        data-bs-target="#editBiayaOperasionalModal-{{ $data->id }}">
+                                                                        data-bs-target="#editBiayaProduksiModal-{{ $data->id }}">
                                                                         <i class="ph ph-pencil fs-5"></i>
                                                                         Edit
                                                                     </button>
@@ -104,15 +104,14 @@
                                                                     <button type="button"
                                                                         class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                         data-bs-toggle="modal"
-                                                                        data-bs-target="#removeBiayaOperasionalModal-{{ $data->id }}">
+                                                                        data-bs-target="#removeBiayaProduksiModal-{{ $data->id }}">
                                                                         <i class="ph ph-trash fs-5"></i>
                                                                         Hapus
                                                                     </button>
                                                                 </div>
                                                             @else
                                                                 <!-- Tombol Aktifkan -->
-                                                                <form
-                                                                    action="{{ route('biaya-operasional.restore', $data->id) }}"
+                                                                <form action="{{ route('biaya-Produksi.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
                                                                     @method('PATCH')
@@ -127,7 +126,7 @@
                                                     </tr>
 
                                                     <!-- Modal Konfirmasi Hapus -->
-                                                    <div id="removeBiayaOperasionalModal-{{ $data->id }}"
+                                                    <div id="removeBiayaProduksiModal-{{ $data->id }}"
                                                         class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
@@ -141,17 +140,15 @@
                                                                     </div>
                                                                     <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                     <p class="text-muted mb-4">
-                                                                        Apakah kamu yakin ingin menghapus biaya operasional ini?
-                                                                        <strong>Biaya Operasional yang dihapus tidak dapat
+                                                                        Apakah kamu yakin ingin menghapus biaya Produksi ini?
+                                                                        <strong>Biaya Produksi yang dihapus tidak dapat
                                                                             dikembalikan.</strong>
                                                                     </p>
                                                                     <div
                                                                         class="d-grid gap-2 d-md-flex justify-content-md-center">
                                                                         <button type="button" class="btn btn-light btn-sm"
                                                                             data-bs-dismiss="modal">Batal</button>
-                                                                        <form
-                                                                            action="{{ route('biaya-operasional.destroy', $data->id) }}"
-                                                                            method="POST">
+                                                                        <form action="" method="POST">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button type="submit"
@@ -181,11 +178,11 @@
 
 
         {{-- create modal --}}
-        {{-- @include('pages.akuntan.biaya-operasional.create') --}}
+        @include('pages.akuntan.biaya-produksi.create')
         {{-- end create modal --}}
 
         {{-- edit modal --}}
-        {{-- @include('pages.akuntan.biaya-operasional.edit') --}}
+        {{-- @include('pages.akuntan.biaya-Produksi.edit') --}}
         {{-- end edit modal --}}
     @endrole
 @endsection
