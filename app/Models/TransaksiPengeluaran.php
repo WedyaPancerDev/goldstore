@@ -11,6 +11,17 @@ class TransaksiPengeluaran extends Model
 
     protected $table = 'transaksi_pengeluaran';
 
+    protected $fillable = [
+        'nomor_order',
+        'order_date',
+        'quantity',
+        'total_price',
+        'deskripsi',
+        'produk_id',
+        'user_id',
+        'cabang_id',
+    ];
+
     protected $guarded = [
         "created_at",
         "updated_at"

@@ -185,6 +185,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:manajer|akuntan'])->group(function () {
         //part of laba
         Route::get('laba-rugi', [LabaRugiController::class, 'index'])->name('laba-rugi.index');
+        Route::get('/laba-rugi/filter', [LabaRugiController::class, 'getFilteredData'])->name('laba-rugi.filter');
+
         //biaya operasional
         Route::get('biaya-operasional', [BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
         Route::post('biaya-operasional', [BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
