@@ -14,12 +14,12 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 50px auto;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
@@ -68,6 +68,28 @@
         .badge-danger {
             background-color: #dc3545;
         }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            table {
+                width: 100%;
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 10px;
+                margin: 20px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 
@@ -79,6 +101,7 @@
                 <tr>
                     <th>No</th>
                     <th>Nama Pengguna</th>
+                    <th>Cabang</th>
                     <th>Bulan</th>
                     <th>Target Penjualan</th>
                     <th>Total Penjualan</th>
@@ -90,6 +113,7 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $data['user'] }}</td>
+                        <td>{{ $data['cabang'] }}</td>
                         <td>{{ $data['bulan'] }}</td>
                         <td>Rp {{ number_format($data['target'], 0, ',', '.') }}</td>
                         <td>Rp {{ number_format($data['total_price'], 0, ',', '.') }}</td>

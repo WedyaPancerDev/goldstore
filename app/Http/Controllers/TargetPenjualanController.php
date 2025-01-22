@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
 use App\Models\User;
@@ -338,56 +339,60 @@ class TargetPenjualanController extends Controller
     public function exportMonthlyPDF()
     {
         $targets = TargetPenjualan::where('is_deleted', false)->get();
+        $cabangs = Cabang::where('is_deleted', false)->with('transaksiPengeluaran')->get();
 
         $reportData = [];
 
-        foreach ($targets as $target) {
-            $user = User::find($target->user_id);
-            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::whereIn('user_id', function ($query) use ($cabang) {
+                $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+            })->where('is_deleted', false)->get();
 
-            $month = [
-                'JAN' => '01',
-                'FEB' => '02',
-                'MAR' => '03',
-                'APR' => '04',
-                'MAY' => '05',
-                'JUN' => '06',
-                'JUL' => '07',
-                'AUG' => '08',
-                'SEP' => '09',
-                'OCT' => '10',
-                'NOV' => '11',
-                'DEC' => '12',
-            ];
+            foreach ($targets as $target) {
+                $user = User::find($target->user_id);
+                $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
 
-            $targetMonth = $month[$target->bulan] ?? null;
+                $month = [
+                    'JAN' => '01',
+                    'FEB' => '02',
+                    'MAR' => '03',
+                    'APR' => '04',
+                    'MAY' => '05',
+                    'JUN' => '06',
+                    'JUL' => '07',
+                    'AUG' => '08',
+                    'SEP' => '09',
+                    'OCT' => '10',
+                    'NOV' => '11',
+                    'DEC' => '12',
+                ];
 
-            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
-                $orderMonth = date('m', strtotime($t->order_date));
-                return $orderMonth === $targetMonth;
-            });
+                $targetMonth = $month[$target->bulan] ?? null;
 
-            $totalPrice = $filteredTransactions->sum('total_price');
+                $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                    return date('m', strtotime($t->order_date)) === $targetMonth;
+                });
 
-            if ($target->total == 0 && $totalPrice == 0) {
-                $status = 'TIDAK TERPENUHI';
-            } else {
-                $status = $totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
+                $totalPrice = $filteredTransactions->sum('total_price');
+
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'user' => $user->fullname,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status
+                ];
             }
-
-            $reportData[] = [
-                'user' => $user->fullname,
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status
-            ];
         }
-
 
         $pdf = PDF::loadView('reports.target_penjualan_monthly', compact('reportData'));
 
-        $dateNow = Carbon::now()->format('Y-m-d_H-i-s   ');
+        $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
         $fileName = "laporan-target-penjualan-{$dateNow}.pdf";
 
         return $pdf->download($fileName);
