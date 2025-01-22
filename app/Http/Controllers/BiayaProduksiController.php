@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BiayaProduksi;
 use Illuminate\Http\Request;
 
 class BiayaProduksiController extends Controller
 {
     public function index()
     {
-        return view('pages.akuntan.biaya-produksi.index');
+        $biaya_produksi = BiayaProduksi::all();
+        return view('pages.akuntan.biaya-produksi.index', compact('biaya_produksi'));
     }
 
     /**
@@ -24,7 +26,18 @@ class BiayaProduksiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_biaya_produksi' => 'required|string|max:255',
+        ]);
+
+        $create_biaya_produksi = BiayaProduksi::create([
+            'nama_biaya_produksi' => $request->nama_biaya_produksi,
+        ]);
+
+        if ($create_biaya_produksi) {
+            return redirect()->route('biaya-produksi.index')->with('success', 'Berhasil menambahkan biaya produksi');
+        }
+        return redirect()->route('biaya-produksi.index')->with('error', 'Gagal menambahkan biaya produksi');
     }
 
     /**
