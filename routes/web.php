@@ -206,8 +206,6 @@ Route::middleware(['auth'])->group(function () {
             Route::patch('/{id}/restore', [HargaOperasionalController::class, 'restore'])->name('harga-operasional.restore');
         });
 
-
-
         //biaya gaji
         Route::resource('biaya-gaji', BiayaGajiController::class)->names([
             'index' => 'biaya-gaji.index',

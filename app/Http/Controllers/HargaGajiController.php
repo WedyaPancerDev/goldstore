@@ -2,49 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HargaGaji;
 use Illuminate\Http\Request;
-use App\Models\BiayaOperasional;
-use App\Models\HargaOperasional;
 
-class HargaOperasionalController extends Controller
+class HargaGajiController extends Controller
 {
-    // public function index($id)
-    // {
-    //     $biaya = BiayaOperasional::findOrFail($id);
-    //     $harga_operasional = HargaOperasional::where('biaya_operasional_id', $id)->get();
-
-    //     // Get array of months
-    //     $months = [
-    //         'Januari',
-    //         'Februari',
-    //         'Maret',
-    //         'April',
-    //         'Mei',
-    //         'Juni',
-    //         'Juli',
-    //         'Agustus',
-    //         'September',
-    //         'Oktober',
-    //         'November',
-    //         'Desember'
-    //     ];
-
-    //     // Get available years from database
-    //     $years = HargaOperasional::select('tahun')
-    //         ->where('biaya_operasional_id', $id)
-    //         ->distinct()
-    //         ->orderBy('tahun', 'desc')
-    //         ->pluck('tahun');
-
-    //     return view(
-    //         'pages.akuntan.biaya-operasional.harga-operasional.index',
-    //         compact('biaya', 'harga_operasional', 'months', 'years')
-    //     );
-    // }
-
     public function getFilteredData(Request $request, $id)
     {
-        $query = HargaOperasional::where('biaya_operasional_id', $id)
+        $query = HargaGaji::where('biaya_gaji_id', $id)
             ->where('is_deleted', 0);
 
         if ($request->month !== 'none') {
@@ -55,11 +20,11 @@ class HargaOperasionalController extends Controller
             $query->where('tahun', $request->year);
         }
 
-        $harga_operasional = $query->get();
+        $harga_gaji = $query->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $harga_operasional
+            'data' => $harga_gaji
         ]);
     }
 
@@ -72,7 +37,7 @@ class HargaOperasionalController extends Controller
         ]);
 
         // Check for existing record
-        $exists = HargaOperasional::where('biaya_operasional_id', $id)
+        $exists = HargaGaji::where('biaya_gaji_id', $id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('is_deleted', 0)
@@ -83,8 +48,8 @@ class HargaOperasionalController extends Controller
                 ->with('error', 'Data untuk bulan dan tahun tersebut sudah ada!');
         }
 
-        HargaOperasional::create([
-            'biaya_operasional_id' => $id,
+        HargaGaji::create([
+            'biaya_gaji_id' => $id,
             'harga' => $request->harga,
             'bulan' => $request->bulan,
             'tahun' => $request->tahun
@@ -101,10 +66,10 @@ class HargaOperasionalController extends Controller
             'tahun' => 'required|numeric|min:2000|max:2099'
         ]);
 
-        $harga_operasional = HargaOperasional::findOrFail($id);
+        $harga_gaji = HargaGaji::findOrFail($id);
 
         // Check for existing record
-        $exists = HargaOperasional::where('biaya_operasional_id', $harga_operasional->biaya_operasional_id)
+        $exists = HargaGaji::where('biaya_gaji_id', $harga_gaji->biaya_gaji_id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('id', '!=', $id)
@@ -116,7 +81,7 @@ class HargaOperasionalController extends Controller
                 ->with('error', 'Data untuk bulan dan tahun tersebut sudah ada!');
         }
 
-        $harga_operasional->update([
+        $harga_gaji->update([
             'harga' => $request->harga,
             'bulan' => $request->bulan,
             'tahun' => $request->tahun
@@ -127,16 +92,16 @@ class HargaOperasionalController extends Controller
 
     public function destroy($id)
     {
-        $harga_operasional = HargaOperasional::findOrFail($id);
-        $harga_operasional->update(['is_deleted' => 1]);
+        $harga_gaji = HargaGaji::findOrFail($id);
+        $harga_gaji->update(['is_deleted' => 1]);
 
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
     }
 
     public function restore($id)
     {
-        $harga_operasional = HargaOperasional::findOrFail($id);
-        $harga_operasional->update(['is_deleted' => 0]);
+        $harga_gaji = HargaGaji::findOrFail($id);
+        $harga_gaji->update(['is_deleted' => 0]);
 
         return redirect()->back()->with('success', 'Data berhasil diaktifkan kembali!');
     }
