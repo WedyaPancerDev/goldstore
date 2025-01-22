@@ -207,11 +207,12 @@ Route::middleware(['auth'])->group(function () {
         //harga gaji
         Route::prefix('harga-gaji')->group(function () {
             Route::get('/', [HargaGajiController::class, 'index'])->name('harga-gaji.index');
-            Route::get('/create', [HargaGajiController::class, 'create'])->name('harga-gaji.create');
-            Route::post('/', [HargaGajiController::class, 'store'])->name('harga-gaji.store');
-            Route::get('/{id}/edit', [HargaGajiController::class, 'edit'])->name('harga-gaji.edit');
+            Route::get('/{id}', [HargaGajiController::class, 'show'])->name('harga-gaji.show');
+            Route::get('/{id}/filter', [HargaGajiController::class, 'getFilteredData'])->name('harga-gaji.filter');
+            Route::post('/{id}', [HargaGajiController::class, 'store'])->name('harga-gaji.store');
             Route::put('/{id}', [HargaGajiController::class, 'update'])->name('harga-gaji.update');
             Route::delete('/{id}', [HargaGajiController::class, 'destroy'])->name('harga-gaji.destroy');
+            Route::patch('/{id}/restore', [HargaGajiController::class, 'restore'])->name('harga-gaji.restore');
         });
 
 

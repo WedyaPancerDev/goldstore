@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\HargaGaji;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,27 +15,27 @@ class HargaGajiController extends Controller
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
             ->where('roles.name', '=', 'staff')
+            ->where('users.is_deleted', '=', 0)
             ->select([
                 'users.id',
                 'users.username',
+                'users.fullname',
                 'users.is_deleted',
                 'roles.name as user_role'
             ])
             ->orderBy('users.created_at', 'asc')
             ->get();
-        dd($users);
 
-        $userRole = Auth::user()->roles->pluck('name')->toArray();
-        return view('pages.akuntan.biaya-gaji.harga-gaji.index');
+        return view('pages.akuntan.biaya-gaji.index', compact('users'));
     }
 
     public function show(string $id)
     {
-        $biaya = BiayaProduksi::find($id);
-        if (!$biaya) {
-            return redirect()->route('biaya-produksi.index')->with('error', 'Biaya produksi tidak ditemukan');
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->route('harga-gaji.index')->with('error', 'Data tidak ditemukan!');
         }
-        $harga_produksi = HargaProduksi::where('biaya_produksi_id', $biaya->id)->get();
+        $harga_gaji = HargaGaji::where('user_id', $user->id)->get();
 
         // Get array of months
         $months = [
@@ -52,18 +54,23 @@ class HargaGajiController extends Controller
         ];
 
         // Get available years from database
-        $years = HargaProduksi::select('tahun')
-            ->where('biaya_produksi_id', $id)
+        $years = HargaGaji::select('tahun')
+            ->where('user_id', $id)
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        return view('pages.akuntan.biaya-gaji.harga-gaji.index', compact('biaya', 'harga_gaji', 'months', 'years'));
+        return view('pages.akuntan.biaya-gaji.harga-gaji.index', [
+            'user' => $user,
+            'harga_gaji' => $harga_gaji,
+            'months' => $months,
+            'years' => $years
+        ]);
     }
 
     public function getFilteredData(Request $request, $id)
     {
-        $query = HargaGaji::where('biaya_gaji_id', $id)
+        $query = HargaGaji::where('user_id', $id)
             ->where('is_deleted', 0);
 
         if ($request->month !== 'none') {
@@ -91,7 +98,7 @@ class HargaGajiController extends Controller
         ]);
 
         // Check for existing record
-        $exists = HargaGaji::where('biaya_gaji_id', $id)
+        $exists = HargaGaji::where('user_id', $id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('is_deleted', 0)
@@ -103,7 +110,7 @@ class HargaGajiController extends Controller
         }
 
         HargaGaji::create([
-            'biaya_gaji_id' => $id,
+            'user_id' => $id,
             'harga' => $request->harga,
             'bulan' => $request->bulan,
             'tahun' => $request->tahun
@@ -123,7 +130,7 @@ class HargaGajiController extends Controller
         $harga_gaji = HargaGaji::findOrFail($id);
 
         // Check for existing record
-        $exists = HargaGaji::where('biaya_gaji_id', $harga_gaji->biaya_gaji_id)
+        $exists = HargaGaji::where('user_id', $harga_gaji->user_id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('id', '!=', $id)

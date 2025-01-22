@@ -142,14 +142,14 @@
                     <h4 class="mb-2">Apakah kamu yakin?</h4>
                     <p class="text-muted mb-4">
                         Apakah kamu yakin ingin menghapus harga produksi ini?
-                        <strong>Data yang dihapus masih dapat diaktifkan kembali.</strong>
+                        <strong>Data yang dihapus tidak dapat diaktifkan kembali.</strong>
                     </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Batal</button>
                         <form action="{{ route('harga-produksi.destroy', $data->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Ya, Nonaktifkan!</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Ya, Hapus!</button>
                         </form>
                     </div>
                 </div>
