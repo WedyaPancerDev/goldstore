@@ -165,6 +165,15 @@
                                     {{-- End crancy Table Body --}}
                                 </table>
                                 {{-- End crancy Table --}}
+                                <div style="text-align: left; margin-left: 50px;">
+                                    <p style="font-size: 17px; font-weight: bold;">
+                                        Jumlah Total: {{ $transaksiPengeluaran->sum('quantity') }}
+                                    </p>
+                                    <p style="font-size: 17px; font-weight: bold;">
+                                        Total Keseluruhan: Rp
+                                        {{ number_format($transaksiPengeluaran->sum('total_price'), 0, ',', '.') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
