@@ -10,12 +10,12 @@ class BiayaOperasional extends Model
 
     protected $fillable = [
         'nama_biaya_operasional',
+        'is_deleted',
     ];
 
     protected $guarded = [
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
 
     public function harga_operasional()

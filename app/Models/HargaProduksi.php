@@ -13,6 +13,7 @@ class HargaProduksi extends Model
         'harga',
         'bulan',
         'tahun',
+        'is_deleted',
     ];
 
     protected $guarded = [

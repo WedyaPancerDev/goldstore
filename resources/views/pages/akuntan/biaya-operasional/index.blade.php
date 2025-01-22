@@ -87,9 +87,12 @@
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
                                                                     <!-- Tombol Detail -->
                                                                     <a href="{{ route('biaya-operasional.show', $data->id) }}"
-                                                                        class="btn-detail rounded-lg btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2">
-                                                                        <i class="ph ph-eye fs-5"></i>
-                                                                        Details
+                                                                        class="px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                        <button
+                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-eye fs-5"></i>
+                                                                            Detail
+                                                                        </button>
                                                                     </a>
                                                                     <!-- Tombol Edit -->
                                                                     <button type="button"
@@ -110,16 +113,71 @@
                                                                     </button>
                                                                 </div>
                                                             @else
-                                                                {{-- restore form --}}
-
-                                                                {{-- end restore form --}}
+                                                                <!-- Tombol Aktifkan -->
+                                                                <form
+                                                                    action="{{ route('biaya-operasional.restore', $data->id) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <button type="submit"
+                                                                        class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2 gap-2">
+                                                                        <i class="ph ph-check fs-5"></i>
+                                                                        Aktifkan
+                                                                    </button>
+                                                                </form>
                                                             @endif
                                                         </td>
                                                     </tr>
 
-                                                    {{-- modal confirm delete --}}
-                                                    @include('pages.akuntan.biaya-operasional.delete-modal')
-                                                    {{-- end modal confirm delete --}}
+                                                    <!-- Modal Konfirmasi Hapus -->
+                                                    <div id="removeBiayaOperasionalModal-{{ $data->id }}"
+                                                        class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header border-0">
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body text-center p-4">
+                                                                    <div class="text-danger mb-4">
+                                                                        <i class="bi bi-trash display-4"></i>
+                                                                    </div>
+                                                                    <h4 class="mb-2">Apakah kamu yakin?</h4>
+                                                                    <p class="text-muted mb-4">
+                                                                        Apakah kamu yakin ingin menghapus biaya
+                                                                        operasional ini?
+                                                                        <br>
+                                                                        <strong>Biaya Operasional yang dihapus
+                                                                            dapat mempengaruhi data lainya dan tidak
+                                                                            dapat dikembalikan!</strong>
+                                                                    </p>
+                                                                    <div
+                                                                        class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                                        <button type="button" class="btn btn-light btn-sm"
+                                                                            data-bs-dismiss="modal">Batal</button>
+                                                                        <form
+                                                                            action="{{ route('biaya-operasional.destroy', $data->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit"
+                                                                                class="btn btn-danger btn-sm">Iya,
+                                                                                Hapus!</button>
+                                                                        </form>
+                                                                        <form
+                                                                            action="{{ route('biaya-operasional.deactivate', $data->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            @method('PATCH')
+                                                                            <button type="submit"
+                                                                                class="btn btn-warning btn-sm">Nonaktifkan
+                                                                                saja!</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 @endforeach
                                             @endif
 
@@ -137,13 +195,9 @@
         </section>
 
 
-        {{-- create modal --}}
-        @include('pages.akuntan.biaya-operasional.create')
-        {{-- end create modal --}}
-
-        {{-- edit modal --}}
-        @include('pages.akuntan.biaya-operasional.edit')
-        {{-- end edit modal --}}
+        {{-- modal --}}
+        @include('pages.akuntan.biaya-operasional.modal-biaya-operasional')
+        {{-- end modal --}}
     @endrole
 @endsection
 

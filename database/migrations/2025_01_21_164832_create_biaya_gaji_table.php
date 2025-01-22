@@ -18,7 +18,7 @@ return new class extends Migration
                 ->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->softDeletes();
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }

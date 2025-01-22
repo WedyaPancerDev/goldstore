@@ -10,12 +10,12 @@ class BiayaProduksi extends Model
 
     protected $fillable = [
         'nama_biaya_produksi',
+        'is_deleted',
     ];
 
     protected $guarded = [
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
 
     public function hargaProduksi()

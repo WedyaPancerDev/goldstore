@@ -47,7 +47,31 @@ class BiayaOperasionalController extends Controller
             return redirect()->route('biaya-operasional.index')->with('error', 'Biaya operasional tidak ditemukan');
         }
         $harga_operasional = HargaOperasional::where('biaya_operasional_id', $biaya->id)->get();
-        return view('pages.akuntan.biaya-operasional.harga-operasional.index', compact('biaya', 'harga_operasional'));
+
+        // Get array of months
+        $months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ];
+
+        // Get available years from database
+        $years = HargaOperasional::select('tahun')
+            ->where('biaya_operasional_id', $id)
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        return view('pages.akuntan.biaya-operasional.harga-operasional.index', compact('biaya', 'harga_operasional', 'months', 'years'));
     }
 
     /**
@@ -91,6 +115,16 @@ class BiayaOperasionalController extends Controller
             return redirect()->route('biaya-operasional.index')->with('success', 'Biaya operasional berhasil dihapus');
         }
         return redirect()->route('biaya-operasional.index')->with('error', 'Gagal menghapus biaya operasional');
+    }
+
+    public function deactivate($id)
+    {
+        $biaya = BiayaOperasional::findOrFail($id);
+        $biaya->is_deleted = 1;
+        if ($biaya->save()) {
+            return redirect()->route('biaya-operasional.index')->with('success', 'Biaya operasional berhasil dinonaktifkan.');
+        }
+        return redirect()->route('biaya-operasional.index')->with('error', 'Gagal menonaktifkan biaya operasional.');
     }
 
     public function restore($id)

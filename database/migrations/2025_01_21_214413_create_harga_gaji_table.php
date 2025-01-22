@@ -21,6 +21,7 @@ return new class extends Migration
             $table->double('harga')->nullable();
             $table->integer('bulan')->length(2)->nullable();
             $table->integer('tahun')->nullable();
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }
