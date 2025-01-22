@@ -338,8 +338,9 @@ class TargetPenjualanController extends Controller
 
     public function exportMonthlyPDF()
     {
-        $targets = TargetPenjualan::where('is_deleted', false)->get();
-        $cabangs = Cabang::where('is_deleted', false)->with('transaksiPengeluaran')->get();
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) {
+            $query->where('is_deleted', false);
+        })->get();
 
         $reportData = [];
 
@@ -347,6 +348,8 @@ class TargetPenjualanController extends Controller
             $targets = TargetPenjualan::whereIn('user_id', function ($query) use ($cabang) {
                 $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
             })->where('is_deleted', false)->get();
+
+            $cabangData = [];
 
             foreach ($targets as $target) {
                 $user = User::find($target->user_id);
@@ -379,8 +382,7 @@ class TargetPenjualanController extends Controller
                     ? 'TIDAK TERPENUHI'
                     : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                $reportData[] = [
-                    'cabang' => $cabang->nama_cabang,
+                $cabangData[] = [
                     'user' => $user->fullname,
                     'bulan' => $target->bulan,
                     'target' => $target->total,
@@ -388,6 +390,11 @@ class TargetPenjualanController extends Controller
                     'status' => $status
                 ];
             }
+
+            $reportData[] = [
+                'cabang' => $cabang->nama_cabang,
+                'data' => $cabangData
+            ];
         }
 
         $pdf = PDF::loadView('reports.target_penjualan_monthly', compact('reportData'));

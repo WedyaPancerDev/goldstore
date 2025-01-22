@@ -9,40 +9,52 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f4f4f4;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
         }
 
-        h2 {
-            text-align: center;
-            color: #333;
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            color: #007bff;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         th,
         td {
-            padding: 12px;
-            text-align: center;
             border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
         }
 
@@ -54,79 +66,55 @@
             background-color: #f1f1f1;
         }
 
-        .badge {
-            padding: 5px 10px;
-            border-radius: 4px;
-            color: white;
+        .status-TERPENUHI {
+            color: green;
             font-weight: bold;
         }
 
-        .badge-success {
-            background-color: #28a745;
-        }
-
-        .badge-danger {
-            background-color: #dc3545;
-        }
-
-        /* Responsiveness */
-        @media (max-width: 768px) {
-            table {
-                width: 100%;
-                font-size: 12px;
-            }
-
-            th,
-            td {
-                padding: 8px;
-            }
-
-            .container {
-                padding: 10px;
-                margin: 20px;
-            }
-
-            h2 {
-                font-size: 18px;
-            }
+        .status-TIDAK_TERPENUHI {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h2>Laporan Target Penjualan Bulanan</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama Pengguna</th>
-                    <th>Cabang</th>
-                    <th>Bulan</th>
-                    <th>Target Penjualan</th>
-                    <th>Total Penjualan</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($reportData as $index => $data)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $data['user'] }}</td>
-                        <td>{{ $data['cabang'] }}</td>
-                        <td>{{ $data['bulan'] }}</td>
-                        <td>Rp {{ number_format($data['target'], 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($data['total_price'], 0, ',', '.') }}</td>
-                        <td>
-                            <span class="badge {{ $data['status'] == 'TERPENUHI' ? 'badge-success' : 'badge-danger' }}">
-                                {{ $data['status'] }}
-                            </span>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+    <h1>Laporan Target Penjualan Bulanan</h1>
+
+    @foreach ($reportData as $cabang)
+        <div class="card">
+            <div class="card-header">
+                {{ $cabang['cabang'] }}
+            </div>
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Bulan</th>
+                            <th>Target</th>
+                            <th>Total Penjualan</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($cabang['data'] as $data)
+                            <tr>
+                                <td>{{ $data['user'] }}</td>
+                                <td>{{ $data['bulan'] }}</td>
+                                <td>{{ number_format($data['target'], 2) }}</td>
+                                <td>{{ number_format($data['total_price'], 2) }}</td>
+                                <td
+                                    class="{{ $data['status'] === 'TERPENUHI' ? 'status-TERPENUHI' : 'status-TIDAK_TERPENUHI' }}">
+                                    {{ $data['status'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endforeach
 </body>
 
 </html>
