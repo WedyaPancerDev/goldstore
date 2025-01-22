@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BiayaProduksi;
+use App\Models\HargaProduksi;
 use Illuminate\Http\Request;
 
 class BiayaProduksiController extends Controller
@@ -45,15 +46,36 @@ class BiayaProduksiController extends Controller
      */
     public function show(string $id)
     {
-        //
-    }
+        $biaya = BiayaProduksi::find($id);
+        if (!$biaya) {
+            return redirect()->route('biaya-produksi.index')->with('error', 'Biaya produksi tidak ditemukan');
+        }
+        $harga_produksi = HargaProduksi::where('biaya_produksi_id', $biaya->id)->get();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        // Get array of months
+        $months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ];
+
+        // Get available years from database
+        $years = HargaProduksi::select('tahun')
+            ->where('biaya_produksi_id', $id)
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        return view('pages.akuntan.biaya-produksi.harga-produksi.index', compact('biaya', 'harga_produksi', 'months', 'years'));
     }
 
     /**
@@ -61,7 +83,26 @@ class BiayaProduksiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $biaya = BiayaProduksi::find($id);
+        if (!$biaya) {
+            return redirect()->route('biaya-produksi.index')->with('error', 'Biaya produksi tidak ditemukan');
+        }
+
+        $request->validate([
+            'nama_biaya_produksi' => 'required|string|max:255',
+        ], [
+            'nama_biaya_produksi.required' => 'Nama biaya produksi harus diisi',
+            'nama_biaya_produksi.string' => 'Nama biaya produksi harus berupa string',
+            'nama_biaya_produksi.max' => 'Nama biaya produksi maksimal 255 karakter',
+        ]);
+
+        $update = $biaya->update([
+            'nama_biaya_produksi' => $request->nama_biaya_produksi,
+        ]);
+        if ($update) {
+            return redirect()->route('biaya-produksi.index')->with('success', 'Biaya produksi berhasil diperbarui');
+        }
+        return redirect()->route('biaya-produksi.index')->with('error', 'Gagal memperbarui biaya produksi');
     }
 
 
@@ -70,11 +111,33 @@ class BiayaProduksiController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $biaya = BiayaProduksi::find($id);
+        if (!$biaya) {
+            return redirect()->route('biaya-produksi.index')->with('error', 'Biaya produksi tidak ditemukan');
+        }
+        if ($biaya->delete()) {
+            return redirect()->route('biaya-produksi.index')->with('success', 'Biaya produksi berhasil dihapus');
+        }
+        return redirect()->route('biaya-produksi.index')->with('error', 'Gagal menghapus biaya produksi');
+    }
+
+    public function deactivate($id)
+    {
+        $biaya = BiayaProduksi::findOrFail($id);
+        $biaya->is_deleted = 1;
+        if ($biaya->save()) {
+            return redirect()->route('biaya-produksi.index')->with('success', 'Biaya produksi berhasil dinonaktifkan.');
+        }
+        return redirect()->route('biaya-produksi.index')->with('error', 'Gagal menonaktifkan biaya produksi.');
     }
 
     public function restore($id)
     {
-        //
+        $biaya = BiayaProduksi::findOrFail($id);
+        $biaya->is_deleted = 0;
+        if ($biaya->save()) {
+            return redirect()->route('biaya-produksi.index')->with('success', 'Biaya produksi berhasil diaktifkan kembali.');
+        }
+        return redirect()->route('biaya-produksi.index')->with('error', 'Gagal mengaktifkan kembali biaya produksi.');
     }
 }

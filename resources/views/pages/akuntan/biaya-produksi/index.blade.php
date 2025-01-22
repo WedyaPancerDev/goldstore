@@ -86,10 +86,13 @@
                                                                 <div
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
                                                                     <!-- Tombol Detail -->
-                                                                    <a
-                                                                        class="btn-detail rounded-lg btn-cst btn-primary d-flex align-items-center justify-content-center w-auto px-2 d-flex justify-content-lg-center gap-2">
-                                                                        <i class="ph ph-eye fs-5"></i>
-                                                                        Details
+                                                                    <a href="{{ route('biaya-produksi.show', $data->id) }}"
+                                                                        class="px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                        <button
+                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-eye fs-5"></i>
+                                                                            Detail
+                                                                        </button>
                                                                     </a>
                                                                     <!-- Tombol Edit -->
                                                                     <button type="button"
@@ -177,13 +180,9 @@
         </section>
 
 
-        {{-- create modal --}}
-        @include('pages.akuntan.biaya-produksi.create')
-        {{-- end create modal --}}
-
-        {{-- edit modal --}}
-        {{-- @include('pages.akuntan.biaya-Produksi.edit') --}}
-        {{-- end edit modal --}}
+        {{-- modal --}}
+        @include('pages.akuntan.biaya-produksi.modal-biaya-produksi')
+        {{-- end modal --}}
     @endrole
 @endsection
 

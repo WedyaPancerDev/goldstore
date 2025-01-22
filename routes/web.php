@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\AssignBonus;
-use App\Models\MasterBonus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CabangController;
@@ -9,16 +7,16 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LabaRugiController;
 use App\Http\Controllers\PenggunaController;
-use App\Http\Controllers\BiayaGajiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AssignBonusController;
-use App\Http\Controllers\BiayaLainyaController;
 use App\Http\Controllers\MasterBonusController;
 use App\Http\Controllers\BiayaProduksiController;
 use App\Http\Controllers\TargetPenjualanController;
 use App\Http\Controllers\BiayaOperasionalController;
 use App\Http\Controllers\HargaOperasionalController;
 use App\Http\Controllers\Auth\AuthenticatedController;
+use App\Http\Controllers\HargaGajiController;
+use App\Http\Controllers\HargaProduksiController;
 use App\Http\Controllers\TransaksiPengeluaranController;
 
 Route::middleware(['guest'])->group(function () {
@@ -206,23 +204,34 @@ Route::middleware(['auth'])->group(function () {
             Route::patch('/{id}/restore', [HargaOperasionalController::class, 'restore'])->name('harga-operasional.restore');
         });
 
-        //biaya gaji
-        Route::resource('biaya-gaji', BiayaGajiController::class)->names([
-            'index' => 'biaya-gaji.index',
-            'create' => 'biaya-gaji.create',
-            'store' => 'biaya-gaji.store',
-            'edit' => 'biaya-gaji.edit',
-            'update' => 'biaya-gaji.update',
-            'destroy' => 'biaya-gaji.destroy',
-        ]);
+        //harga gaji
+        Route::prefix('harga-gaji')->group(function () {
+            Route::get('/', [HargaGajiController::class, 'index'])->name('harga-gaji.index');
+            Route::get('/create', [HargaGajiController::class, 'create'])->name('harga-gaji.create');
+            Route::post('/', [HargaGajiController::class, 'store'])->name('harga-gaji.store');
+            Route::get('/{id}/edit', [HargaGajiController::class, 'edit'])->name('harga-gaji.edit');
+            Route::put('/{id}', [HargaGajiController::class, 'update'])->name('harga-gaji.update');
+            Route::delete('/{id}', [HargaGajiController::class, 'destroy'])->name('harga-gaji.destroy');
+        });
+
+
         //biaya produksi
-        Route::resource('biaya-produksi', BiayaProduksiController::class)->names([
-            'index' => 'biaya-produksi.index',
-            'create' => 'biaya-produksi.create',
-            'store' => 'biaya-produksi.store',
-            'edit' => 'biaya-produksi.edit',
-            'update' => 'biaya-produksi.update',
-            'destroy' => 'biaya-produksi.destroy',
-        ]);
+        Route::get('biaya-produksi', [BiayaProduksiController::class, 'index'])->name('biaya-produksi.index');
+        Route::post('biaya-produksi', [BiayaProduksiController::class, 'store'])->name('biaya-produksi.store');
+        Route::put('biaya-produksi/{id}', [BiayaProduksiController::class, 'update'])->name('biaya-produksi.update');
+        Route::delete('biaya-produksi/{id}', [BiayaProduksiController::class, 'destroy'])->name('biaya-produksi.destroy');
+        Route::patch('biaya-produksi/{id}', [BiayaProduksiController::class, 'deactivate'])->name('biaya-produksi.deactivate');
+        Route::patch('biaya-produksi/{id}/restore', [BiayaProduksiController::class, 'restore'])->name('biaya-produksi.restore');
+        //show harga produksi by biaya
+        Route::get('biaya-produksi/{id}', [BiayaProduksiController::class, 'show'])->name('biaya-produksi.show');
+        //harga produksi
+        Route::prefix('harga-produksi')->group(function () {
+            Route::get('/{id}', [HargaProduksiController::class, 'index'])->name('harga-produksi.index');
+            Route::get('/{id}/filter', [HargaProduksiController::class, 'getFilteredData'])->name('harga-produksi.filter');
+            Route::post('/{id}', [HargaProduksiController::class, 'store'])->name('harga-produksi.store');
+            Route::put('/{id}', [HargaProduksiController::class, 'update'])->name('harga-produksi.update');
+            Route::delete('/{id}', [HargaProduksiController::class, 'destroy'])->name('harga-produksi.destroy');
+            Route::patch('/{id}/restore', [HargaProduksiController::class, 'restore'])->name('harga-produksi.restore');
+        });
     });
 });

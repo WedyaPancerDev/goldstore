@@ -2,68 +2,48 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HargaProduksi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class HargaGajiController extends Controller
+class HargaProduksiController extends Controller
 {
-    public function index()
-    {
-        $users = DB::table('users')
-            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->where('roles.name', '=', 'staff')
-            ->select([
-                'users.id',
-                'users.username',
-                'users.is_deleted',
-                'roles.name as user_role'
-            ])
-            ->orderBy('users.created_at', 'asc')
-            ->get();
-        dd($users);
+    // public function index($id)
+    // {
+    //     $biaya = BiayaProduksi::findOrFail($id);
+    //     $harga_produksi = HargaProduksi::where('biaya_produksi_id', $id)->get();
 
-        $userRole = Auth::user()->roles->pluck('name')->toArray();
-        return view('pages.akuntan.biaya-gaji.harga-gaji.index');
-    }
+    //     // Get array of months
+    //     $months = [
+    //         'Januari',
+    //         'Februari',
+    //         'Maret',
+    //         'April',
+    //         'Mei',
+    //         'Juni',
+    //         'Juli',
+    //         'Agustus',
+    //         'September',
+    //         'Oktober',
+    //         'November',
+    //         'Desember'
+    //     ];
 
-    public function show(string $id)
-    {
-        $biaya = BiayaProduksi::find($id);
-        if (!$biaya) {
-            return redirect()->route('biaya-produksi.index')->with('error', 'Biaya produksi tidak ditemukan');
-        }
-        $harga_produksi = HargaProduksi::where('biaya_produksi_id', $biaya->id)->get();
+    //     // Get available years from database
+    //     $years = HargaProduksi::select('tahun')
+    //         ->where('biaya_produksi_id', $id)
+    //         ->distinct()
+    //         ->orderBy('tahun', 'desc')
+    //         ->pluck('tahun');
 
-        // Get array of months
-        $months = [
-            'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember'
-        ];
-
-        // Get available years from database
-        $years = HargaProduksi::select('tahun')
-            ->where('biaya_produksi_id', $id)
-            ->distinct()
-            ->orderBy('tahun', 'desc')
-            ->pluck('tahun');
-
-        return view('pages.akuntan.biaya-gaji.harga-gaji.index', compact('biaya', 'harga_gaji', 'months', 'years'));
-    }
+    //     return view(
+    //         'pages.akuntan.biaya-produksi.harga-produksi.index',
+    //         compact('biaya', 'harga_produksi', 'months', 'years')
+    //     );
+    // }
 
     public function getFilteredData(Request $request, $id)
     {
-        $query = HargaGaji::where('biaya_gaji_id', $id)
+        $query = HargaProduksi::where('biaya_produksi_id', $id)
             ->where('is_deleted', 0);
 
         if ($request->month !== 'none') {
@@ -74,11 +54,11 @@ class HargaGajiController extends Controller
             $query->where('tahun', $request->year);
         }
 
-        $harga_gaji = $query->get();
+        $harga_produksi = $query->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $harga_gaji
+            'data' => $harga_produksi
         ]);
     }
 
@@ -91,7 +71,7 @@ class HargaGajiController extends Controller
         ]);
 
         // Check for existing record
-        $exists = HargaGaji::where('biaya_gaji_id', $id)
+        $exists = HargaProduksi::where('biaya_produksi_id', $id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('is_deleted', 0)
@@ -102,8 +82,8 @@ class HargaGajiController extends Controller
                 ->with('error', 'Data untuk bulan dan tahun tersebut sudah ada!');
         }
 
-        HargaGaji::create([
-            'biaya_gaji_id' => $id,
+        HargaProduksi::create([
+            'biaya_produksi_id' => $id,
             'harga' => $request->harga,
             'bulan' => $request->bulan,
             'tahun' => $request->tahun
@@ -120,10 +100,10 @@ class HargaGajiController extends Controller
             'tahun' => 'required|numeric|min:2000|max:2099'
         ]);
 
-        $harga_gaji = HargaGaji::findOrFail($id);
+        $harga_produksi = HargaProduksi::findOrFail($id);
 
         // Check for existing record
-        $exists = HargaGaji::where('biaya_gaji_id', $harga_gaji->biaya_gaji_id)
+        $exists = HargaProduksi::where('biaya_produksi_id', $harga_produksi->biaya_produksi_id)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->where('id', '!=', $id)
@@ -135,7 +115,7 @@ class HargaGajiController extends Controller
                 ->with('error', 'Data untuk bulan dan tahun tersebut sudah ada!');
         }
 
-        $harga_gaji->update([
+        $harga_produksi->update([
             'harga' => $request->harga,
             'bulan' => $request->bulan,
             'tahun' => $request->tahun
@@ -146,16 +126,16 @@ class HargaGajiController extends Controller
 
     public function destroy($id)
     {
-        $harga_gaji = HargaGaji::findOrFail($id);
-        $harga_gaji->update(['is_deleted' => 1]);
+        $harga_produksi = HargaProduksi::findOrFail($id);
+        $harga_produksi->update(['is_deleted' => 1]);
 
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
     }
 
     public function restore($id)
     {
-        $harga_gaji = HargaGaji::findOrFail($id);
-        $harga_gaji->update(['is_deleted' => 0]);
+        $harga_produksi = HargaProduksi::findOrFail($id);
+        $harga_produksi->update(['is_deleted' => 0]);
 
         return redirect()->back()->with('success', 'Data berhasil diaktifkan kembali!');
     }

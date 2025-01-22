@@ -1,10 +1,10 @@
 @extends('layouts.master')
 @section('title')
-    Toko Emas - Harga Operasional
+    Toko Emas - Harga Produksi
 @endsection
 
 @section('title-section')
-    Harga Operasional
+    Harga Produksi
 @endsection
 
 @section('content')
@@ -13,22 +13,22 @@
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0">Detail Harga Operasional : {{ $biaya->nama_biaya_operasional }}</h4>
+                        <h4 class="mb-sm-0">Detail Harga Produksi : {{ $biaya->nama_biaya_produksi }}</h4>
 
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 @role('akuntan')
                                     <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('biaya-operasional.index') }}">Biaya
-                                            Operasional</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ route('biaya-produksi.index') }}">Biaya
+                                            Produksi</a></li>
                                 @endrole
 
                                 @role('manajer')
                                     <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('biaya-operasional.index') }}">Biaya
-                                            Operasional</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ route('biaya-produksi.index') }}">Biaya
+                                            Produksi</a></li>
                                 @endrole
-                                <li class="breadcrumb-item active">Harga Operasional</li>
+                                <li class="breadcrumb-item active">Harga Produksi</li>
                             </ol>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
 
                                 <div class="col-lg-2">
                                     <button type="button" class="btn btn-success fw-bold w-100" data-bs-toggle="modal"
-                                        data-bs-target="#addHargaOperasionalModal">
+                                        data-bs-target="#addHargaProduksiModal">
                                         Tambah
                                     </button>
                                 </div>
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            @include('pages.akuntan.biaya-operasional.harga-operasional.modal-harga-operasional')
+            @include('pages.akuntan.biaya-produksi.harga-produksi.modal-harga-produksi')
         </section>
     @endrole
 @endsection
@@ -120,7 +120,7 @@
                 }
 
                 $.ajax({
-                    url: "{{ route('harga-operasional.filter', $biaya->id) }}",
+                    url: "{{ route('harga-produksi.filter', $biaya->id) }}",
                     type: "GET",
                     data: {
                         month: selectedMonth,
@@ -147,12 +147,12 @@
                                         <td class="crancy-table__column-5 text-center">
                                             <div class="d-flex align-items-center gap-2 justify-content-center">
                                                 <button type="button" class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2 gap-2"
-                                                    data-bs-toggle="modal" data-bs-target="#editHargaOperasionalModal-${item.id}">
+                                                    data-bs-toggle="modal" data-bs-target="#editHargaProduksiModal-${item.id}">
                                                     <i class="ph ph-pencil fs-5"></i>
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
-                                                    data-bs-toggle="modal" data-bs-target="#removeHargaOperasionalModal-${item.id}">
+                                                    data-bs-toggle="modal" data-bs-target="#removeHargaProduksiModal-${item.id}">
                                                     <i class="ph ph-trash fs-5"></i>
                                                     Hapus
                                                 </button>

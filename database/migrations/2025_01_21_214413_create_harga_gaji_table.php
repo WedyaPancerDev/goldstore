@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('harga_gaji', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('biaya_gaji_id')
+            $table->foreignId('user_id')
                 ->references('id')
-                ->on('biaya_gaji')
+                ->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->double('harga')->nullable();

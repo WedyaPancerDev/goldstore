@@ -162,8 +162,8 @@
                             </a>
                         </li>
                         <li class="pb-2">
-                            <a class="collapsed links px-2 {{ request()->routeIs('biaya-gaji.index') ? 'active-bg' : '' }}"
-                                href="{{ route('biaya-gaji.index') }}">
+                            <a class="collapsed links px-2 {{ request()->routeIs('harga-gaji.index') ? 'active-bg' : '' }}"
+                                href="{{ route('harga-gaji.index') }}">
                                 <span class="menu-bar__text d-flex">
                                     <i class="ph ph-coins fs-4 me-2"></i>
                                     <span class="menu-bar__name fs-6 fw-medium">Biaya Gaji</span>
