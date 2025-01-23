@@ -108,7 +108,7 @@
                                                             {{ $item->kategori->nama ?? '-' }}</td>
                                                         {{-- <td class="crancy-table__column-3 fw-semibold">{{ number_format($item->harga_beli, 0, ',', '.') }}</td> --}}
                                                         <td class="crancy-table__column-3 fw-semibold">
-                                                            {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                                            Rp {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
                                                         <td class="crancy-table__column-3 fw-semibold">{{ $item->stok }}
                                                         </td>
                                                         @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))

@@ -137,7 +137,7 @@
                                                         {{ $transaksi->quantity ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-6 fw-semibold">
-                                                        {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
+                                                        Rp {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
                                                     </td>
                                                     <td class="crancy-table__column-7 fw-semibold">
                                                         {{ $transaksi->deskripsi ?? '-' }}
