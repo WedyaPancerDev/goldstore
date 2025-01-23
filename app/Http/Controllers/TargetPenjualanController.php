@@ -510,8 +510,8 @@ class TargetPenjualanController extends Controller
                     'cabang' => $cabang->nama_cabang,
                     'user' => $user->fullname,
                     'bulan' => $target->bulan,
-                    'target' => $target->total,
-                    'total_price' => $totalPrice,
+                    'target' => 'Rp ' . number_format($target->total, 0, ',', '.'),
+                    'total_price' => 'Rp ' . number_format($totalPrice, 0, ',', '.'),
                     'status' => $status
                 ];
             }
@@ -535,7 +535,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['User', 'Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
+                return ['Cabang', 'User',  'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
     }

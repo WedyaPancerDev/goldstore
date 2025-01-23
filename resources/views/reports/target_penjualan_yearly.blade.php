@@ -105,8 +105,8 @@
                         @foreach ($data as $entry)
                             <tr>
                                 <td>{{ $entry['user'] }}</td>
-                                <td>{{ number_format($entry['total_target'], 0, ',', '.') }}</td>
-                                <td>{{ number_format($entry['total_penjualan'], 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($entry['total_target'], 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($entry['total_penjualan'], 0, ',', '.') }}</td>
                                 <td style="color: {{ $entry['status'] === 'TERPENUHI' ? '#28a745' : '#dc3545' }};">
                                     {{ $entry['status'] }}
                                 </td>

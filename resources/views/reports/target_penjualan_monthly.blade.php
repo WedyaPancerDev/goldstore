@@ -102,8 +102,8 @@
                             <tr>
                                 <td>{{ $data['user'] }}</td>
                                 <td>{{ $data['bulan'] }}</td>
-                                <td>{{ number_format($data['target'], 2) }}</td>
-                                <td>{{ number_format($data['total_price'], 2) }}</td>
+                                <td>Rp {{ number_format($data['target'], 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($data['total_price'], 0, ',', '.') }}</td>
                                 <td
                                     class="{{ $data['status'] === 'TERPENUHI' ? 'status-TERPENUHI' : 'status-TIDAK_TERPENUHI' }}">
                                     {{ $data['status'] }}
