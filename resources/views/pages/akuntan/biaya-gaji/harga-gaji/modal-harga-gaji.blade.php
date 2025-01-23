@@ -22,7 +22,7 @@
                     @endif
                 </div>
 
-                <div class="mb-3 form-group">
+                <div class="mb-5 form-group">
                     <label class="form-label" for="bulan">Bulan <span class="text-danger">*</span></label>
                     <select id="bulan" class="form-select fw-semibold" name="bulan" required>
                         <option value="" selected disabled>Pilih Bulan</option>
