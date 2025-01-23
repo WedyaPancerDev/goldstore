@@ -761,23 +761,42 @@ class TargetPenjualanController extends Controller
         $reportData = [];
 
         foreach ($years as $year) {
-            $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
-                ->where('is_deleted', false)
-                ->sum('total');
+            $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId, $year) {
+                $query->where('user_id', $userId)->whereYear('order_date', $year);
+            })->get();
 
-            $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereYear('order_date', $year)
-                ->sum('total_price');
+            $reportDataYear = [];
 
-            $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+            foreach ($cabangs as $cabang) {
+                $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
+                    ->where('is_deleted', false)
+                    ->whereIn('id', function ($query) use ($cabang, $year) {
+                        $query->select('id')->from('transaksi_pengeluaran')
+                            ->where('cabang_id', $cabang->id)
+                            ->whereYear('order_date', $year);
+                    })
+                    ->sum('total');
 
-            $reportData[$year] = [
-                'total_target' => $totalTargetTahun,
-                'total_penjualan' => $totalPenjualanTahun,
-                'status' => $status,
-            ];
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereYear('order_date', $year)
+                    ->where('cabang_id', $cabang->id)
+                    ->sum('total_price');
+
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportDataYear[$cabang->id] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'total_target' => $totalTargetTahun,
+                    'total_penjualan' => $totalPenjualanTahun,
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($reportDataYear)) {
+                $reportData[$year] = $reportDataYear;
+            }
         }
 
         $pdf = PDF::loadView('reports.target_penjualan_yearly_user', compact('user', 'reportData'));
