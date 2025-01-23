@@ -86,7 +86,9 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <button id="btn-reset-filter" type="button" class="btn btn-secondary fw-bold w-100">
+                    <button id="btn-reset-filter" type="button"
+                        class="btn btn-secondary fw-bold w-100 d-flex justify-content-center align-items-center gap-2">
+                        <i class="ph ph-arrow-clockwise fs-5"></i>
                         Reset Filter
                     </button>
                 </div>
@@ -102,8 +104,11 @@
                             <h5 class="mb-0" id="period-title">Laporan Laba Rugi - Semua Periode</h5>
                         </div>
                         <div class="col-auto no-print">
-                            <button class="btn btn-sm btn-success px-3" onclick="printContent()">
-                                <i class="bi bi-printer me-1"></i> Cetak Halaman Ini
+                            <button
+                                class="btn btn-sm btn-success px-3 d-flex justify-content-center align-items-center gap-2"
+                                onclick="printContent()">
+                                <i class="ph ph-printer fs-5"></i>
+                                Cetak Halaman Ini
                             </button>
                         </div>
                     </div>
