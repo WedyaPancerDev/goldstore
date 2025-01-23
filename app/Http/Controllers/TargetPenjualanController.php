@@ -832,24 +832,37 @@ class TargetPenjualanController extends Controller
         $reportData = [];
 
         foreach ($years as $year) {
-            $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
-                ->where('is_deleted', false)
-                ->sum('total');
+            $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId, $year) {
+                $query->where('user_id', $userId)
+                    ->whereYear('order_date', $year);
+            })->get();
 
-            $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereYear('order_date', $year)
-                ->sum('total_price');
+            foreach ($cabangs as $cabang) {
+                $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
+                    ->where('is_deleted', false)
+                    ->whereIn('id', function ($query) use ($cabang) {
+                        $query->select('id')->from('transaksi_pengeluaran')
+                            ->where('cabang_id', $cabang->id);
+                    })
+                    ->sum('total');
 
-            $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
+                    ->where('cabang_id', $cabang->id)
+                    ->whereYear('order_date', $year)
+                    ->sum('total_price');
 
-            $reportData[] = [
-                'year' => $year,
-                'total_target' => $totalTargetTahun,
-                'total_penjualan' => $totalPenjualanTahun,
-                'status' => $status,
-            ];
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportData[] = [
+                    'year' => $year,
+                    'cabang' => $cabang->nama_cabang,
+                    'total_target' => $totalTargetTahun,
+                    'total_penjualan' => $totalPenjualanTahun,
+                    'status' => $status,
+                ];
+            }
         }
 
         $dateNow = now()->format('Y-m-d_H-i-s');
@@ -870,7 +883,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Year', 'Total Target', 'Total Penjualan', 'Status'];
+                return ['Year', 'Cabang', 'Total Target', 'Total Penjualan', 'Status'];
             }
         }, $fileName);
     }
