@@ -510,8 +510,8 @@ class TargetPenjualanController extends Controller
                     'cabang' => $cabang->nama_cabang,
                     'user' => $user->fullname,
                     'bulan' => $target->bulan,
-                    'target' => $target->total,
-                    'total_price' => $totalPrice,
+                    'target' => 'Rp ' . number_format($target->total, 0, ',', '.'),
+                    'total_price' => 'Rp ' . number_format($totalPrice, 0, ',', '.'),
                     'status' => $status
                 ];
             }
@@ -535,7 +535,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['User', 'Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
+                return ['Cabang', 'User',  'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
     }
@@ -576,8 +576,8 @@ class TargetPenjualanController extends Controller
                     if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
                         $cabangData[] = [
                             'user' => $user->fullname,
-                            'total_target' => $totalTargetTahun,
-                            'total_penjualan' => $totalPenjualanTahun,
+                            'total_target' => 'Rp ' . number_format($totalTargetTahun, 0, ',', '.'),
+                            'total_penjualan' => 'Rp ' . number_format($totalPenjualanTahun, 0, ',', '.'),
                             'status' => $status,
                         ];
                     }
@@ -788,8 +788,8 @@ class TargetPenjualanController extends Controller
                     'user' => $user->fullname,
                     'cabang' => $cabang->nama_cabang,
                     'bulan' => $target->bulan,
-                    'target' => $target->total,
-                    'total_price' => $totalPrice,
+                    'target' => 'Rp ' . number_format($target->total, 0, ',', '.'),
+                    'total_price' => 'Rp ' . number_format($totalPrice, 0, ',', '.'),
                     'status' => $status,
                 ];
             }
@@ -860,8 +860,8 @@ class TargetPenjualanController extends Controller
                     'user' => $user->fullname,
                     'year' => $year,
                     'cabang' => $cabang->nama_cabang,
-                    'total_target' => $totalTargetTahun,
-                    'total_penjualan' => $totalPenjualanTahun,
+                    'total_target' => 'Rp ' . number_format($totalTargetTahun, 0, ',', '.'),
+                    'total_penjualan' => 'Rp ' . number_format($totalPenjualanTahun, 0, ',', '.'),
                     'status' => $status,
                 ];
             }

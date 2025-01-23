@@ -78,8 +78,8 @@
                 @foreach ($cabangData as $data)
                     <tr>
                         <td>{{ $data['bulan'] }}</td>
-                        <td>{{ number_format($data['target'], 2, ',', '.') }}</td>
-                        <td>{{ number_format($data['total_price'], 2, ',', '.') }}</td>
+                        <td>Rp {{ number_format($data['target'], 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($data['total_price'], 0, ',', '.') }}</td>
                         <td class="status-{{ str_replace(' ', '-', $data['status']) }}">{{ $data['status'] }}</td>
                     </tr>
                 @endforeach

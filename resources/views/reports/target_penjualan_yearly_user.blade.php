@@ -94,8 +94,8 @@
                     @foreach ($data as $cabang)
                         <tr>
                             <td>{{ $cabang['cabang'] }}</td>
-                            <td>{{ number_format($cabang['total_target'], 2, ',', '.') }}</td>
-                            <td>{{ number_format($cabang['total_penjualan'], 2, ',', '.') }}</td>
+                            <td>Rp {{ number_format($cabang['total_target'], 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($cabang['total_penjualan'], 0, ',', '.') }}</td>
                             <td
                                 class="{{ $cabang['status'] == 'TERPENUHI' ? 'status-terpenuhi' : 'status-tidak-terpenuhi' }}">
                                 {{ $cabang['status'] }}

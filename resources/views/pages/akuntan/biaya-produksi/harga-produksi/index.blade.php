@@ -60,14 +60,18 @@
                                 </div>
 
                                 <div class="col-lg-2">
-                                    <button id="btn-reset-filter" type="button" class="btn btn-secondary fw-bold w-100">
+                                    <button id="btn-reset-filter" type="button"
+                                        class="btn btn-secondary fw-bold w-100 d-flex justify-content-center align-items-center gap-2">
+                                        <i class="ph ph-arrow-clockwise fs-5"></i>
                                         Reset
                                     </button>
                                 </div>
 
                                 <div class="col-lg-2">
-                                    <button type="button" class="btn btn-success fw-bold w-100" data-bs-toggle="modal"
-                                        data-bs-target="#addHargaProduksiModal">
+                                    <button type="button"
+                                        class="btn btn-success fw-bold w-100 d-flex justify-content-center align-items-center gap-2"
+                                        data-bs-toggle="modal" data-bs-target="#addHargaProduksiModal">
+                                        <i class="ph ph-plus fs-5"></i>
                                         Tambah
                                     </button>
                                 </div>
@@ -141,7 +145,7 @@
 
                                 tableContent += `
                                     <tr>
-                                        <td class="crancy-table__column-2 fw-semibold">${formattedHarga}</td>
+                                        <td class="crancy-table__column-2 fw-semibold">Rp ${formattedHarga}</td>
                                         <td class="crancy-table__column-2 fw-semibold">${formattedMonth}</td>
                                         <td class="crancy-table__column-2 fw-semibold">${formattedYear}</td>
                                         <td class="crancy-table__column-5 text-center">

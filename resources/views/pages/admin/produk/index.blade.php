@@ -108,7 +108,7 @@
                                                             {{ $item->kategori->nama ?? '-' }}</td>
                                                         {{-- <td class="crancy-table__column-3 fw-semibold">{{ number_format($item->harga_beli, 0, ',', '.') }}</td> --}}
                                                         <td class="crancy-table__column-3 fw-semibold">
-                                                            {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                                            Rp {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
                                                         <td class="crancy-table__column-3 fw-semibold">{{ $item->stok }}
                                                         </td>
                                                         @if (empty(array_intersect(['staff', 'akuntan'], $userRole)))
@@ -116,23 +116,26 @@
                                                                 <div
                                                                     class="d-flex align-items-center gap-2 justify-content-center">
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-light d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        class="btn-edit btn-cst btn-light d-flex align-items-center gap-2 justify-content-center w-auto px-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#detailProdukModal-{{ $item->id }}">
+                                                                        <i class="ph ph-eye fs-5"></i>
                                                                         Detail
                                                                     </button>
 
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center gap-2 w-auto px-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editProdukModal-{{ $item->id }}">
+                                                                        <i class="ph ph-pencil fs-5"></i>
                                                                         Edit
                                                                     </button>
 
                                                                     <button type="button"
-                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeProdukModal-{{ $item->id }}">
+                                                                        <i class="ph ph-trash fs-5"></i>
                                                                         Hapus
                                                                     </button>
                                                                 </div>
@@ -195,7 +198,8 @@
     </section>
 
     <!-- Modal Tambah Produk -->
-    <div id="addProdukModal" class="modal fade" tabindex="-1" aria-labelledby="addProdukModalLabel" aria-hidden="true">
+    <div id="addProdukModal" class="modal fade" tabindex="-1" aria-labelledby="addProdukModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable">
             <form method="POST" action="{{ route('manajemen-produk.store') }}" class="modal-content"
                 enctype="multipart/form-data">
