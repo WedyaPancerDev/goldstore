@@ -464,48 +464,57 @@ class TargetPenjualanController extends Controller
 
         return $pdf->download($fileName);
     }
-
     public function exportMonthlyExcel()
     {
-        $targets = TargetPenjualan::where('is_deleted', false)->get();
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) {
+            $query->where('is_deleted', false);
+        })->get();
+
         $reportData = [];
 
-        foreach ($targets as $target) {
-            $user = User::find($target->user_id);
-            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::whereIn('user_id', function ($query) use ($cabang) {
+                $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+            })->where('is_deleted', false)->get();
 
-            $month = [
-                'JAN' => '01',
-                'FEB' => '02',
-                'MAR' => '03',
-                'APR' => '04',
-                'MAY' => '05',
-                'JUN' => '06',
-                'JUL' => '07',
-                'AUG' => '08',
-                'SEP' => '09',
-                'OCT' => '10',
-                'NOV' => '11',
-                'DEC' => '12',
-            ];
+            foreach ($targets as $target) {
+                $user = User::find($target->user_id);
+                $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
 
-            $targetMonth = $month[$target->bulan] ?? null;
-            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
-                return date('m', strtotime($t->order_date)) === $targetMonth;
-            });
+                $month = [
+                    'JAN' => '01',
+                    'FEB' => '02',
+                    'MAR' => '03',
+                    'APR' => '04',
+                    'MAY' => '05',
+                    'JUN' => '06',
+                    'JUL' => '07',
+                    'AUG' => '08',
+                    'SEP' => '09',
+                    'OCT' => '10',
+                    'NOV' => '11',
+                    'DEC' => '12',
+                ];
 
-            $totalPrice = $filteredTransactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                $targetMonth = $month[$target->bulan] ?? null;
+                $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                    return date('m', strtotime($t->order_date)) === $targetMonth;
+                });
 
-            $reportData[] = [
-                'user' => $user->fullname,
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status
-            ];
+                $totalPrice = $filteredTransactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'user' => $user->fullname,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status
+                ];
+            }
         }
 
         $dateNow = now()->format('Y-m-d_H-i-s');
@@ -526,7 +535,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['User', 'Bulan', 'Target', 'Total Price', 'Status'];
+                return ['User', 'Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
     }
