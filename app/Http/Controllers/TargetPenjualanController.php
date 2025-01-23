@@ -686,70 +686,6 @@ class TargetPenjualanController extends Controller
         return $pdf->download($fileName);
     }
 
-    public function exportMonthlyExcelByUser($userId)
-    {
-        $user = User::findOrFail($userId);
-        $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
-
-
-        $reportData = [];
-        $monthMapping = [
-            'JAN' => '01',
-            'FEB' => '02',
-            'MAR' => '03',
-            'APR' => '04',
-            'MAY' => '05',
-            'JUN' => '06',
-            'JUL' => '07',
-            'AUG' => '08',
-            'SEP' => '09',
-            'OCT' => '10',
-            'NOV' => '11',
-            'DEC' => '12',
-        ];
-
-        foreach ($targets as $target) {
-            $targetMonth = $monthMapping[$target->bulan] ?? null;
-            $transactions = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereMonth('order_date', $targetMonth)
-                ->get();
-
-            $totalPrice = $transactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
-
-            $reportData[] = [
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status,
-            ];
-        }
-
-        $dateNow = now()->format('Y-m-d_H-i-s');
-        $fileName = "laporan-bulanan-{$user->fullname}-{$dateNow}.xlsx";
-
-        return Excel::download(new class($reportData) implements FromArray, WithHeadings {
-            protected $data;
-
-            public function __construct(array $data)
-            {
-                $this->data = $data;
-            }
-
-            public function array(): array
-            {
-                return $this->data;
-            }
-
-            public function headings(): array
-            {
-                return ['Bulan', 'Target', 'Total Price', 'Status'];
-            }
-        }, $fileName);
-    }
-
     public function exportYearlyPDFByUser($userId)
     {
         $user = User::findOrFail($userId);
@@ -805,6 +741,84 @@ class TargetPenjualanController extends Controller
         $fileName = "laporan-tahunan-{$user->fullname}-{$dateNow}.pdf";
 
         return $pdf->download($fileName);
+    }
+
+
+    public function exportMonthlyExcelByUser($userId)
+    {
+        $user = User::findOrFail($userId);
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+
+        $reportData = [];
+        $monthMapping = [
+            'JAN' => '01',
+            'FEB' => '02',
+            'MAR' => '03',
+            'APR' => '04',
+            'MAY' => '05',
+            'JUN' => '06',
+            'JUL' => '07',
+            'AUG' => '08',
+            'SEP' => '09',
+            'OCT' => '10',
+            'NOV' => '11',
+            'DEC' => '12',
+        ];
+
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
+            $cabangData = [];
+
+            foreach ($targets as $target) {
+                $targetMonth = $monthMapping[$target->bulan] ?? null;
+                $transactions = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereMonth('order_date', $targetMonth)
+                    ->where('cabang_id', $cabang->id)
+                    ->get();
+
+                $totalPrice = $transactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $cabangData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($cabangData)) {
+                $reportData[$cabang->id] = $cabangData;
+            }
+        }
+
+        $dateNow = now()->format('Y-m-d_H-i-s');
+        $fileName = "laporan-bulanan-{$user->fullname}-{$dateNow}.xlsx";
+
+        return Excel::download(new class($reportData) implements FromArray, WithHeadings {
+            protected $data;
+
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return ['Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
+            }
+        }, $fileName);
     }
 
     public function exportYearlyExcelByUser($userId)
