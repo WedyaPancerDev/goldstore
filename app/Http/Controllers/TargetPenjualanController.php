@@ -857,6 +857,7 @@ class TargetPenjualanController extends Controller
                     : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
                 $reportData[] = [
+                    'user' => $user->fullname,
                     'year' => $year,
                     'cabang' => $cabang->nama_cabang,
                     'total_target' => $totalTargetTahun,
@@ -884,7 +885,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Year', 'Cabang', 'Total Target', 'Total Penjualan', 'Status'];
+                return ['User', 'Year',  'Cabang', 'Total Target', 'Total Penjualan', 'Status'];
             }
         }, $fileName);
     }
