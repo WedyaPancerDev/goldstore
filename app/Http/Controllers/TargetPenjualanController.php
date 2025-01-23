@@ -628,8 +628,9 @@ class TargetPenjualanController extends Controller
     public function exportMonthlyPDFByUser($userId)
     {
         $user = User::findOrFail($userId);
-        $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
-
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
 
         $reportData = [];
         $monthMapping = [
@@ -647,23 +648,34 @@ class TargetPenjualanController extends Controller
             'DEC' => '12',
         ];
 
-        foreach ($targets as $target) {
-            $targetMonth = $monthMapping[$target->bulan] ?? null;
-            $transactions = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereMonth('order_date', $targetMonth)
-                ->get();
+        foreach ($cabangs as $cabang) {
+            $cabangData = [];
+            $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
 
-            $totalPrice = $transactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+            foreach ($targets as $target) {
+                $targetMonth = $monthMapping[$target->bulan] ?? null;
+                $transactions = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereMonth('order_date', $targetMonth)
+                    ->where('cabang_id', $cabang->id)
+                    ->get();
 
-            $reportData[] = [
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status,
-            ];
+                $totalPrice = $transactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $cabangData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($cabangData)) {
+                $reportData[$cabang->id] = $cabangData;
+            }
         }
 
         $pdf = PDF::loadView('reports.target_penjualan_monthly_user', compact('user', 'reportData'));
