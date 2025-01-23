@@ -542,6 +542,7 @@ class TargetPenjualanController extends Controller
 
     public function exportYearlyExcel()
     {
+        $cabangs = Cabang::where('is_deleted', false)->get();
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
         $reportData = [];
         $years = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
@@ -551,28 +552,39 @@ class TargetPenjualanController extends Controller
 
         foreach ($years as $year) {
             $yearlyData = [];
-            foreach ($userIds as $userId) {
-                $user = User::find($userId);
+            foreach ($cabangs as $cabang) {
+                $cabangData = [];
+                foreach ($userIds as $userId) {
+                    $user = User::find($userId);
 
-                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
-                    ->where('is_deleted', false)
-                    ->sum('total');
+                    $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                        ->where('is_deleted', false)
+                        ->whereIn('user_id', function ($query) use ($cabang) {
+                            $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+                        })
+                        ->sum('total');
 
-                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
-                    ->whereYear('order_date', $year)
-                    ->sum('total_price');
+                    $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                        ->whereYear('order_date', $year)
+                        ->where('cabang_id', $cabang->id)
+                        ->sum('total_price');
 
-                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                    ? 'TIDAK TERPENUHI'
-                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                    $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                        ? 'TIDAK TERPENUHI'
+                        : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
-                    $yearlyData[] = [
-                        'user' => $user->fullname,
-                        'total_target' => $totalTargetTahun,
-                        'total_penjualan' => $totalPenjualanTahun,
-                        'status' => $status,
-                    ];
+                    if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                        $cabangData[] = [
+                            'user' => $user->fullname,
+                            'total_target' => $totalTargetTahun,
+                            'total_penjualan' => $totalPenjualanTahun,
+                            'status' => $status,
+                        ];
+                    }
+                }
+
+                if (!empty($cabangData)) {
+                    $yearlyData[$cabang->id] = $cabangData;
                 }
             }
 
@@ -596,8 +608,10 @@ class TargetPenjualanController extends Controller
             {
                 $data = [];
                 foreach ($this->data as $year => $yearlyData) {
-                    foreach ($yearlyData as $item) {
-                        $data[] = array_merge(['Year' => $year], $item);
+                    foreach ($yearlyData as $cabangId => $cabangData) {
+                        foreach ($cabangData as $item) {
+                            $data[] = array_merge(['Year' => $year, 'Cabang' => Cabang::find($cabangId)->nama_cabang], $item);
+                        }
                     }
                 }
                 return $data;
@@ -605,7 +619,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Year', 'User', 'Total Target', 'Total Penjualan', 'Status'];
+                return ['Year', 'Cabang', 'User', 'Total Target', 'Total Penjualan', 'Status'];
             }
         }, $fileName);
     }
