@@ -785,6 +785,7 @@ class TargetPenjualanController extends Controller
                     : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
                 $cabangData[] = [
+                    'user' => $user->fullname,
                     'cabang' => $cabang->nama_cabang,
                     'bulan' => $target->bulan,
                     'target' => $target->total,
@@ -816,7 +817,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
+                return ['User', 'Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
     }
