@@ -126,7 +126,7 @@
                     </div>
 
                     <!-- Expenses Section -->
-                    <div class="mb-4" style="padding-left: 80px; padding-right: 80px;">
+                    <div class="mb-4" style="padding-left: 90px; padding-right: 90px;">
                         <h6 class="fw-bold mb-3">Pengeluaran</h6>
 
                         <!-- Operational Costs -->
@@ -175,7 +175,7 @@
                     <!-- Net Profit/Loss -->
                     <div class="row border-top border-2 border-dark mt-4 pt-4">
                         <div class="col">
-                            <h5 class="fw-bold mb-0">Laba/Rugi Bersih</h5>
+                            <h5 class="fw-bold mb-0" id="profit-title">Laba/Rugi</h5>
                         </div>
                         <div class="col-auto">
                             <h5 class="fw-bold mb-0" id="net-profit">Rp 0</h5>
@@ -289,13 +289,16 @@
                             // Update net profit/loss
                             const netProfitElement = $('#net-profit');
                             const netProfit = data.totals.net_profit;
+                            const netProfitTitle = $('#profit-title');
 
                             if (netProfit >= 0) {
+                                netProfitTitle.text('Laba');
                                 netProfitElement
                                     .text(formatCurrency(netProfit))
                                     .removeClass('text-danger')
                                     .addClass('text-success');
                             } else {
+                                netProfitTitle.text('Rugi');
                                 netProfitElement
                                     .text(`(${formatCurrency(Math.abs(netProfit))})`)
                                     .removeClass('text-success')
