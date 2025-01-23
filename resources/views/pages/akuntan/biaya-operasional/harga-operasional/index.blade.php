@@ -145,7 +145,7 @@
 
                                 tableContent += `
                                     <tr>
-                                        <td class="crancy-table__column-2 fw-semibold">${formattedHarga}</td>
+                                        <td class="crancy-table__column-2 fw-semibold">Rp ${formattedHarga}</td>
                                         <td class="crancy-table__column-2 fw-semibold">${formattedMonth}</td>
                                         <td class="crancy-table__column-2 fw-semibold">${formattedYear}</td>
                                         <td class="crancy-table__column-5 text-center">
