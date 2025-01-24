@@ -41,6 +41,16 @@
             padding-bottom: 5px;
         }
 
+        /* Cabang title styling */
+        .cabang-title {
+            font-size: 18px;
+            color: #495057;
+            font-weight: bold;
+            margin-top: 10px;
+            border-bottom: 2px solid #17a2b8;
+            padding-bottom: 5px;
+        }
+
         /* Table styling */
         table {
             width: 100%;
@@ -73,32 +83,38 @@
     <h1>Laporan Target Penjualan Tahunan</h1>
 
     <!-- Loop through each year in the report data -->
-    @foreach ($reportData as $year => $data)
+    @foreach ($reportData as $year => $cabangs)
         <div class="year-section">
             <div class="year-title">Penjualan Tahun {{ $year }}</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Pengguna</th>
-                        <th>Total Target</th>
-                        <th>Total Penjualan</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Loop through each user entry in the year data -->
-                    @foreach ($data as $entry)
+
+            <!-- Loop through each cabang in the report data for the year -->
+            @foreach ($cabangs as $cabangId => $data)
+                <div class="cabang-title">{{ $data[0]['cabang'] }}</div> <!-- Display Cabang Name -->
+
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ $entry['user'] }}</td>
-                            <td>{{ number_format($entry['total_target'], 0, ',', '.') }}</td>
-                            <td>{{ number_format($entry['total_penjualan'], 0, ',', '.') }}</td>
-                            <td style="color: {{ $entry['status'] === 'TERPENUHI' ? '#28a745' : '#dc3545' }};">
-                                {{ $entry['status'] }}
-                            </td>
+                            <th>Nama Pengguna</th>
+                            <th>Total Target</th>
+                            <th>Total Penjualan</th>
+                            <th>Status</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through each user entry in the year and cabang data -->
+                        @foreach ($data as $entry)
+                            <tr>
+                                <td>{{ $entry['user'] }}</td>
+                                <td>Rp {{ number_format($entry['total_target'], 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($entry['total_penjualan'], 0, ',', '.') }}</td>
+                                <td style="color: {{ $entry['status'] === 'TERPENUHI' ? '#28a745' : '#dc3545' }};">
+                                    {{ $entry['status'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endforeach
         </div>
     @endforeach
 

@@ -19,7 +19,21 @@
                 <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @role('admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('manajer')
+                                <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('akuntan')
+                                <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('staff')
+                                <li class="breadcrumb-item"><a href="{{ route('staff.root') }}">Dashboard</a></li>
+                            @endrole
                             <li class="breadcrumb-item active">Transaksi Penjualan</li>
                         </ol>
                     </div>
@@ -32,13 +46,13 @@
                 <div class="crancy-dsinner">
                     <div class="crancy-table-meta mg-top-30">
                         <div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
-                            @if (empty(array_intersect(['akuntan'], $userRole)))
+                            @role('staff')
                                 <button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
                                     data-bs-target="#management-transaksi-pengeluaran-create">
                                     <i class="ph ph-plus fs-5"></i>
                                     Tambah Transaksi Penjualan
                                 </button>
-                            @endif
+                            @endrole
                         </div>
                     </div>
 
@@ -74,6 +88,9 @@
                                             </th>
                                             <th class="crancy-table__column-4 crancy-table__h2">
                                                 Produk
+                                            </th>
+                                            <th class="crancy-table__column-4 crancy-table__h2">
+                                                Cabang
                                             </th>
                                             <th class="crancy-table__column-5 crancy-table__h4">
                                                 Jumlah
@@ -113,11 +130,14 @@
                                                     <td class="crancy-table__column-4 fw-semibold">
                                                         {{ $transaksi->nama_produk ?? '-' }}
                                                     </td>
+                                                    <td class="crancy-table__column-4 fw-semibold">
+                                                        {{ $transaksi->nama_cabang ?? '-' }}
+                                                    </td>
                                                     <td class="crancy-table__column-5 fw-semibold">
                                                         {{ $transaksi->quantity ?? '-' }}
                                                     </td>
                                                     <td class="crancy-table__column-6 fw-semibold">
-                                                        {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
+                                                        Rp {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
                                                     </td>
                                                     <td class="crancy-table__column-7 fw-semibold">
                                                         {{ $transaksi->deskripsi ?? '-' }}
@@ -128,9 +148,11 @@
                                                     @if (empty(array_intersect(['akuntan'], $userRole)))
                                                         @role('admin|akuntan|manajer')
                                                             <td class="crancy-table__column-8">
-                                                                <button type="button" class="btn-edit btn-cst btn-warning px-2"
+                                                                <button type="button"
+                                                                    class="btn-edit btn-cst btn-warning px-2 d-flex align-items-center justify-content-center gap-2"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
+                                                                    <i class="ph ph-pencil"></i>
                                                                     Ubah
                                                                 </button>
                                                             </td>
@@ -143,6 +165,15 @@
                                     {{-- End crancy Table Body --}}
                                 </table>
                                 {{-- End crancy Table --}}
+                                <div style="text-align: left; margin-left: 50px;">
+                                    <p style="font-size: 17px; font-weight: bold;">
+                                        Jumlah Total: {{ $transaksiPengeluaran->sum('quantity') }}
+                                    </p>
+                                    <p style="font-size: 17px; font-weight: bold;">
+                                        Total Keseluruhan: Rp
+                                        {{ number_format($transaksiPengeluaran->sum('total_price'), 0, ',', '.') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,6 +228,24 @@
                             </div>
                         </div>
                         <span class="form-text text-muted">Maksimal 3 user dapat dipilih.</span>
+                    </div>
+
+                    <!-- Cabang -->
+                    <div class="mb-5 form-group">
+                        <label class="form-label" for="cabang_id">Pilih Cabang <span class="text-danger">*</span></label>
+                        <select class="form-select crancy__item-input cabang-select" name="cabang_id" required>
+                            <option data-display="Tentukan Cabang" selected disabled></option>
+                            @foreach ($cabang as $cabg)
+                                <option value="{{ $cabg->id }}">
+                                    {{ $cabg->nama_cabang }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($errors->has('cabang_id'))
+                            <div class="pt-2">
+                                <span class="form-text text-danger">{{ $errors->first('cabang_id') }}</span>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Quantity -->
@@ -389,8 +438,10 @@
                 let isUserSelected = $('.user-select').filter(function() {
                     return $(this).val() !== null && $(this).val() !== '';
                 }).length > 0;
+                let isCabangSelected = $('.cabang-select').val() !== null;
 
-                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected));
+                $('#btn-submit').prop('disabled', !(isProductSelected && isQuantityValid && isUserSelected &&
+                    isCabangSelected));
             }
 
             // Memeriksa stok produk dan menghitung total harga

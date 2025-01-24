@@ -28,6 +28,7 @@ return new class extends Migration
         Schema::table('transaksi_pengeluaran', function (Blueprint $table) {
             $table->foreignId('produk_id')->after('order_date')->references('id')->on('produk');
             $table->foreignId('user_id')->after('produk_id')->references('id')->on('users');
+            $table->foreignId('cabang_id')->after('user_id')->references('id')->on('cabang');
         });
     }
 

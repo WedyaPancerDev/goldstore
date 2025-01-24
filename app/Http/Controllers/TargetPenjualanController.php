@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\TargetPenjualan;
 use App\Models\TransaksiPengeluaran;
 use App\Models\User;
@@ -337,57 +338,68 @@ class TargetPenjualanController extends Controller
 
     public function exportMonthlyPDF()
     {
-        $targets = TargetPenjualan::where('is_deleted', false)->get();
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) {
+            $query->where('is_deleted', false);
+        })->get();
 
         $reportData = [];
 
-        foreach ($targets as $target) {
-            $user = User::find($target->user_id);
-            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::whereIn('user_id', function ($query) use ($cabang) {
+                $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+            })->where('is_deleted', false)->get();
 
-            $month = [
-                'JAN' => '01',
-                'FEB' => '02',
-                'MAR' => '03',
-                'APR' => '04',
-                'MAY' => '05',
-                'JUN' => '06',
-                'JUL' => '07',
-                'AUG' => '08',
-                'SEP' => '09',
-                'OCT' => '10',
-                'NOV' => '11',
-                'DEC' => '12',
-            ];
+            $cabangData = [];
 
-            $targetMonth = $month[$target->bulan] ?? null;
+            foreach ($targets as $target) {
+                $user = User::find($target->user_id);
+                $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
 
-            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
-                $orderMonth = date('m', strtotime($t->order_date));
-                return $orderMonth === $targetMonth;
-            });
+                $month = [
+                    'JAN' => '01',
+                    'FEB' => '02',
+                    'MAR' => '03',
+                    'APR' => '04',
+                    'MAY' => '05',
+                    'JUN' => '06',
+                    'JUL' => '07',
+                    'AUG' => '08',
+                    'SEP' => '09',
+                    'OCT' => '10',
+                    'NOV' => '11',
+                    'DEC' => '12',
+                ];
 
-            $totalPrice = $filteredTransactions->sum('total_price');
+                $targetMonth = $month[$target->bulan] ?? null;
 
-            if ($target->total == 0 && $totalPrice == 0) {
-                $status = 'TIDAK TERPENUHI';
-            } else {
-                $status = $totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI';
+                $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                    return date('m', strtotime($t->order_date)) === $targetMonth;
+                });
+
+                $totalPrice = $filteredTransactions->sum('total_price');
+
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $cabangData[] = [
+                    'user' => $user->fullname,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status
+                ];
             }
 
             $reportData[] = [
-                'user' => $user->fullname,
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status
+                'cabang' => $cabang->nama_cabang,
+                'data' => $cabangData
             ];
         }
 
-
         $pdf = PDF::loadView('reports.target_penjualan_monthly', compact('reportData'));
 
-        $dateNow = Carbon::now()->format('Y-m-d_H-i-s   ');
+        $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
         $fileName = "laporan-target-penjualan-{$dateNow}.pdf";
 
         return $pdf->download($fileName);
@@ -395,6 +407,7 @@ class TargetPenjualanController extends Controller
 
     public function exportYearlyPDF()
     {
+        $cabangs = Cabang::where('is_deleted', false)->with('transaksiPengeluaran')->get(); // Ambil semua cabang yang aktif
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
 
         $reportData = [];
@@ -404,35 +417,46 @@ class TargetPenjualanController extends Controller
             ->pluck('year');
 
         foreach ($years as $year) {
-            $yearlyData = [];
-            foreach ($userIds as $userId) {
-                $user = User::find($userId);
+            foreach ($cabangs as $cabang) {
+                $yearlyData = [];
+                foreach ($userIds as $userId) {
+                    $user = User::find($userId);
 
-                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
-                    ->where('is_deleted', false)
-                    ->sum('total');
+                    // Ambil target penjualan berdasarkan user dan cabang
+                    $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                        ->where('is_deleted', false)
+                        ->whereIn('user_id', function ($query) use ($cabang) {
+                            $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+                        })
+                        ->sum('total');
 
-                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
-                    ->whereYear('order_date', $year)
-                    ->sum('total_price');
+                    // Ambil total penjualan berdasarkan user, cabang dan tahun
+                    $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                        ->whereYear('order_date', $year)
+                        ->where('cabang_id', $cabang->id)
+                        ->sum('total_price');
 
-                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
-                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                    $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0 ? 'TIDAK TERPENUHI'
+                        : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
-                    $yearlyData[] = [
-                        'user' => $user->fullname,
-                        'total_target' => $totalTargetTahun,
-                        'total_penjualan' => $totalPenjualanTahun,
-                        'status' => $status,
-                    ];
+                    if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                        $yearlyData[] = [
+                            'cabang' => $cabang->nama_cabang,  // Nama cabang yang ingin ditampilkan
+                            'user' => $user->fullname,
+                            'total_target' => $totalTargetTahun,
+                            'total_penjualan' => $totalPenjualanTahun,
+                            'status' => $status,
+                        ];
+                    }
                 }
-            }
-            if (!empty($yearlyData)) {
-                $reportData[$year] = $yearlyData;
+
+                if (!empty($yearlyData)) {
+                    $reportData[$year][$cabang->id] = $yearlyData; // Menyimpan berdasarkan tahun dan cabang
+                }
             }
         }
 
+        // Generate PDF
         $pdf = PDF::loadView('reports.target_penjualan_yearly', compact('reportData'));
 
         $dateNow = Carbon::now()->format('Y-m-d_H-i-s');
@@ -440,48 +464,57 @@ class TargetPenjualanController extends Controller
 
         return $pdf->download($fileName);
     }
-
     public function exportMonthlyExcel()
     {
-        $targets = TargetPenjualan::where('is_deleted', false)->get();
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) {
+            $query->where('is_deleted', false);
+        })->get();
+
         $reportData = [];
 
-        foreach ($targets as $target) {
-            $user = User::find($target->user_id);
-            $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::whereIn('user_id', function ($query) use ($cabang) {
+                $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+            })->where('is_deleted', false)->get();
 
-            $month = [
-                'JAN' => '01',
-                'FEB' => '02',
-                'MAR' => '03',
-                'APR' => '04',
-                'MAY' => '05',
-                'JUN' => '06',
-                'JUL' => '07',
-                'AUG' => '08',
-                'SEP' => '09',
-                'OCT' => '10',
-                'NOV' => '11',
-                'DEC' => '12',
-            ];
+            foreach ($targets as $target) {
+                $user = User::find($target->user_id);
+                $transaksi = TransaksiPengeluaran::where('user_id', $user->id)->get();
 
-            $targetMonth = $month[$target->bulan] ?? null;
-            $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
-                return date('m', strtotime($t->order_date)) === $targetMonth;
-            });
+                $month = [
+                    'JAN' => '01',
+                    'FEB' => '02',
+                    'MAR' => '03',
+                    'APR' => '04',
+                    'MAY' => '05',
+                    'JUN' => '06',
+                    'JUL' => '07',
+                    'AUG' => '08',
+                    'SEP' => '09',
+                    'OCT' => '10',
+                    'NOV' => '11',
+                    'DEC' => '12',
+                ];
 
-            $totalPrice = $filteredTransactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                $targetMonth = $month[$target->bulan] ?? null;
+                $filteredTransactions = $transaksi->filter(function ($t) use ($targetMonth) {
+                    return date('m', strtotime($t->order_date)) === $targetMonth;
+                });
 
-            $reportData[] = [
-                'user' => $user->fullname,
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status
-            ];
+                $totalPrice = $filteredTransactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'user' => $user->fullname,
+                    'bulan' => $target->bulan,
+                    'target' => 'Rp ' . number_format($target->total, 0, ',', '.'),
+                    'total_price' => 'Rp ' . number_format($totalPrice, 0, ',', '.'),
+                    'status' => $status
+                ];
+            }
         }
 
         $dateNow = now()->format('Y-m-d_H-i-s');
@@ -502,13 +535,14 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['User', 'Bulan', 'Target', 'Total Price', 'Status'];
+                return ['Cabang', 'User',  'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
     }
 
     public function exportYearlyExcel()
     {
+        $cabangs = Cabang::where('is_deleted', false)->get();
         $userIds = TargetPenjualan::where('is_deleted', false)->pluck('user_id')->unique();
         $reportData = [];
         $years = TransaksiPengeluaran::selectRaw('YEAR(order_date) as year')
@@ -518,28 +552,39 @@ class TargetPenjualanController extends Controller
 
         foreach ($years as $year) {
             $yearlyData = [];
-            foreach ($userIds as $userId) {
-                $user = User::find($userId);
+            foreach ($cabangs as $cabang) {
+                $cabangData = [];
+                foreach ($userIds as $userId) {
+                    $user = User::find($userId);
 
-                $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
-                    ->where('is_deleted', false)
-                    ->sum('total');
+                    $totalTargetTahun = TargetPenjualan::where('user_id', $user->id)
+                        ->where('is_deleted', false)
+                        ->whereIn('user_id', function ($query) use ($cabang) {
+                            $query->select('user_id')->from('transaksi_pengeluaran')->where('cabang_id', $cabang->id);
+                        })
+                        ->sum('total');
 
-                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
-                    ->whereYear('order_date', $year)
-                    ->sum('total_price');
+                    $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $user->id)
+                        ->whereYear('order_date', $year)
+                        ->where('cabang_id', $cabang->id)
+                        ->sum('total_price');
 
-                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                    ? 'TIDAK TERPENUHI'
-                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                    $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                        ? 'TIDAK TERPENUHI'
+                        : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
 
-                if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
-                    $yearlyData[] = [
-                        'user' => $user->fullname,
-                        'total_target' => $totalTargetTahun,
-                        'total_penjualan' => $totalPenjualanTahun,
-                        'status' => $status,
-                    ];
+                    if ($totalPenjualanTahun > 0 || $totalTargetTahun > 0) {
+                        $cabangData[] = [
+                            'user' => $user->fullname,
+                            'total_target' => 'Rp ' . number_format($totalTargetTahun, 0, ',', '.'),
+                            'total_penjualan' => 'Rp ' . number_format($totalPenjualanTahun, 0, ',', '.'),
+                            'status' => $status,
+                        ];
+                    }
+                }
+
+                if (!empty($cabangData)) {
+                    $yearlyData[$cabang->id] = $cabangData;
                 }
             }
 
@@ -563,8 +608,10 @@ class TargetPenjualanController extends Controller
             {
                 $data = [];
                 foreach ($this->data as $year => $yearlyData) {
-                    foreach ($yearlyData as $item) {
-                        $data[] = array_merge(['Year' => $year], $item);
+                    foreach ($yearlyData as $cabangId => $cabangData) {
+                        foreach ($cabangData as $item) {
+                            $data[] = array_merge(['Year' => $year, 'Cabang' => Cabang::find($cabangId)->nama_cabang], $item);
+                        }
                     }
                 }
                 return $data;
@@ -572,7 +619,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Year', 'User', 'Total Target', 'Total Penjualan', 'Status'];
+                return ['Year', 'Cabang', 'User', 'Total Target', 'Total Penjualan', 'Status'];
             }
         }, $fileName);
     }
@@ -581,8 +628,9 @@ class TargetPenjualanController extends Controller
     public function exportMonthlyPDFByUser($userId)
     {
         $user = User::findOrFail($userId);
-        $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
-
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
 
         $reportData = [];
         $monthMapping = [
@@ -600,23 +648,34 @@ class TargetPenjualanController extends Controller
             'DEC' => '12',
         ];
 
-        foreach ($targets as $target) {
-            $targetMonth = $monthMapping[$target->bulan] ?? null;
-            $transactions = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereMonth('order_date', $targetMonth)
-                ->get();
+        foreach ($cabangs as $cabang) {
+            $cabangData = [];
+            $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
 
-            $totalPrice = $transactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+            foreach ($targets as $target) {
+                $targetMonth = $monthMapping[$target->bulan] ?? null;
+                $transactions = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereMonth('order_date', $targetMonth)
+                    ->where('cabang_id', $cabang->id)
+                    ->get();
 
-            $reportData[] = [
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status,
-            ];
+                $totalPrice = $transactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $cabangData[] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'bulan' => $target->bulan,
+                    'target' => $target->total,
+                    'total_price' => $totalPrice,
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($cabangData)) {
+                $reportData[$cabang->id] = $cabangData;
+            }
         }
 
         $pdf = PDF::loadView('reports.target_penjualan_monthly_user', compact('user', 'reportData'));
@@ -627,10 +686,70 @@ class TargetPenjualanController extends Controller
         return $pdf->download($fileName);
     }
 
+    public function exportYearlyPDFByUser($userId)
+    {
+        $user = User::findOrFail($userId);
+        $years = TransaksiPengeluaran::where('user_id', $userId)
+            ->selectRaw('YEAR(order_date) as year')
+            ->distinct()
+            ->pluck('year');
+
+        $reportData = [];
+
+        foreach ($years as $year) {
+            $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId, $year) {
+                $query->where('user_id', $userId)->whereYear('order_date', $year);
+            })->get();
+
+            $reportDataYear = [];
+
+            foreach ($cabangs as $cabang) {
+                $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
+                    ->where('is_deleted', false)
+                    ->whereIn('id', function ($query) use ($cabang, $year) {
+                        $query->select('id')->from('transaksi_pengeluaran')
+                            ->where('cabang_id', $cabang->id)
+                            ->whereYear('order_date', $year);
+                    })
+                    ->sum('total');
+
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereYear('order_date', $year)
+                    ->where('cabang_id', $cabang->id)
+                    ->sum('total_price');
+
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportDataYear[$cabang->id] = [
+                    'cabang' => $cabang->nama_cabang,
+                    'total_target' => $totalTargetTahun,
+                    'total_penjualan' => $totalPenjualanTahun,
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($reportDataYear)) {
+                $reportData[$year] = $reportDataYear;
+            }
+        }
+
+        $pdf = PDF::loadView('reports.target_penjualan_yearly_user', compact('user', 'reportData'));
+
+        $dateNow = now()->format('Y-m-d_H-i-s');
+        $fileName = "laporan-tahunan-{$user->fullname}-{$dateNow}.pdf";
+
+        return $pdf->download($fileName);
+    }
+
+
     public function exportMonthlyExcelByUser($userId)
     {
         $user = User::findOrFail($userId);
-        $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
+        $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
 
 
         $reportData = [];
@@ -649,23 +768,35 @@ class TargetPenjualanController extends Controller
             'DEC' => '12',
         ];
 
-        foreach ($targets as $target) {
-            $targetMonth = $monthMapping[$target->bulan] ?? null;
-            $transactions = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereMonth('order_date', $targetMonth)
-                ->get();
+        foreach ($cabangs as $cabang) {
+            $targets = TargetPenjualan::where('user_id', $userId)->where('is_deleted', false)->get();
+            $cabangData = [];
 
-            $totalPrice = $transactions->sum('total_price');
-            $status = $target->total == 0 && $totalPrice == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+            foreach ($targets as $target) {
+                $targetMonth = $monthMapping[$target->bulan] ?? null;
+                $transactions = TransaksiPengeluaran::where('user_id', $userId)
+                    ->whereMonth('order_date', $targetMonth)
+                    ->where('cabang_id', $cabang->id)
+                    ->get();
 
-            $reportData[] = [
-                'bulan' => $target->bulan,
-                'target' => $target->total,
-                'total_price' => $totalPrice,
-                'status' => $status,
-            ];
+                $totalPrice = $transactions->sum('total_price');
+                $status = $target->total == 0 && $totalPrice == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPrice >= $target->total ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $cabangData[] = [
+                    'user' => $user->fullname,
+                    'cabang' => $cabang->nama_cabang,
+                    'bulan' => $target->bulan,
+                    'target' => 'Rp ' . number_format($target->total, 0, ',', '.'),
+                    'total_price' => 'Rp ' . number_format($totalPrice, 0, ',', '.'),
+                    'status' => $status,
+                ];
+            }
+
+            if (!empty($cabangData)) {
+                $reportData[$cabang->id] = $cabangData;
+            }
         }
 
         $dateNow = now()->format('Y-m-d_H-i-s');
@@ -686,47 +817,9 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Bulan', 'Target', 'Total Price', 'Status'];
+                return ['User', 'Cabang', 'Bulan', 'Target', 'Total Price', 'Status'];
             }
         }, $fileName);
-    }
-
-    public function exportYearlyPDFByUser($userId)
-    {
-        $user = User::findOrFail($userId);
-        $years = TransaksiPengeluaran::where('user_id', $userId)
-            ->selectRaw('YEAR(order_date) as year')
-            ->distinct()
-            ->pluck('year');
-
-        $reportData = [];
-
-        foreach ($years as $year) {
-            $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
-                ->where('is_deleted', false)
-                ->sum('total');
-
-            $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereYear('order_date', $year)
-                ->sum('total_price');
-
-            $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
-
-            $reportData[$year] = [
-                'total_target' => $totalTargetTahun,
-                'total_penjualan' => $totalPenjualanTahun,
-                'status' => $status,
-            ];
-        }
-
-        $pdf = PDF::loadView('reports.target_penjualan_yearly_user', compact('user', 'reportData'));
-
-        $dateNow = now()->format('Y-m-d_H-i-s');
-        $fileName = "laporan-tahunan-{$user->fullname}-{$dateNow}.pdf";
-
-        return $pdf->download($fileName);
     }
 
     public function exportYearlyExcelByUser($userId)
@@ -740,24 +833,38 @@ class TargetPenjualanController extends Controller
         $reportData = [];
 
         foreach ($years as $year) {
-            $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
-                ->where('is_deleted', false)
-                ->sum('total');
+            $cabangs = Cabang::whereHas('transaksiPengeluaran', function ($query) use ($userId, $year) {
+                $query->where('user_id', $userId)
+                    ->whereYear('order_date', $year);
+            })->get();
 
-            $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
-                ->whereYear('order_date', $year)
-                ->sum('total_price');
+            foreach ($cabangs as $cabang) {
+                $totalTargetTahun = TargetPenjualan::where('user_id', $userId)
+                    ->where('is_deleted', false)
+                    ->whereIn('id', function ($query) use ($cabang) {
+                        $query->select('id')->from('transaksi_pengeluaran')
+                            ->where('cabang_id', $cabang->id);
+                    })
+                    ->sum('total');
 
-            $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
-                ? 'TIDAK TERPENUHI'
-                : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+                $totalPenjualanTahun = TransaksiPengeluaran::where('user_id', $userId)
+                    ->where('cabang_id', $cabang->id)
+                    ->whereYear('order_date', $year)
+                    ->sum('total_price');
 
-            $reportData[] = [
-                'year' => $year,
-                'total_target' => $totalTargetTahun,
-                'total_penjualan' => $totalPenjualanTahun,
-                'status' => $status,
-            ];
+                $status = $totalTargetTahun == 0 && $totalPenjualanTahun == 0
+                    ? 'TIDAK TERPENUHI'
+                    : ($totalPenjualanTahun >= $totalTargetTahun ? 'TERPENUHI' : 'TIDAK TERPENUHI');
+
+                $reportData[] = [
+                    'user' => $user->fullname,
+                    'year' => $year,
+                    'cabang' => $cabang->nama_cabang,
+                    'total_target' => 'Rp ' . number_format($totalTargetTahun, 0, ',', '.'),
+                    'total_penjualan' => 'Rp ' . number_format($totalPenjualanTahun, 0, ',', '.'),
+                    'status' => $status,
+                ];
+            }
         }
 
         $dateNow = now()->format('Y-m-d_H-i-s');
@@ -778,7 +885,7 @@ class TargetPenjualanController extends Controller
 
             public function headings(): array
             {
-                return ['Year', 'Total Target', 'Total Penjualan', 'Status'];
+                return ['User', 'Year',  'Cabang', 'Total Target', 'Total Penjualan', 'Status'];
             }
         }, $fileName);
     }

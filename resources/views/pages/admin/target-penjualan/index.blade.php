@@ -14,7 +14,23 @@
                 <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @role('admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('manajer')
+                                <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('akuntan')
+                                <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('staff')
+                                <li class="breadcrumb-item"><a href="{{ route('staff.root') }}">Dashboard</a></li>
+                            @endrole
+
+
                             <li class="breadcrumb-item active">Target Penjualan</li>
                         </ol>
                     </div>
@@ -81,20 +97,24 @@
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.detail', $target->user_id) }}">
                                                                         <button
-                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold">
+                                                                            class="btn-edit btn-cst btn-secondary px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-eye fs-5"></i>
                                                                             Detail
                                                                         </button>
                                                                     </a>
                                                                     <a
                                                                         href="{{ route('manajemen-target-penjualan.edit', $target->user_id) }}">
                                                                         <button
-                                                                            class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold">
+                                                                            class="btn-edit btn-cst btn-warning px-3 text-white fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                                                            <i class="ph ph-pencil fs-5"></i>
                                                                             Ubah
                                                                         </button>
                                                                     </a>
-                                                                    <button type="button" class="btn-cst btn-danger px-3 w-25"
+                                                                    <button type="button"
+                                                                        class="btn-cst btn-danger px-3 w-25 d-flex justcontent-center align-items-center gap-2 justify-content-center"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeTargetModal-{{ $target->user_id }}">
+                                                                        <i class="ph ph-trash fs-5"></i>
                                                                         Nonaktifkan
                                                                     </button>
                                                                     <!-- Modal for Deactivation -->
@@ -145,6 +165,7 @@
                                                                     <div class="d-flex gap-2 fw-semibold">
                                                                         <a href="{{ route('export.yearly.pdf.byuser', $target->user_id) }}"
                                                                             class="btn btn-warning">
+
                                                                             Laporan Tahunan PDF
                                                                         </a>
                                                                         <a href="{{ route('export.monthly.pdf.byuser', $target->user_id) }}"
@@ -191,7 +212,8 @@
     </section>
 
     <!-- Modal untuk Menambah Target Penjualan -->
-    <div id="addTargetPenjualan" class="modal fade" tabindex="-1" aria-labelledby="addTargetPenjualan" aria-hidden="true">
+    <div id="addTargetPenjualan" class="modal fade" tabindex="-1" aria-labelledby="addTargetPenjualan"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="height: 75vh; max-height: 90vh;">
             <form method="POST" action="{{ route('manajemen-target-penjualan.store') }}" class="modal-content"
                 style="height: 100%;">

@@ -18,7 +18,18 @@
                 <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @role('admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('manajer')
+                                <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                            @endrole
+
+                            @role('akuntan')
+                                <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                            @endrole
+
                             <li class="breadcrumb-item active">Pengguna</li>
                         </ol>
                     </div>
@@ -135,18 +146,20 @@
                                                                 @if ($user->is_deleted == 0)
                                                                     {{-- EDIT --}}
                                                                     <button type="button"
-                                                                        class="btn-edit btn-cst btn-warning px-2"
+                                                                        class="btn-edit btn-cst btn-warning px-2 d-flex justify-content-center align-items-center gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editUserModal-{{ $user->id }}">
+                                                                        <i class="ph ph-pencil"></i>
                                                                         Ubah
                                                                     </button>
 
 
                                                                     {{-- DELETE / DEACTIVATE --}}
                                                                     <button type="button"
-                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2"
+                                                                        class="btn-cst btn-danger d-flex align-items-center justify-content-center px-2 gap-2"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#removeNotificationModal-{{ $loop->iteration }}">
+                                                                        <i class="ph ph-trash"></i>
                                                                         Non Aktifkan
                                                                     </button>
 
@@ -236,8 +249,8 @@
     </section>
 
     {{-- create --}}
-    <div id="management-user-create" class="modal fade" tabindex="-1" aria-labelledby="management-user" aria-hidden="true"
-        style="display: none;">
+    <div id="management-user-create" class="modal fade" tabindex="-1" aria-labelledby="management-user"
+        aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-dialog-scrollable">
             <form method="POST" action="{{ route('manajemen-pengguna.store') }}" class="modal-content"
                 enctype="multipart/form-data">

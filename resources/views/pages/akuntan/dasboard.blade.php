@@ -3,28 +3,29 @@
 @section('title', 'Chart Per User')
 
 @section('content')
-<section class="container container__bscreen mt-5">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-0">Dashboard</h4>
-                <div class="d-flex gap-2 w-50">
-                    <button id="btn-monthly" class="btn btn-primary">Tampilkan Chart Perbulan</button>
-                    <button id="btn-yearly" class="btn btn-secondary">Tampilkan Chart Pertahun</button>
+    <section class="container container__bscreen mt-5">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-0">Dashboard</h4>
+                    <div class="d-flex gap-2 w-50">
+                        <button id="btn-monthly" class="btn btn-primary">Tampilkan Chart Perbulan</button>
+                        <button id="btn-yearly" class="btn btn-secondary">Tampilkan Chart Pertahun</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row" id="staffChartsContainer">
-    </div>
-</section>
+
+        <div class="row" id="staffChartsContainer">
+        </div>
+    </section>
 
 @endsection
 
 @section('script')
-<script>
- document.addEventListener('DOMContentLoaded', () => {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
             const btnMonthly = document.getElementById('btn-monthly');
             const btnYearly = document.getElementById('btn-yearly');
             const container = document.getElementById('staffChartsContainer');
@@ -182,5 +183,5 @@
                 });
             }
         });
-</script>
+    </script>
 @endsection

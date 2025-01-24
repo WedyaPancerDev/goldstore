@@ -19,7 +19,18 @@
                     <div class="page-title-box d-sm-flex align-items-center justify-content-end">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                                @role('admin')
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.root') }}">Dashboard</a></li>
+                                @endrole
+
+                                @role('manajer')
+                                    <li class="breadcrumb-item"><a href="{{ route('manajer.root') }}">Dashboard</a></li>
+                                @endrole
+
+                                @role('akuntan')
+                                    <li class="breadcrumb-item"><a href="{{ route('akuntan.root') }}">Dashboard</a></li>
+                                @endrole
+
                                 <li class="breadcrumb-item active">Kategori</li>
                             </ol>
                         </div>
@@ -87,17 +98,19 @@
                                                                         class="d-flex align-items-center gap-2 justify-content-center">
                                                                         <!-- Tombol Edit -->
                                                                         <button type="button"
-                                                                            class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2"
+                                                                            class="btn-edit btn-cst btn-warning d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editKategoriModal-{{ $data->id }}">
+                                                                            <i class="ph ph-pencil fs-5"></i>
                                                                             Edit
                                                                         </button>
 
                                                                         <!-- Tombol Hapus -->
                                                                         <button type="button"
-                                                                            class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2"
+                                                                            class="btn-cst btn-danger d-flex align-items-center justify-content-center w-auto px-2 gap-2"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#removeKategoriModal-{{ $data->id }}">
+                                                                            <i class="ph ph-trash fs-5"></i>
                                                                             Hapus
                                                                         </button>
                                                                     </div>
@@ -109,7 +122,8 @@
                                                                         @csrf
                                                                         @method('PATCH')
                                                                         <button type="submit"
-                                                                            class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2">
+                                                                            class="btn-cst btn-success d-flex align-items-center justify-content-center w-auto px-2 gap-2">
+                                                                            <i class="ph ph-check fs-5"></i>
                                                                             Aktifkan
                                                                         </button>
                                                                     </form>
@@ -137,21 +151,27 @@
                                                                     </div>
                                                                     <h4 class="mb-2">Apakah kamu yakin?</h4>
                                                                     <p class="text-muted mb-4">
-                                                                        Apakah kamu yakin ingin menghapus kategori ini?
-                                                                        <strong>Kategori yang dihapus tidak dapat
+                                                                        Apakah kamu yakin ingin menonaktifkan kategori ini?
+                                                                        <strong>Kategori yang dihapus dapat
                                                                             dikembalikan.</strong>
                                                                     </p>
                                                                     <div
                                                                         class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                                                        <button type="button" class="btn btn-light btn-sm"
-                                                                            data-bs-dismiss="modal">Batal</button>
+                                                                        <button type="button"
+                                                                            class="btn btn-light btn-sm d-flex justify-content-center align-items-center gap-2"
+                                                                            data-bs-dismiss="modal">
+                                                                            <i class="ph ph-x fs-5"></i>
+                                                                            Batal
+                                                                        </button>
                                                                         <form
                                                                             action="{{ route('manajemen-kategori.destroy', $data->id) }}"
                                                                             method="POST">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button type="submit"
-                                                                                class="btn btn-danger btn-sm">Iya,
+                                                                                class="btn btn-danger btn-sm d-flex justify-content-center align-items-center gap-2">
+                                                                                <i class="ph ph-trash fs-5"></i>
+                                                                                Iya,
                                                                                 Nonaktifkan!</button>
                                                                         </form>
                                                                     </div>
