@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TransaksiPengeluaran;
+use App\Models\Cabang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\TransaksiPengeluaran;
 use Illuminate\Support\Facades\Auth;
 
 class TransaksiPengeluaranController extends Controller
@@ -18,6 +19,7 @@ class TransaksiPengeluaranController extends Controller
             ->join('produk', 'transaksi_pengeluaran.produk_id', '=', 'produk.id')
             ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
             ->join('users', 'transaksi_pengeluaran.user_id', '=', 'users.id')
+            ->join('cabang', 'transaksi_pengeluaran.cabang_id', '=', 'cabang.id')
             ->select(
                 'transaksi_pengeluaran.id',
                 'transaksi_pengeluaran.nomor_order',
@@ -26,9 +28,11 @@ class TransaksiPengeluaranController extends Controller
                 'transaksi_pengeluaran.total_price',
                 'transaksi_pengeluaran.deskripsi',
                 'transaksi_pengeluaran.produk_id',
+
                 'produk.nama as nama_produk',
                 'kategori.nama as kategori_nama',
-                'users.username as nama_user'
+                'users.username as nama_user',
+                'cabang.nama_cabang as nama_cabang'
             )
             ->get();
 
@@ -45,7 +49,15 @@ class TransaksiPengeluaranController extends Controller
         $users = DB::table('users')->select('id', 'username')->get(); // Add this to get users
         $userRole = Auth::user()->roles->pluck('name')->toArray();
 
-        return view("pages.admin.transaksi-pengeluaran.index", compact("transaksiPengeluaran", "products", "users", 'userRole'));
+        $cabang = Cabang::where('is_deleted', 0)->get();
+
+        return view("pages.admin.transaksi-pengeluaran.index", [
+            "transaksiPengeluaran" => $transaksiPengeluaran,
+            "products" => $products,
+            "users" => $users,
+            "userRole" => $userRole,
+            "cabang" => $cabang,
+        ]);
     }
 
     public function checkStock(Request $request)
@@ -80,6 +92,7 @@ class TransaksiPengeluaranController extends Controller
             'quantity' => 'required|integer|min:1',
             'deskripsi' => 'required|string',
             'order_date' => 'required|date',
+            'cabang_id' => 'required|exists:cabang,id',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -116,8 +129,9 @@ class TransaksiPengeluaranController extends Controller
 
                 DB::table('transaksi_pengeluaran')->insert([
                     'nomor_order' => $newOrderNumber,
-                    'user_id' => $userId,
                     'produk_id' => $request->product_id,
+                    'user_id' => $userId,
+                    'cabang_id' => $request->cabang_id,
                     'quantity' => $request->quantity,
                     'total_price' => $totalPricePerUser,
                     'deskripsi' => $request->deskripsi,

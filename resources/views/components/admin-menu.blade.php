@@ -97,6 +97,19 @@
                     @endif
 
 
+                    @role('admin|manajer')
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('manajemen-cabang.index') ? 'active-bg' : '' }}"
+                                href="{{ route('manajemen-cabang.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-map-pin fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Cabang</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endrole
+
+
 
                     <li class="pb-2">
                         <a class="collapsed links px-2 {{ request()->routeIs('manajemen-transaksi-pengeluaran.index') ? 'active-bg' : '' }}"
@@ -119,6 +132,45 @@
                             </span>
                         </a>
                     </li>
+
+                    @role('akuntan|manajer')
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('laba-rugi.index') ? 'active-bg' : '' }}"
+                                href="{{ route('laba-rugi.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-scales fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Laba Rugi</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('biaya-operasional.index') ? 'active-bg' : '' }}"
+                                href="{{ route('biaya-operasional.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-wallet fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Biaya Operasional</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('biaya-produksi.index') ? 'active-bg' : '' }}"
+                                href="{{ route('biaya-produksi.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-tray fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Biaya Produksi</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="pb-2">
+                            <a class="collapsed links px-2 {{ request()->routeIs('harga-gaji.index') ? 'active-bg' : '' }}"
+                                href="{{ route('harga-gaji.index') }}">
+                                <span class="menu-bar__text d-flex">
+                                    <i class="ph ph-coins fs-4 me-2"></i>
+                                    <span class="menu-bar__name fs-6 fw-medium">Biaya Gaji</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endrole
 
 
                 @endrole
