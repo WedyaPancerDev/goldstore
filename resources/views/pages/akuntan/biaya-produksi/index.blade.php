@@ -114,7 +114,7 @@
                                                                 </div>
                                                             @else
                                                                 <!-- Tombol Aktifkan -->
-                                                                <form action="{{ route('biaya-Produksi.restore', $data->id) }}"
+                                                                <form action="{{ route('biaya-produksi.restore', $data->id) }}"
                                                                     method="POST">
                                                                     @csrf
                                                                     @method('PATCH')
@@ -151,12 +151,23 @@
                                                                         class="d-grid gap-2 d-md-flex justify-content-md-center">
                                                                         <button type="button" class="btn btn-light btn-sm"
                                                                             data-bs-dismiss="modal">Batal</button>
-                                                                        <form action="" method="POST">
+                                                                        <form
+                                                                            action="{{ route('biaya-produksi.destroy', $data->id) }}"
+                                                                            method="POST">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button type="submit"
                                                                                 class="btn btn-danger btn-sm">Iya,
-                                                                                Nonaktifkan!</button>
+                                                                                Hapus!</button>
+                                                                        </form>
+                                                                        <form
+                                                                            action="{{ route('biaya-produksi.deactivate', $data->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            @method('PATCH')
+                                                                            <button type="submit"
+                                                                                class="btn btn-warning btn-sm">Nonaktifkan
+                                                                                saja!</button>
                                                                         </form>
                                                                     </div>
                                                                 </div>
