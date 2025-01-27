@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPengeluaran;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransaksiPengeluaranController extends Controller
 {
@@ -284,6 +287,49 @@ class TransaksiPengeluaranController extends Controller
         return redirect()->route('manajemen-transaksi-pengeluaran.index')->with('success', 'Transaksi berhasil diperbarui');
     }
 
+
+    public function exportExcel()
+    {
+        $transaksiPengeluaran = DB::table('transaksi_pengeluaran')
+            ->join('produk', 'transaksi_pengeluaran.produk_id', '=', 'produk.id')
+            ->join('kategori', 'produk.kategori_id', '=', 'kategori.id')
+            ->join('users', 'transaksi_pengeluaran.user_id', '=', 'users.id')
+            ->join('cabang', 'transaksi_pengeluaran.cabang_id', '=', 'cabang.id')
+            ->select(
+                'cabang.nama_cabang as nama_cabang',
+                'users.username as nama_user',
+                'transaksi_pengeluaran.order_date',
+                'produk.nama as nama_produk',
+                'kategori.nama as kategori_nama',
+                'transaksi_pengeluaran.quantity',
+                'transaksi_pengeluaran.total_price',
+                'transaksi_pengeluaran.deskripsi'
+            )
+            ->get()
+            ->toArray();
+
+        $dateNow = now()->format('Y-m-d_H-i-s');
+        $fileName = "transaksi-pengeluaran-{$dateNow}.xlsx";
+
+        return Excel::download(new class($transaksiPengeluaran) implements FromArray, WithHeadings {
+            protected $data;
+
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return ['Cabang', 'User', 'Order Date', 'Product', 'Category', 'Quantity', 'Total Price', 'Description'];
+            }
+        }, $fileName);
+    }
 
 
 

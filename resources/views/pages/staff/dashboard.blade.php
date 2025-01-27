@@ -7,7 +7,8 @@
     <section class="container container__bscreen mt-4">
         <div class="row mb-3">
             <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-end">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-0">Dashboard</h4>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('staff.root') }}">Dashboard</a></li>
@@ -23,9 +24,16 @@
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="crancy-table-tab-1" role="tabpanel"
                             aria-labelledby="crancy-table-tab-1">
-                            <div class="crancy-table crancy-table--v3 mg-top-30 p-5">
-                                <div class="w-full">
-                                    <canvas id="salesChart"></canvas>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Grafik Target dan Transaksi</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-center"
+                                        style="position: relative; height: 60vh; width: 100%;">
+                                        <canvas id="salesChart"
+                                            style="max-width: 100%; max-height: 100%; width: 100%; height: 100%;"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>

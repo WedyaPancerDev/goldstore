@@ -164,21 +164,24 @@
                                                                 @role('staff')
                                                                     <div class="d-flex gap-2 fw-semibold">
                                                                         <a href="{{ route('export.yearly.pdf.byuser', $target->user_id) }}"
-                                                                            class="btn btn-warning">
-
-                                                                            Laporan Tahunan PDF
+                                                                            class="btn btn-warning btn-sm d-flex gap-2 fw-bold">
+                                                                            <i class="ph ph-printer fs-5"></i> Laporan Tahunan
+                                                                            PDF
                                                                         </a>
                                                                         <a href="{{ route('export.monthly.pdf.byuser', $target->user_id) }}"
-                                                                            class="btn btn-warning">
-                                                                            Laporan Bulanan PDF
+                                                                            class="btn btn-warning btn-sm d-flex gap-2 fw-bold">
+                                                                            <i class="ph ph-printer fs-5"></i> Laporan Bulanan
+                                                                            PDF
                                                                         </a>
                                                                         <a href="{{ route('export.yearly.excel.byuser', $target->user_id) }}"
-                                                                            class="btn btn-success">
-                                                                            Laporan Tahunan Excel
+                                                                            class="btn btn-success btn-sm d-flex gap-2 fw-bold">
+                                                                            <i class="ph ph-printer fs-5"></i> Laporan
+                                                                            Tahunan Excel
                                                                         </a>
                                                                         <a href="{{ route('export.monthly.excel.byuser', $target->user_id) }}"
-                                                                            class="btn btn-success">
-                                                                            Laporan Bulanan Excel
+                                                                            class="btn btn-success btn-sm d-flex gap-2 fw-bold">
+                                                                            <i class="ph ph-printer fs-5"></i> Laporan
+                                                                            Bulanan Excel
                                                                         </a>
                                                                     </div>
                                                                 @endrole

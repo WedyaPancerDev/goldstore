@@ -158,6 +158,8 @@ Route::middleware(['auth'])->group(function () {
             'destroy' => 'manajemen-transaksi-pengeluaran.destroy',
         ]);
 
+
+        Route::get('/export-transaksi-pengeluaran-excel', [TransaksiPengeluaranController::class, 'exportExcel'])->name('export.transaksi-pengeluaran.excel');
         Route::get('/check-stock', [TransaksiPengeluaranController::class, 'checkStock'])->name('check-stock');
     });
 
