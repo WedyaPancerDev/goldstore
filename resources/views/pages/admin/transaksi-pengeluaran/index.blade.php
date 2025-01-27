@@ -9,6 +9,40 @@
 
 @section('css')
 	@include('layouts.datatatables-css')
+	<style>
+		@media print {
+
+			/* Sembunyikan semua elemen */
+			body * {
+				visibility: hidden;
+			}
+
+			/* Hanya tampilkan elemen dalam #printable-area */
+			#printable-area,
+			#printable-area * {
+				visibility: visible;
+			}
+
+			/* Atur posisi area cetak */
+			#printable-area {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+			}
+
+			/* Hilangkan tombol cetak */
+			.no-print {
+				display: none !important;
+			}
+
+			/* Hilangkan kolom aksi */
+			.crancy-table__column-9,
+			.crancy-table__column-9 * {
+				display: none !important;
+			}
+		}
+	</style>
 @endsection
 
 @section('content')
@@ -47,11 +81,22 @@
 					<div class="crancy-table-meta mg-top-30">
 						<div class="crancy-flex-wrap crancy-flex-gap-10 crancy-flex-start">
 							@role('staff|manajer')
-								<button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
-									data-bs-target="#management-transaksi-pengeluaran-create">
-									<i class="ph ph-plus fs-5"></i>
-									Tambah Transaksi Penjualan
-								</button>
+								<div class="d-flex justify-content-between">
+									<div>
+										<button type="button" class="crancy-btn crancy-btn__filter" data-bs-toggle="modal"
+											data-bs-target="#management-transaksi-pengeluaran-create">
+											<i class="ph ph-plus fs-5"></i>
+											Tambah Transaksi Penjualan
+										</button>
+									</div>
+									<div>
+										<button class="btn btn-sm btn-success px-3 d-flex justify-content-center align-items-center gap-2"
+											onclick="printContent()">
+											<i class="ph ph-printer fs-5"></i>
+											Cetak Halaman Ini
+										</button>
+									</div>
+								</div>
 							@endrole
 						</div>
 					</div>
@@ -73,96 +118,98 @@
 								</div>
 
 								{{-- Crancy Table --}}
-								<table id="table-container" class="crancy-table__main crancy-table__main-v3">
-									{{-- crancy Table Head --}}
-									<thead class="crancy-table__head">
-										<tr>
-											<th class="crancy-table__column-1 crancy-table__h2">
-												No
-											</th>
-											<th class="crancy-table__column-2 crancy-table__h2">
-												Nomor Order
-											</th>
-											<th class="crancy-table__column-3 crancy-table__h2">
-												Nama User
-											</th>
-											<th class="crancy-table__column-4 crancy-table__h2">
-												Produk
-											</th>
-											<th class="crancy-table__column-4 crancy-table__h2">
-												Cabang
-											</th>
-											<th class="crancy-table__column-5 crancy-table__h4">
-												Jumlah
-											</th>
-											<th class="crancy-table__column-6 crancy-table__h4">
-												Total
-											</th>
-											<th class="crancy-table__column-7 crancy-table__h5">
-												Deskripsi
-											</th>
-											<th class="crancy-table__column-8 crancy-table__h5">
-												Tanggal Order
-											</th>
-											@if (empty(array_intersect(['akuntan'], $userRole)))
-												@role('admin|akuntan|manajer')
-													<th class="crancy-table__column-9 crancy-table__h5">
-														Aksi
-													</th>
-												@endrole
+								<div id="printable-area">
+									<table id="table-container" class="crancy-table__main crancy-table__main-v3">
+										{{-- crancy Table Head --}}
+										<thead class="crancy-table__head">
+											<tr>
+												<th class="crancy-table__column-1 crancy-table__h2">
+													No
+												</th>
+												<th class="crancy-table__column-2 crancy-table__h2">
+													Nomor Order
+												</th>
+												<th class="crancy-table__column-3 crancy-table__h2">
+													Nama User
+												</th>
+												<th class="crancy-table__column-4 crancy-table__h2">
+													Produk
+												</th>
+												<th class="crancy-table__column-4 crancy-table__h2">
+													Cabang
+												</th>
+												<th class="crancy-table__column-5 crancy-table__h4">
+													Jumlah
+												</th>
+												<th class="crancy-table__column-6 crancy-table__h4">
+													Total
+												</th>
+												<th class="crancy-table__column-7 crancy-table__h5">
+													Deskripsi
+												</th>
+												<th class="crancy-table__column-8 crancy-table__h5">
+													Tanggal Order
+												</th>
+												{{-- @if (empty(array_intersect(['akuntan'], $userRole)))
+													@role('admin|akuntan|manajer')
+														<th class="crancy-table__column-9 crancy-table__h5">
+															Aksi
+														</th>
+													@endrole
+												@endif --}}
+											</tr>
+										</thead>
+										{{-- crancy Table Body --}}
+										<tbody class="crancy-table__body">
+											@if ($transaksiPengeluaran->count() > 0)
+												@foreach ($transaksiPengeluaran as $transaksi)
+													<tr>
+														<td class="crancy-table__column-1 fw-semibold">
+															{{ $loop->iteration }}
+														</td>
+														<td class="crancy-table__column-2 fw-semibold">
+															{{ $transaksi->nomor_order ?? '-' }}
+														</td>
+														<td class="crancy-table__column-3 fw-semibold">
+															{{ $transaksi->nama_user ?? '-' }}
+														</td>
+														<td class="crancy-table__column-4 fw-semibold">
+															{{ $transaksi->nama_produk ?? '-' }}
+														</td>
+														<td class="crancy-table__column-4 fw-semibold">
+															{{ $transaksi->nama_cabang ?? '-' }}
+														</td>
+														<td class="crancy-table__column-5 fw-semibold">
+															{{ $transaksi->quantity ?? '-' }}
+														</td>
+														<td class="crancy-table__column-6 fw-semibold">
+															Rp {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
+														</td>
+														<td class="crancy-table__column-7 fw-semibold">
+															{{ $transaksi->deskripsi ?? '-' }}
+														</td>
+														<td class="crancy-table__column-8tar fw-semibold">
+															{{ $transaksi->order_date ?? '-' }}
+														</td>
+														{{-- @if (empty(array_intersect(['akuntan'], $userRole)))
+															@role('admin|akuntan|manajer')
+																<td class="crancy-table__column-8">
+																	<button type="button"
+																		class="btn-edit btn-cst btn-warning px-2 d-flex align-items-center justify-content-center gap-2"
+																		data-bs-toggle="modal" data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
+																		<i class="ph ph-pencil"></i>
+																		Ubah
+																	</button>
+																</td>
+															@endrole
+														@endif --}}
+													</tr>
+												@endforeach
 											@endif
-										</tr>
-									</thead>
-									{{-- crancy Table Body --}}
-									<tbody class="crancy-table__body">
-										@if ($transaksiPengeluaran->count() > 0)
-											@foreach ($transaksiPengeluaran as $transaksi)
-												<tr>
-													<td class="crancy-table__column-1 fw-semibold">
-														{{ $loop->iteration }}
-													</td>
-													<td class="crancy-table__column-2 fw-semibold">
-														{{ $transaksi->nomor_order ?? '-' }}
-													</td>
-													<td class="crancy-table__column-3 fw-semibold">
-														{{ $transaksi->nama_user ?? '-' }}
-													</td>
-													<td class="crancy-table__column-4 fw-semibold">
-														{{ $transaksi->nama_produk ?? '-' }}
-													</td>
-													<td class="crancy-table__column-4 fw-semibold">
-														{{ $transaksi->nama_cabang ?? '-' }}
-													</td>
-													<td class="crancy-table__column-5 fw-semibold">
-														{{ $transaksi->quantity ?? '-' }}
-													</td>
-													<td class="crancy-table__column-6 fw-semibold">
-														Rp {{ number_format($transaksi->total_price ?? 0, 0, ',', '.') }}
-													</td>
-													<td class="crancy-table__column-7 fw-semibold">
-														{{ $transaksi->deskripsi ?? '-' }}
-													</td>
-													<td class="crancy-table__column-8tar fw-semibold">
-														{{ $transaksi->order_date ?? '-' }}
-													</td>
-													@if (empty(array_intersect(['akuntan'], $userRole)))
-														@role('admin|akuntan|manajer')
-															<td class="crancy-table__column-8">
-																<button type="button"
-																	class="btn-edit btn-cst btn-warning px-2 d-flex align-items-center justify-content-center gap-2"
-																	data-bs-toggle="modal" data-bs-target="#management-transaksi-pengeluaran-edit-{{ $transaksi->id }}">
-																	<i class="ph ph-pencil"></i>
-																	Ubah
-																</button>
-															</td>
-														@endrole
-													@endif
-												</tr>
-											@endforeach
-										@endif
-									</tbody>
-									{{-- End crancy Table Body --}}
-								</table>
+										</tbody>
+										{{-- End crancy Table Body --}}
+									</table>
+								</div>
 								{{-- End crancy Table --}}
 								<div style="text-align: left; margin-left: 50px;">
 									<p style="font-size: 17px; font-weight: bold;">
@@ -388,6 +435,20 @@
 
 	{{-- script modal create --}}
 	<script>
+		function printContent() {
+			const originalContent = document.body.innerHTML;
+
+			const printArea = document.getElementById('printable-area').outerHTML;
+
+			document.body.innerHTML = printArea;
+
+			window.print();
+
+			document.body.innerHTML = originalContent;
+
+			window.location.reload();
+		}
+
 		$(document).ready(function() {
 			let maxUsers = 3;
 
